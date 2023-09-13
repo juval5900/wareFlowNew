@@ -1,0 +1,213 @@
+{% load static %}
+
+{% load socialaccount %}
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>USER REGISTRATION</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--===============================================================================================-->
+		<link rel="icon" type="image/png"
+			href="{% static 'register/images/icons/favicon.ico' %}" />
+		<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'register/vendor/bootstrap/css/bootstrap.min.css' %}">
+		<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'register/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+		<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'register/vendor/animate/animate.css' %}">
+		<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'register/vendor/css-hamburgers/hamburgers.min.css' %}">
+		<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'register/vendor/select2/select2.min.css' %}">
+		<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'register/css/util.css' %}">
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'register/css/main.css' %}">
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'register/css/social-login.css' %}">
+		<!--===============================================================================================-->
+		<link rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+		<style>
+		.error-message {
+			color: red;
+			font-size: 14px;
+			border: 1px solid red;
+			padding: 10px;
+			background-color: #ffe6e6;
+			text-align: center;
+		  }
+		</style>
+
+	</head>
+	<body>
+
+		<script>
+		$(document).ready(function() {
+			const emailInput = $('#email');
+			const usernameInput = $('#username');
+			const emailError = $('#emailError');
+			const usernameError = $('#nameError');
+			
+			emailInput.on('input', function() {
+				const enteredEmail = $(this).val();
+				$.get('/check_email/', { email: enteredEmail }, function(data) {
+					if (enteredEmail && data.exists) {
+						emailError.text('Email already taken');
+					} else {
+						emailError.text('');
+					}
+				});
+			});
+			
+			usernameInput.on('input', function() {
+				const enteredUsername = $(this).val();
+				$.get('/check_username/', { username: enteredUsername }, function(data) {
+					if (enteredUsername && data.exists) {
+						usernameError.text('Username already taken');
+					} else {
+						usernameError.text('');
+					}
+				});
+			});
+	});
+	</script>
+
+		<div class="limiter">
+			<div class="container-login100">
+				<div class="wrap-login100">
+					<div class="login100-pic js-tilt" data-tilt>
+						<img src="{% static 'register/images/img-01.png' %}" alt="IMG">
+					</div>
+
+					<form class="login100-form validate-form" method="post">
+						{%csrf_token %}
+						<span class="login100-form-title">
+							Member Registration
+						</span>
+
+						<div class="wrap-input100 validate-input"
+							data-validate="name should contain only alphabets and must be atleast 3 characters long">
+							<input class="input100" type="text" name="name" placeholder="Name"
+								id="t1">
+							<span class="focus-input100"></span>
+							<span class="symbol-input100">
+								<i class="fa fa-envelope" aria-hidden="true"></i>
+							</span>
+						</div>
+						{% comment %} <div
+							id="t11"></div> {% endcomment %}
+
+						{% comment %} <div class="wrap-input100 validate-input"
+							data-validate="Username should only contain alphanumeric and be at least 3 characters long">
+							<input class="input100" type="text" name="username"
+								placeholder="Username" id="username">
+							<span id="nameError"></span>
+							<span class="focus-input100"></span>
+							<span class="symbol-input100">
+								<i class="fa fa-lock" aria-hidden="true"></i>
+							</span>
+						</div> {% endcomment %}
+						{% comment %} <div
+							id="t21"></div> {% endcomment %}
+
+						<div class="wrap-input100 validate-input"
+							data-validate="Valid email is required: ex@abc.xyz">
+							<input class="input100" type="text" name="email" placeholder="Email"
+								id="email">
+							<span id="emailError"></span>
+							<span class="focus-input100"></span>
+							<span class="symbol-input100">
+								<i class="fa fa-envelope" aria-hidden="true"></i>
+							</span>
+						</div>
+
+						{% comment %} <div
+							id="t31"></div> {% endcomment %}
+
+						<div class="wrap-input100 validate-input"
+							data-validate="Password should contain an uppercase, lowercase, special character, and numeric letter with a minimum length of 5 and maximum length of 12">
+							<input class="input100" type="password" name="pass"
+								placeholder="Password" id="t5">
+							<span class="focus-input100"></span>
+							<span class="symbol-input100">
+								<i class="fa fa-lock" aria-hidden="true"></i>
+							</span>
+						</div>
+
+						{% comment %} <div
+							id="t41"></div> {% endcomment %}
+
+						<div class="wrap-input100 validate-input"
+							data-validate="Confirm password should match with Password">
+							<input class="input100" type="password" name="cpass"
+								placeholder=" Confirm Password" id="t6">
+							<span class="focus-input100"></span>
+							<span class="symbol-input100">
+								<i class="fa fa-lock" aria-hidden="true"></i>
+							</span>
+						</div>
+
+						{% comment %} <div
+							id="t51"></div> {% endcomment %}
+
+						<div class="container-login100-form-btn">
+							<button class="login100-form-btn">
+								SIGNUP
+							</button>
+
+						</div>
+
+						{% for message in messages %}
+						<div class="error-message">{{ message }}</div>
+						{% endfor %}
+						<!-- Your existing HTML code for the registration form -->
+
+						<div class="button-container">
+							<a href="{% provider_login_url 'google'%}" class="social-btn btn-google">
+								<i class="fa fa-google fa-fw"></i>
+							</a>
+							{% comment %} <a href="#" class="social-btn btn-facebook">
+								<i class="fa fa-facebook fa-fw"></i>
+							</a>
+							<a href="#" class="social-btn btn-twitter">
+								<i class="fa fa-twitter fa-fw"></i>
+							</a> {% endcomment %}
+						</div>
+
+					</form>
+
+				</div>
+			</div>
+		</div>
+
+		<!--===============================================================================================-->
+		<script src="{% static 'register/vendor/jquery/jquery-3.2.1.min.js' %}"></script>
+		<!--===============================================================================================-->
+		<script src="{% static 'register/vendor/bootstrap/js/popper.js' %}"></script>
+		<script src="{% static 'register/vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+		<!--===============================================================================================-->
+		<script src="{% static 'register/vendor/select2/select2.min.js' %}"></script>
+		<!--===============================================================================================-->
+		<script src="{% static 'register/vendor/tilt/tilt.jquery.min.js' %}"></script>
+		<script>
+		$('.js-tilt').tilt({
+			scale: 1.1
+		})
+	</script>
+		<!--===============================================================================================-->
+		{% comment %} <script src="{% static 'register/js/main.js' %}"></script> {%endcomment %}
+		<script src="{% static 'register/js/validate.js' %}"></script>
+
+	</body>
+</html>
