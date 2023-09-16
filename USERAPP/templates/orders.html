@@ -17,7 +17,8 @@
     <!-- App CSS -->  
     <link id="theme-style" rel="stylesheet" href="{% static 'assets/css/portal.css' %}">
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="{% static 'assets/js/jspdf.umd.min.js' %}"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
 
 
 	<style>
@@ -351,41 +352,47 @@
 
 				<div id="orderFormPopup" class="popup" action="">
 					<h2>Add Order</h2>
-					<form method="post" action="{% url 'add_orders' %}" enctype="multipart/form-data">
-						{% csrf_token %}
-						<div class="form-group">
-							<label for="product">Product:</label>
-							<select id="product" name="product" class="form-control">
-								<option value="" disabled selected>Select</option>
-								{% for Product in products %}
-								<option value="{{ Product.product_id }}">{{ Product.product_name }}</option>
-								{% endfor %}
-							</select>
-						</div>
-						<div class="form-group">
-							<label for="supplier">Supplier:</label>
-							<select id="supplier" name="supplier" class="form-control">
-								<option value="" disabled selected>Select</option>
-								{% for Supplier in suppliers %}
-								<option value="{{ Supplier.supplier_id }}">{{ Supplier.supplier_name }}</option>
-								{% endfor %}
-							</select>
-						</div>
-						<!-- Replace orderstatus field with a hidden input -->
-						<input type="hidden" name="orderstatus" value="Order Placed">
-						<div class="form-group">
-							<label for="warehouse">Warehouse:</label>
-							<input type="text" id="warehouse" name="warehouse" class="form-control">
-						</div>
-						<div class="form-group">
-							<label for="quantity">Quantity:</label>
-							<input type="number" id="quantity" name="quantity" class="form-control">
-						</div>
-						<input type="submit" value="Add" class="btn btn-primary">
-						<button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
+					<form method="post" enctype="multipart/form-data" id="add-order-form">
+					  {% csrf_token %}
+				  
+					  <input type="hidden" id="order-id" name="order-id">
+					  <div class="form-group">
+						<label for="product">Product:</label>
+						<select id="product" name="product" class="form-control">
+						  <option value="" disabled selected>Select</option>
+						  {% for Product in products %}
+						  <option value="{{ Product.product_id }}">{{ Product.product_name }}</option>
+						  {% endfor %}
+						</select>
+						<span id="product-error" class="error text-danger"></span> <!-- Error message for Product -->
+					  </div>
+					  <div class="form-group">
+						<label for="supplier">Supplier:</label>
+						<select id="supplier" name="supplier" class="form-control">
+						  <option value="" disabled selected>Select</option>
+						  {% for Supplier in suppliers %}
+						  <option value="{{ Supplier.supplier_id }}">{{ Supplier.supplier_name }}</option>
+						  {% endfor %}
+						</select>
+						<span id="supplier-error" class="error text-danger"></span> <!-- Error message for Supplier -->
+					  </div>
+					  <!-- Replace orderstatus field with a hidden input -->
+					  <input type="hidden" name="orderstatus" value="Order Placed">
+					  <div class="form-group">
+						<label for="warehouse">Warehouse:</label>
+						<input type="text" id="warehouse" name="warehouse" class="form-control">
+						<span id="warehouse-error" class="error text-danger"></span> <!-- Error message for Warehouse -->
+					  </div>
+					  <div class="form-group">
+						<label for="quantity">Quantity:</label>
+						<input type="number" id="quantity" name="quantity" class="form-control">
+						<span id="quantity-error" class="error text-danger"></span> <!-- Error message for Quantity -->
+					  </div>
+					  <input type="submit" value="Add" class="btn btn-primary">
+					  <button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
 					</form>
-				</div>
-				
+				  </div>
+				  
                 
                 <script>
                     const showFormButton = document.getElementById('showFormButton');
@@ -401,13 +408,6 @@
                     });
 					
                 </script>
-			    
-			    {% comment %} <nav id="orders-table-tab" class="orders-table-tab app-nav-tabs nav shadow-sm flex-column flex-sm-row mb-4">
-				    <a class="flex-sm-fill text-sm-center nav-link active" id="orders-all-tab" data-bs-toggle="tab" href="#orders-all" role="tab" aria-controls="orders-all" aria-selected="true">All</a>
-				    <a class="flex-sm-fill text-sm-center nav-link"  id="orders-paid-tab" data-bs-toggle="tab" href="#orders-paid" role="tab" aria-controls="orders-paid" aria-selected="false">Paid</a>
-				    <a class="flex-sm-fill text-sm-center nav-link" id="orders-pending-tab" data-bs-toggle="tab" href="#orders-pending" role="tab" aria-controls="orders-pending" aria-selected="false">Pending</a>
-				    <a class="flex-sm-fill text-sm-center nav-link" id="orders-cancelled-tab" data-bs-toggle="tab" href="#orders-cancelled" role="tab" aria-controls="orders-cancelled" aria-selected="false">Cancelled</a>
-				</nav> {% endcomment %}
 				
 				
 				<div class="tab-content" id="orders-table-tab-content">
@@ -497,62 +497,7 @@
 					</div>
 				</div>
 				
-
-
-
-				<div id="orderFormPopupupdate" class="popup">
-					<h2 class="mb-4">Update Order</h2>
-					<form method="post" enctype="multipart/form-data" id="update-order-form">
-						{% csrf_token %}
-						<!-- Add a hidden input field for order ID -->
-						<input type="hidden" id="order-id" name="order-id">
-				
-						<!-- Product -->
-						<div class="form-group">
-							<label for="productupdate">Product:</label>
-							<select id="productupdate" name="productupdate" class="form-control">
-								<option value="" disabled selected>Select</option>
-								{% for Product in products %}
-								<option value="{{ Product.product_id }}">{{ Product.product_name }}</option>
-								{% endfor %}
-							</select>
-						</div>
-				
-						<!-- Supplier -->
-						<div class="form-group">
-							<label for="supplierupdate">Supplier:</label>
-							<select id="supplierupdate" name="supplierupdate" class="form-control">
-								<option value="" disabled selected>Select</option>
-								{% for Supplier in suppliers %}
-								<option value="{{ Supplier.supplier_id }}">{{ Supplier.supplier_name }}</option>
-								{% endfor %}
-							</select>
-						</div>
-				
-						<!-- Order Status (Hidden Input) -->
-						<input type="hidden" id="orderstatusupdate" name="orderstatusupdate">
-				
-						<!-- Warehouse -->
-						<div class="form-group">
-							<label for="warehouseupdate">Warehouse:</label>
-							<input type="text" id="warehouseupdate" name="warehouseupdate" class="form-control">
-						</div>
-				
-						<!-- Quantity -->
-						<div class="form-group">
-							<label for="quantityupdate">Quantity:</label>
-							<input type="number" id="quantityupdate" name="quantityupdate" class="form-control">
-						</div>
-				
-						<!-- Buttons -->
-						<div class="form-group">
-							<input type="submit" value="Update" class="btn btn-primary">
-							<button type="button" id="cancelupdateButton" class="btn btn-secondary">Cancel</button>
-						</div>
-					</form>
-				</div>
-				
-		
+	
 		
 <script>
     $(document).ready(function () {
@@ -770,10 +715,10 @@
 
                     
                     //document.getElementById("orderImageupdate").value = orderData.order_name;
-					document.getElementById("productupdate").value = orderData.product_id;
-					document.getElementById("supplierupdate").value = orderData.supplier_id;
-					document.getElementById("warehouseupdate").value = orderData.warehouse;
-					document.getElementById("quantityupdate").value = orderData.quantity;
+					document.getElementById("product").value = orderData.product_id;
+					document.getElementById("supplier").value = orderData.supplier_id;
+					document.getElementById("warehouse").value = orderData.warehouse;
+					document.getElementById("quantity").value = orderData.quantity;
 
 					// Optionally, you can add logging to verify the data
 					console.log("order Data:", orderData);
@@ -791,14 +736,14 @@
         // Add an event listener for the update form
         const updateButtons = document.querySelectorAll('.update-order');
         
-        const orderFormPopupupdate = document.getElementById('orderFormPopupupdate');
-        const cancelupdateButton = document.getElementById('cancelupdateButton');
+        const orderFormPopup = document.getElementById('orderFormPopup');
+        const cancelupdateButton = document.getElementById('cancelButton');
 
         
 
         updateButtons.forEach(button => {
             button.addEventListener('click', () => {
-                orderFormPopupupdate.style.display = 'block';
+                orderFormPopup.style.display = 'block';
                 
                 const orderId = button.getAttribute('data-order-id');
                 document.getElementById('order-id').value = orderId;
@@ -806,8 +751,9 @@
             });
         });
 
-        cancelupdateButton.addEventListener('click', () => {
-            orderFormPopupupdate.style.display = 'none';
+        cancelButton.addEventListener('click', () => {
+            orderFormPopup.style.display = 'none';
+			window.location.href = "/list_orders/";
         });
 
 
@@ -833,7 +779,7 @@
 		}
    
 
-        const updateorderForm = document.getElementById("update-order-form");
+        const updateorderForm = document.getElementById("add-order-form");
 
         updateorderForm.addEventListener("submit", function (e) {
             e.preventDefault();
@@ -844,9 +790,19 @@
             // Extract the order_id from the form or data attributes
             const orderId = document.getElementById("order-id").value;
 
+
+			let baseUrl =  `/add_orders/`;
+
+							if (orderId) {
+								// If productId is not null, append it to the base URL
+								baseUrl =  `/update_order/${orderId}/`;
+							}
             // Send an AJAX request to the update URL
             $.ajax({
-                url: `/update_order/${orderId}/`,
+				headers: {
+					'X-CSRFToken': csrfToken
+				},
+                url: baseUrl,
                 method: "POST",
                 data: formData,
                 processData: false,
@@ -864,9 +820,7 @@
 			
         });
 
-		document.getElementById('generate-pdf-btn').addEventListener('click', function () {
-			generatePDF();
-		  });
+		
 		
 		  function generatePDF() {
 			const pdf = new jsPDF();
@@ -894,6 +848,85 @@
 			pdf.save('order_report.pdf');
 		  }
 			
+		  document.getElementById('generate-pdf-btn').addEventListener('click', function () {
+			generatePDF();
+		  });
+
+
+		  const orderForm = document.getElementById("add-order-form");
+		  const productSelect = document.getElementById("product");
+		  const supplierSelect = document.getElementById("supplier");
+		  const warehouseInput = document.getElementById("warehouse");
+		  const quantityInput = document.getElementById("quantity");
+		
+		  // Function to validate the "Product" field
+		  function validateProduct() {
+			const selectedProductValue = productSelect.value;
+			const productError = document.getElementById("product-error");
+			if (selectedProductValue === "") {
+			  productError.textContent = "Please select a product.";
+			} else {
+			  productError.textContent = "";
+			}
+		  }
+		
+		  // Function to validate the "Supplier" field
+		  function validateSupplier() {
+			const selectedSupplierValue = supplierSelect.value;
+			const supplierError = document.getElementById("supplier-error");
+			if (selectedSupplierValue === "") {
+			  supplierError.textContent = "Please select a supplier.";
+			} else {
+			  supplierError.textContent = "";
+			}
+		  }
+		
+		  // Function to validate the warehouse field (only alphabets and numbers, no spaces or special symbols)
+		  function validateWarehouse() {
+			const warehouseValue = warehouseInput.value;
+			const warehouseError = document.getElementById("warehouse-error");
+			const warehouseRegex = /^[A-Za-z0-9]+$/;
+			if (!warehouseRegex.test(warehouseValue)) {
+			  warehouseError.textContent = "Warehouse field must contain only alphabets and numbers.";
+			} else {
+			  warehouseError.textContent = "";
+			}
+		  }
+		
+		  // Function to validate the quantity field (only numerical values)
+		  function validateQuantity() {
+			const quantityValue = quantityInput.value;
+			const quantityError = document.getElementById("quantity-error");
+			if (!/^\d+$/.test(quantityValue)) {
+			  quantityError.textContent = "Quantity field must contain only numerical values.";
+			} else {
+			  quantityError.textContent = "";
+			}
+		  }
+		
+		  // Add input event listeners to trigger field validation on input
+		  productSelect.addEventListener("input", validateProduct);
+		  supplierSelect.addEventListener("input", validateSupplier);
+		  warehouseInput.addEventListener("input", validateWarehouse);
+		  quantityInput.addEventListener("input", validateQuantity);
+		
+		  // Add submit event listener to prevent form submission if there are errors
+		  orderForm.addEventListener("submit", function (e) {
+			// Call validation functions before form submission
+			validateProduct();
+			validateSupplier();
+			validateWarehouse();
+			validateQuantity();
+		
+			// Check for any error messages
+			const errorMessages = document.querySelectorAll(".error");
+			for (const errorMessage of errorMessages) {
+			  if (errorMessage.textContent) {
+				e.preventDefault(); // Prevent form submission if there are errors
+				return;
+			  }
+			}
+		  });
 	});
 </script>
 

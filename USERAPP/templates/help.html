@@ -387,24 +387,27 @@
 	
 					<div id="storageLocationFormPopup" class="popup" action="">
 						<h2>Add Order</h2>
-						<form method="post" action="{% url 'add_storage' %}" enctype="multipart/form-data">
+						<form method="post" action="{% url 'add_storage' %}" enctype="multipart/form-data" id="storage-form">
 							{% csrf_token %}
 							<div class="form-group">
 								<label for="location_name">Location:</label>
 								<input type="text" id="location_name" name="location_name" class="form-control">
+								<span class="error-message" id="location-error"></span>
 							</div>
 							<div class="form-group">
 								<label for="row_capacity">Row Capacity:</label>
 								<input type="number" id="row_capacity" name="row_capacity" class="form-control">
+								<span class="error-message" id="row-capacity-error"></span>
 							</div>
-
 							<div class="form-group">
 								<label for="column_capacity">Column Capacity:</label>
 								<input type="number" id="column_capacity" name="column_capacity" class="form-control">
+								<span class="error-message" id="column-capacity-error"></span>
 							</div>
 							<div class="form-group">
 								<label for="description">Description:</label>
-								<input type="number" id="description" name="description" class="form-control">
+								<input type="text" id="description" name="description" class="form-control">
+								<span class="error-message" id="description-error"></span>
 							</div>
 							<input type="submit" value="Add" class="btn btn-primary">
 							<button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
@@ -623,7 +626,107 @@
 			
 				// Save the PDF as a file
 				pdf.save('order_report.pdf');
-			  }
+			}
+
+
+			function validateLocation(location) {
+				const regex = /^[a-zA-Z\s]+$/;
+				return regex.test(location);
+			}
+		
+			// Function to validate the row and column capacity fields
+			function validateCapacity(capacity) {
+				const regex = /^[0-9]+$/;
+				return regex.test(capacity);
+			}
+		
+			// Function to validate the form fields
+			function validateForm() {
+				const locationInput = document.getElementById('location_name');
+				const rowCapacityInput = document.getElementById('row_capacity');
+				const columnCapacityInput = document.getElementById('column_capacity');
+				const descriptionInput = document.getElementById('description');
+				const locationError = document.getElementById('location-error');
+				const rowCapacityError = document.getElementById('row-capacity-error');
+				const columnCapacityError = document.getElementById('column-capacity-error');
+				const descriptionError = document.getElementById('description-error');
+				let isValid = true;
+		
+				if (!validateLocation(locationInput.value)) {
+					locationError.innerText = 'Location can only contain alphabets and spaces.';
+					isValid = false;
+				} else {
+					locationError.innerText = '';
+				}
+		
+				if (!validateCapacity(rowCapacityInput.value)) {
+					rowCapacityError.innerText = 'Row Capacity must be a number.';
+					isValid = false;
+				} else {
+					rowCapacityError.innerText = '';
+				}
+		
+				if (!validateCapacity(columnCapacityInput.value)) {
+					columnCapacityError.innerText = 'Column Capacity must be a number.';
+					isValid = false;
+				} else {
+					columnCapacityError.innerText = '';
+				}
+		
+				if (!validateLocation(descriptionInput.value)) {
+					descriptionError.innerText = 'Description can only contain alphabets and spaces.';
+					isValid = false;
+				} else {
+					descriptionError.innerText = '';
+				}
+		
+				return isValid;
+			}
+		
+			const storageForm = document.getElementById('storage-form');
+			storageForm.addEventListener('submit', function (event) {
+				if (!validateForm()) {
+					event.preventDefault(); // Prevent form submission if validation fails
+				}
+			});
+		
+			// Real-time validation on input
+			const locationInput = document.getElementById('location_name');
+			const rowCapacityInput = document.getElementById('row_capacity');
+			const columnCapacityInput = document.getElementById('column_capacity');
+			const descriptionInput = document.getElementById('description');
+		
+			locationInput.addEventListener('input', function () {
+				if (!validateLocation(this.value)) {
+					document.getElementById('location-error').innerText = 'Location can only contain alphabets and spaces.';
+				} else {
+					document.getElementById('location-error').innerText = '';
+				}
+			});
+		
+			rowCapacityInput.addEventListener('input', function () {
+				if (!validateCapacity(this.value)) {
+					document.getElementById('row-capacity-error').innerText = 'Row Capacity must be a number.';
+				} else {
+					document.getElementById('row-capacity-error').innerText = '';
+				}
+			});
+		
+			columnCapacityInput.addEventListener('input', function () {
+				if (!validateCapacity(this.value)) {
+					document.getElementById('column-capacity-error').innerText = 'Column Capacity must be a number.';
+				} else {
+					document.getElementById('column-capacity-error').innerText = '';
+				}
+			});
+		
+			descriptionInput.addEventListener('input', function () {
+				if (!validateLocation(this.value)) {
+					document.getElementById('description-error').innerText = 'Description can only contain alphabets and spaces.';
+				} else {
+					document.getElementById('description-error').innerText = '';
+				}
+			});
 				
 		});
 	</script>

@@ -72,25 +72,3 @@ sidePanelDrop.addEventListener('click', (e) => {
 
 
 /* ====== Mobile search ======= */
-const searchMobileTrigger = document.querySelector('.search-mobile-trigger');
-const searchBox = document.querySelector('.app-search-box');
-
-searchMobileTrigger.addEventListener('click', () => {
-
-	searchBox.classList.toggle('is-visible');
-	
-	let searchMobileTriggerIcon = document.querySelector('.search-mobile-trigger-icon');
-	
-	if(searchMobileTriggerIcon.classList.contains('fa-magnifying-glass')) {
-		searchMobileTriggerIcon.classList.remove('fa-magnifying-glass');
-		searchMobileTriggerIcon.classList.add('fa-xmark');
-	} else {
-		searchMobileTriggerIcon.classList.remove('fa-xmark');
-		searchMobileTriggerIcon.classList.add('fa-magnifying-glass');
-	}
-	
-		
-	
-});
-
-

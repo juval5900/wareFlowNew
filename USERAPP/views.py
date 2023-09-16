@@ -16,6 +16,7 @@ from .forms import UserProfileForm
 from django.views import View  
 from django.db import transaction
 from django import forms
+from datetime import date, timedelta
 
 
 
@@ -171,19 +172,19 @@ def update_product(request, product_id):
         product = get_object_or_404(Product, product_id=product_id)
 
         # Process the form data
-        product.product_name = request.POST.get('productNameupdate')
-        product.category_id = request.POST.get('categoryupdate')
-        product.subcategory_id = request.POST.get('subcategoryupdate')
+        product.product_name = request.POST.get('productName')
+        product.category_id = request.POST.get('category')
+        product.subcategory_id = request.POST.get('subcategory')
         #product.buying_price = request.POST.get('buyingPriceupdate')
-        product.quantity = request.POST.get('quantityupdate')
+        product.quantity = request.POST.get('quantity')
         #product.unit = request.POST.get('unitupdate')
         #product.expiry_date = request.POST.get('expiryDateupdate')
-        product.threshold_value = request.POST.get('thresholdValueupdate')
+        product.threshold_value = request.POST.get('thresholdValue')
         
         
         # Check if a new product image is provided
-        if request.FILES.get('productImageupdate'):
-            product.product_image = request.FILES['productImageupdate']
+        if request.FILES.get('productImage'):
+            product.product_image = request.FILES['productImage']
 
         # Save the updated product
         product.save()
@@ -284,15 +285,15 @@ def update_supplier(request, supplier_id):
         supplier = get_object_or_404(Supplier, supplier_id=supplier_id)
 
         # Process the form data
-        supplier.supplier_name = request.POST['supplierNameupdate']
-        supplier.supplier_address = request.POST['supplierAddressupdate']
-        supplier.contact_number = request.POST['contactNumberupdate']
-        supplier.supplier_email= request.POST['supplieremailupdate']
-        supplier.supplier_type = request.POST['supplierTypeupdate']
-        supplier.supplier_image = request.FILES['supplierImageupdate']
+        supplier.supplier_name = request.POST['supplierName']
+        supplier.supplier_address = request.POST['supplierAddress']
+        supplier.contact_number = request.POST['contactNumber']
+        supplier.supplier_email= request.POST['supplieremail']
+        supplier.supplier_type = request.POST['supplierType']
+        supplier.supplier_image = request.FILES['supplierImage']
         # Check if a new supplier image is provided
-        if request.FILES.get('supplierImageupdate'):
-            supplier.supplier_image = request.FILES['supplierImageupdate']
+        if request.FILES.get('supplierImage'):
+            supplier.supplier_image = request.FILES['supplierImage']
 
         # Save the updated supplier
         supplier.save()
@@ -401,7 +402,7 @@ def cancel_order(request, order_id):
         order = Orders.objects.get(pk=order_id)
         order.order_status = 'cancelled'  # Set the order_status to "cancelled"
         order.save()  # Save the changes to the order
-        order.soft_delete()
+        #order.soft_delete()
 
         return JsonResponse({'message': 'Order has been cancelled successfully'})
     except Orders.DoesNotExist:
@@ -424,10 +425,10 @@ def update_order(request, order_id):
         order = get_object_or_404(Orders, order_id=order_id)
 
         # Process the form data
-        order.product_id = request.POST['productupdate']
-        order.supplier_id = request.POST['supplierupdate']
-        order.warehouse = request.POST['warehouseupdate']
-        order.quantity= request.POST['quantityupdate']
+        order.product_id = request.POST['product']
+        order.supplier_id = request.POST['supplier']
+        order.warehouse = request.POST['warehouse']
+        order.quantity= request.POST['quantity']
 
         # Save the updated order
         order.save()
@@ -520,12 +521,21 @@ def profile_view(request):
             profile_picture_form.save()
 
         # Extract first name and last name from the full name
+        
+        
         full_name = request.POST.get('nameupdate', '')
-        if 'nameupdate' in request.POST:
+
+        if ' ' in full_name:
+            # Split the full name into first name and last name
             first_name, last_name = full_name.split(' ', 1)
             user.first_name = first_name
             user.last_name = last_name
-            user.save()
+        else:
+            # If there is no space, consider the whole name as the first name
+            user.first_name = full_name
+            user.last_name = ''
+
+        user.save()
 
         # Update user profile fields
         if request.POST.get('dobupdate'):
@@ -546,6 +556,7 @@ def profile_view(request):
             user_profile.addressline2 = request.POST.get('adrlupdate')
         if request.POST.get('pinupdate'):
             user_profile.pin_code = request.POST.get('pinupdate')
+            
 
         with transaction.atomic():
             user.save()
@@ -553,9 +564,13 @@ def profile_view(request):
         return redirect('profile_view')
 
     user_profile.date_of_birth = user_profile.date_of_birth.strftime('%Y-%m-%d') if user_profile.date_of_birth else ''
+    sixteen_years_ago = date.today() - timedelta(days=16*365)
+    sixtyfive_years_ago = date.today() - timedelta(days=65*365)
     context = {
         'user': user,
         'user_profile': user_profile,
+        'sixteen_years_ago': sixteen_years_ago.strftime('%Y-%m-%d'),  # Format the date as YYYY-MM-DD
+        'sixtyfive_years_ago': sixtyfive_years_ago.strftime('%Y-%m-%d'),
         'profile_picture_form': ProfilePictureForm(instance=user_profile),  # Pass the form to the template
     }
     return render(request, 'account.html', context)
@@ -563,9 +578,9 @@ def profile_view(request):
 
 
 def list_storage(request):
-    active_orders = Orders.objects.filter(is_active=True).order_by('order_id')
+    delivered_orders = Orders.objects.filter(order_status="Delivered", is_stored=False).order_by('order_id')
     orders_per_page = 12
-    paginator = Paginator(active_orders, orders_per_page)
+    paginator = Paginator(delivered_orders, orders_per_page)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     storagelocations=StorageLocation.objects.all()

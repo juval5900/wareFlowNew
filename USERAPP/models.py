@@ -151,4 +151,4 @@ class ProductLocation(models.Model):
         self.save()
 
     def __str__(self):
-        return f"{self.product.product_name} - {self.storage_location.location_name}"
+        return f"{self.storage_location.location_name} ({self.quantity})"
