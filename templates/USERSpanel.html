@@ -1,0 +1,904 @@
+{% load static  %}
+
+<!DOCTYPE html>
+<html lang="en"> 
+<head>
+    <title>WAREFLOW</title>
+    
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     
+    
+    <!-- FontAwesome JS-->
+	<script defer src="{% static 'assets/plugins/fontawesome/js/all.min.js' %}"></script>
+
+    
+    <!-- App CSS -->  
+    <link id="theme-style" rel="stylesheet" href="{% static 'assets/css/portal.css' %}">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="{% static 'assets/js/jspdf.umd.min.js' %}"></script>
+
+
+	<style>
+        /* Add your CSS styling here */
+        /* This is just a basic example */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+			z-index: 9999;
+        }
+    </style>
+
+</head> 
+
+<body class="app">   	
+    <header class="app-header fixed-top">	   	            
+        <div class="app-header-inner">  
+	        <div class="container-fluid py-2">
+		        <div class="app-header-content"> 
+		            <div class="row justify-content-between align-items-center">
+			        
+				    <div class="col-auto">
+					    <a id="sidepanel-toggler" class="sidepanel-toggler d-inline-block d-xl-none" href="#">
+						    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" role="img"><title>Menu</title><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg>
+					    </a>
+				    </div><!--//col-->		            
+		            <div class="app-utilities col-auto ml-auto">
+			            <div class="app-utility-item app-notifications-dropdown dropdown">    
+				            <a class="dropdown-toggle no-toggle-arrow" id="notifications-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" title="Notifications">
+					            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+					            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bell icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2z"/>
+  <path fill-rule="evenodd" d="M8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+</svg>
+					            <span class="icon-badge">3</span>
+					        </a><!--//dropdown-toggle-->
+					        
+					        <div class="dropdown-menu p-0" aria-labelledby="notifications-dropdown-toggle">
+					            <div class="dropdown-menu-header p-3">
+						            <h5 class="dropdown-menu-title mb-0">Notifications</h5>
+						        </div><!--//dropdown-menu-title-->
+						        <div class="dropdown-menu-content">
+							       <div class="item p-3">
+								        <div class="row gx-2 justify-content-between align-items-center">
+									        <div class="col-auto">
+										       <img class="profile-image" src="{% static 'assets/images/profiles/profile-1.png' %}" alt="">
+									        </div><!--//col-->
+									        <div class="col">
+										        <div class="info"> 
+											        <div class="desc">Amy shared a file with you. Lorem ipsum dolor sit amet, consectetur adipiscing elit. </div>
+											        <div class="meta"> 2 hrs ago</div>
+										        </div>
+									        </div><!--//col--> 
+								        </div><!--//row-->
+								        <a class="link-mask" href={% url 'notifications' %}></a>
+							       </div><!--//item-->
+							       <div class="item p-3">
+								        <div class="row gx-2 justify-content-between align-items-center">
+									        <div class="col-auto">
+										        <div class="app-icon-holder">
+											        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-receipt" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+	  <path fill-rule="evenodd" d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27zm.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0l-.509-.51z"/>
+	  <path fill-rule="evenodd" d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5z"/>
+	</svg>
+										        </div>
+									        </div><!--//col-->
+									        <div class="col">
+										        <div class="info"> 
+											        <div class="desc">You have a new invoice. Proin venenatis interdum est.</div>
+											        <div class="meta"> 1 day ago</div>
+										        </div>
+									        </div><!--//col-->
+								        </div><!--//row-->
+								        <a class="link-mask" href={% url 'notifications' %}></a>
+							       </div><!--//item-->
+							       <div class="item p-3">
+								        <div class="row gx-2 justify-content-between align-items-center">
+									        <div class="col-auto">
+										        <div class="app-icon-holder icon-holder-mono">
+											        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bar-chart-line" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path fill-rule="evenodd" d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-5 0v-3H2v3h2z"/>
+</svg>
+										        </div>
+									        </div><!--//col-->
+									        <div class="col">
+										        <div class="info"> 
+											        <div class="desc">Your report is ready. Proin venenatis interdum est.</div>
+											        <div class="meta"> 3 days ago</div>
+										        </div>
+									        </div><!--//col-->
+								        </div><!--//row-->
+								        <a class="link-mask" href={% url 'notifications' %}></a>
+							       </div><!--//item-->
+							       <div class="item p-3">
+								        <div class="row gx-2 justify-content-between align-items-center">
+									        <div class="col-auto">
+										       <img class="profile-image" src="{% static 'assets/images/profiles/profile-2.png' %}" alt="">
+									        </div><!--//col-->
+									        <div class="col">
+										        <div class="info"> 
+											        <div class="desc">James sent you a new message.</div>
+											        <div class="meta"> 7 days ago</div>
+										        </div>
+									        </div><!--//col--> 
+								        </div><!--//row-->
+								        <a class="link-mask" href={% url 'notifications' %}></a>
+							       </div><!--//item-->
+						        </div><!--//dropdown-menu-content-->
+						        
+						        <div class="dropdown-menu-footer p-2 text-center">
+							        <a href={% url 'notifications' %}>View all</a>
+						        </div>
+															
+							</div><!--//dropdown-menu-->					        
+				        </div><!--//app-utility-item-->
+			            <div class="app-utility-item">
+				            <a href={% url 'settings' %} title="Settings">
+					            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+					            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-gear icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+  <path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"/>
+  <path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z"/>
+</svg>
+					        </a>
+					    </div><!--//app-utility-item-->
+			            
+			            <div class="app-utility-item app-user-dropdown dropdown">
+							<a class="dropdown-toggle" id="user-dropdown-toggle"
+								data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+								<img src="{% if request.session.profile_picture_url %}{{ request.session.profile_picture_url }}{% else %}{% static 'assets/images/user.png' %}{% endif %}" alt="user profile">
+							</a>
+							<ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
+								<li><span class="dropdown-item">{{ request.session.name }}</span></li>
+								<li><a class="dropdown-item" href={% url 'profile_view' %}>Account</a></li>
+								<li><a class="dropdown-item" href={% url 'settings' %}>Settings</a></li>
+								<li><hr class="dropdown-divider"></li>
+								<li><a class="dropdown-item" href={% url 'loggout' %}>Log Out</a></li>
+							</ul>
+						</div><!--//app-user-dropdown-->
+		            </div><!--//app-utilities-->
+		        </div><!--//row-->
+	            </div><!--//app-header-content-->
+	        </div><!--//container-fluid-->
+        </div><!--//app-header-inner-->
+        <div id="app-sidepanel" class="app-sidepanel sidepanel-hidden"> 
+	        <div id="sidepanel-drop" class="sidepanel-drop"></div>
+	        <div class="sidepanel-inner d-flex flex-column">
+		        <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
+		        <div class="app-branding">
+		            <a class="app-logo" href={% url 'index' %}><img class="logo-icon me-2" src="{% static 'assets/images/app-logo.svg' %}" alt="logo"><span class="logo-text">WAREFLOW</span></a>
+	
+		        </div><!--//app-branding-->  
+			    <nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
+				    <ul class="app-menu list-unstyled accordion" id="menu-accordion">
+					    <li class="nav-item">
+							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+							<a class="nav-link" href="{% url 'adminindex' %}">
+								<span class="nav-icon">
+									<svg width="1em" height="1em" viewBox="0 0 16 16"
+										class="bi bi-house-door" fill="currentColor"
+										xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd"
+											d="M7.646 1.146a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 .146.354v7a.5.5 0 0 1-.5.5H9.5a.5.5 0 0 1-.5-.5v-4H7v4a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .146-.354l6-6zM2.5 7.707V14H6v-4a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4h3.5V7.707L8 2.207l-5.5 5.5z" />
+										<path fill-rule="evenodd"
+											d="M13 2.5V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
+									</svg>
+								</span>
+								<span class="nav-link-text">Dashboard</span>
+							</a><!--//nav-link-->
+						</li><!--//nav-item-->
+						<li class="nav-item">
+							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+							<a class="nav-link active" href={% url 'userspanel' %}>
+								<span class="nav-icon svg-icon svg-icon-primary svg-icon-2x"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo8/dist/../src/media/svg/icons/Shopping/Cart1.svg--><svg
+										xmlns="http://www.w3.org/2000/svg"
+										xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px"
+										viewBox="0 0 24 24" version="1.1">
+										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+											<rect x="0" y="0" width="24" height="24" />
+											<path
+												d="M18.1446364,11.84388 L17.4471627,16.0287218 C17.4463569,16.0335568 17.4455155,16.0383857 17.4446387,16.0432083 C17.345843,16.5865846 16.8252597,16.9469884 16.2818833,16.8481927 L4.91303792,14.7811299 C4.53842737,14.7130189 4.23500006,14.4380834 4.13039941,14.0719812 L2.30560137,7.68518803 C2.28007524,7.59584656 2.26712532,7.50338343 2.26712532,7.4104669 C2.26712532,6.85818215 2.71484057,6.4104669 3.26712532,6.4104669 L16.9929851,6.4104669 L17.606173,3.78251876 C17.7307772,3.24850086 18.2068633,2.87071314 18.7552257,2.87071314 L20.8200821,2.87071314 C21.4717328,2.87071314 22,3.39898039 22,4.05063106 C22,4.70228173 21.4717328,5.23054898 20.8200821,5.23054898 L19.6915238,5.23054898 L18.1446364,11.84388 Z"
+												fill="#000000" opacity="0.3" />
+											<path
+												d="M6.5,21 C5.67157288,21 5,20.3284271 5,19.5 C5,18.6715729 5.67157288,18 6.5,18 C7.32842712,18 8,18.6715729 8,19.5 C8,20.3284271 7.32842712,21 6.5,21 Z M15.5,21 C14.6715729,21 14,20.3284271 14,19.5 C14,18.6715729 14.6715729,18 15.5,18 C16.3284271,18 17,18.6715729 17,19.5 C17,20.3284271 16.3284271,21 15.5,21 Z"
+												fill="#000000" />
+										</g>
+									</svg><!--end::Svg Icon--></span>
+								<span class="nav-link-text">USERS</span>
+							</a><!--//nav-link-->
+						</li><!--//nav-item-->
+						<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+						<li class="nav-item">
+							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+							<a class="nav-link" href="#">
+								<span class="nav-icon">
+									<svg width="1em" height="1em" viewBox="0 0 16 16"
+										class="bi bi-bar-chart-line" fill="currentColor"
+										xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd"
+											d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-5 0v-3H2v3h2z" />
+									</svg>
+								</span>
+								<span class="nav-link-text">Charts</span>
+							</a><!--//nav-link-->
+						</li><!--//nav-item-->
+
+						<li class="nav-item">
+							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+							<a class="nav-link" href="#">
+								<span class="nav-icon">
+									<svg style="color: rgb(75, 74, 73);" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16"> <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" fill="#4b4a49"></path> <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z" fill="#4b4a49"></path> </svg>
+								</span>
+								<span class="nav-link-text">Warehouses</span>
+							</a><!--//nav-link-->
+						</li><!--//nav-item-->
+					    </ul><!--//footer-menu-->
+				    </nav>
+			    </div><!--//app-sidepanel-footer-->
+	        </div><!--//sidepanel-inner-->
+	    </div><!--//app-sidepanel-->
+    </header><!--//app-header-->
+    
+    <div class="app-wrapper">
+	    
+	    <div class="app-content pt-3 p-md-3 p-lg-4">
+		    <div class="container-xl">
+			    
+			    <div class="row g-3 mb-4 align-items-center justify-content-between">
+				    <div class="col-auto">
+			            <h1 class="app-page-title mb-0">Users</h1>
+				    </div>
+				    <div class="col-auto">
+					     <div class="page-utilities">
+						    <div class="row g-2 justify-content-start justify-content-md-end align-items-center">
+							    <div class="col-auto">
+								    <form class="table-search-form row gx-1 align-items-center">
+					                    <div class="col-auto">
+					                        <input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
+					                    </div>
+					                    <div class="col-auto">
+											<select class="form-select w-auto" >
+												<option selected value="option-1">All</option>
+												<option value="option-2">This week</option>
+												<option value="option-3">This month</option>
+												<option value="option-4">Last 3 months</option>
+												
+										  </select>
+					                        
+					                    </div>
+					                </form>
+					                
+							    </div><!--//col-->
+							    <div class="col-auto">
+								    <a class="btn btn-info" href="#" id="showFormButton">
+										{% comment %} <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-download me-1" fill="currentColor" xmlns="http://www.w3.org/2000/svg"> {% endcomment %}
+											<path fill-rule="evenodd" d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+											<path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+										{% comment %} </svg> {% endcomment %}
+										ADD user
+									</a>
+								    
+							    </div>
+							    <div class="col-auto">						    
+									<button id="deleteAllButton" class="btn text-white btn-danger" disabled>Delete All</button>
+								</div>
+								<div class="col-auto">						  
+									<button id="generate-pdf-btn" class="btn  btn-secondary">Generate PDF</button>
+								</div>
+						    </div><!--//row-->
+					    </div><!--//table-utilities-->
+				    </div><!--//col-auto-->
+			    </div><!--//row-->
+
+
+				<div id="usersFormPopup" class="popup">
+					<h2 class="mb-4">Add USERS</h2>
+					<form method="post" enctype="multipart/form-data" id="add-user-form">
+						{% csrf_token %}
+						
+						<input type="hidden" id="user-id" name="user-id" class="form-control">
+
+						<div class="form-group">
+							<div id="imagePreview" class="mt-3 text-center">
+								<img id="previewImage" src="" alt="Image Preview" class="rounded-circle" style="max-width: 150px; max-height: 150px;">
+							</div>
+							<label for="userImage">user Image:</label>
+							<input type="file" id="userImage" name="userImage" class="form-control-file">
+							<span id="userImageError" class="text-danger"></span>
+						</div>
+						
+						
+						<!-- user Name -->
+						<div class="form-group">
+							<label for="userName">user Name:</label>
+							<input type="text" id="userName" name="userName" class="form-control">
+							<span id="userNameError" class="text-danger"></span> <!-- Error message for user Name -->
+						</div>
+				
+						<!-- email -->
+						<div class="form-group">
+							<label for="email">email:</label>
+							<input type="text" id="email" name="email" class="form-control">
+							<span id="emailError" class="text-danger"></span> <!-- Error message for email -->
+						</div>
+				
+						<!-- Threshold Value -->
+						<div class="form-group">
+							<label for="FirstName">First Name: </label>
+							<input type="text" id="FirstName" name="FirstName" class="form-control">
+							<span id="FirstNameError" class="text-danger"></span> <!-- Error message for Threshold Value -->
+						</div>
+
+						<!-- Threshold Value -->
+						<div class="form-group">
+							<label for="LastName">Last Name: </label>
+							<input type="text" id="LastName" name="LastName" class="form-control">
+							<span id="LastNameError" class="text-danger"></span> <!-- Error message for Threshold Value -->
+						</div>
+
+						<div class="form-group">
+							<label for="Password">Password: </label>
+							<input type="text" id="Password" name="Password" class="form-control">
+							<span id="PasswordError" class="text-danger"></span> <!-- Error message for Threshold Value -->
+						</div>
+
+						<div class="form-group">
+							<label for="userrole">Role:</label>
+							<select class="form-control" id="userrole" name="userrole" required>
+								<option value="warehouse manager">Warehouse Manager</option>
+								<option value="inventory controller">Inventory Controller</option>
+							</select><br>
+							<span id="roleError" class="text-danger"></span>
+						</div>
+				
+						<!-- Buttons -->
+						<div class="form-group">
+							<input type="submit" value="Add" class="btn btn-primary">
+							<button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
+						</div>
+					</form>
+				</div>
+				
+				
+				<script>
+					const showFormButton = document.getElementById('showFormButton');
+					const userFormPopup = document.getElementById('usersFormPopup');
+					const cancelButton = document.getElementById('cancelButton');
+
+					showFormButton.addEventListener('click', () => {
+						userFormPopup.style.display = 'block';
+					});
+						cancelButton.addEventListener('click', () => {
+                        userFormPopup.style.display = 'none';
+                  
+					});
+
+				</script>
+		    			
+				<div class="tab-content" id="orders-table-tab-content">
+					<div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+						<div class="app-card app-card-orders-table shadow-sm mb-5">
+							<div class="app-card-body">
+								<div class="table-responsive">
+									<table class="table app-table-hover mb-0 text-left">
+										<thead>
+											<tr>
+												<th class="cell"></th> <!-- Add an empty header cell for checkboxes -->
+												<th class="cell">UserName</th>
+												<th class="cell">First Name</th>
+												<th class="cell">Lastname</th>
+												<th class="cell">Email</th>
+												<th class="cell">Role</th>
+												<th class="cell">Status</th> <!-- New column for status -->
+												<th class="cell"></th>
+												<th class="cell"></th>
+												<th class="cell"></th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for user in users_with_roles %}
+											<tr class="user-row">
+												<td class="cell"> <!-- Add a checkbox in this cell -->
+													<input type="checkbox" class="user-checkbox" data-user-id="{{ user.id }}">
+													<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+												</td>
+												<td class="cell user-name"><span class="truncate">{{ user.username }}</span></td>
+												<td class="cell">{{ user.first_name }}</td>
+												<td class="cell">{{ user.last_name }}</td>
+												<td class="cell">{{ user.email }}</td>
+												<td class="cell">{{ user.userrole.role }}</td> <!-- Display the user role -->
+												<td class="cell">
+													{% if user.is_active %}
+														Active
+													{% else %}
+														Inactive
+													{% endif %}
+												</td> <!-- Display the user status -->
+												<td class="cell">
+													<a class="btn btn-danger text-white delete-user" href="#" data-user-id="{{ user.id }}">Deactivate</a>
+												</td>
+												<td class="cell">
+													<a class="btn btn-danger text-white activate-user" href="#" data-user-id="{{ user.id }}">Activate</a>
+												</td>
+												<td class="cell">
+													<a class="btn btn-primary text-white update-user" id="updatebutton" href="#" data-user-id="{{ user.id }}">Update</a>
+												</td>
+											</tr>
+											{% endfor %}
+										</tbody>
+										
+									</table>
+								</div><!--//table-responsive-->
+							</div><!--//app-card-body-->
+						</div><!--//app-card-->
+					</div>
+				</div>
+				
+
+
+
+				
+				
+		
+				<script>
+					$(document).ready(function () {
+						// Add an event listener to handle delete clicks
+						const deleteLinks = document.querySelectorAll(".delete-user");
+				
+						deleteLinks.forEach(link => {
+							link.addEventListener("click", function (e) {
+								e.preventDefault();
+								const userId = link.getAttribute("data-user-id");
+				
+								if (userId) {
+									const confirmation = window.confirm("Are you sure you want to delete this user?");
+				
+									if (confirmation) {
+										// Send an AJAX request to the Django view to delete the user
+										$.ajax({
+											url: `/delete_user/${userId}/`, // Replace with your delete view URL
+											method: "POST", // or "GET" depending on your view
+											data: {
+												csrfmiddlewaretoken: '{{ csrf_token }}', // Include CSRF token
+											},
+											success: function (data) {
+												// Handle success (e.g., remove the row from the table)
+												link.closest("tr").remove();
+												window.location.href = "/userspanel/";
+											},
+											error: function (error) {
+												console.error("Error deleting user:", error);
+											},
+										});
+									}
+								}
+							});
+						});
+
+
+						const activeLinks = document.querySelectorAll(".activate-user");
+				
+						activeLinks.forEach(link => {
+							link.addEventListener("click", function (e) {
+								e.preventDefault();
+								const userId = link.getAttribute("data-user-id");
+				
+								if (userId) {
+									const confirmation = window.confirm("Are you sure you want to Activate this user?");
+				
+									if (confirmation) {
+										// Send an AJAX request to the Django view to delete the user
+										$.ajax({
+											url: `/activate_user/${userId}/`, // Replace with your delete view URL
+											method: "POST", // or "GET" depending on your view
+											data: {
+												csrfmiddlewaretoken: '{{ csrf_token }}', // Include CSRF token
+											},
+											success: function (data) {
+												// Handle success (e.g., remove the row from the table)
+												link.closest("tr").remove();
+												window.location.href = "/userspanel/";
+											},
+											error: function (error) {
+												console.error("Error activating user:", error);
+											},
+										});
+									}
+								}
+							});
+						});
+				
+						// Add event listeners for checkboxes
+						const checkboxes = document.querySelectorAll(".user-checkbox");
+				
+						checkboxes.forEach(checkbox => {
+							checkbox.addEventListener("change", function () {
+								// Check if at least one checkbox is checked
+								const isChecked = Array.from(checkboxes).some(cb => cb.checked);
+								const deleteAllButton = document.getElementById("deleteAllButton");
+				
+								// Enable or disable the "Delete All" button based on checkbox state
+								deleteAllButton.disabled = !isChecked;
+							});
+						});
+				
+						// Add an event listener for the "Delete All" button
+						const csrfToken = "{{ csrf_token }}";
+						const deleteAllButton = document.getElementById("deleteAllButton");
+				
+						deleteAllButton.addEventListener("click", function () {
+							const checkedCheckboxes = document.querySelectorAll(".user-checkbox:checked");
+				
+							// Show a confirmation dialog
+							const confirmation = window.confirm("Are you sure you want to delete the selected users?");
+				
+							if (confirmation) {
+								// Get the user IDs of selected checkboxes
+								const userIds = Array.from(checkedCheckboxes).map(cb => cb.getAttribute("data-user-id"));
+				
+								// Create a FormData object to send the data including the CSRF token
+								const formData = new FormData();
+								userIds.forEach(userId => {
+									formData.append("user_ids[]", userId);
+								});
+				
+								formData.append("csrfmiddlewaretoken", csrfToken);
+				
+								// Send an AJAX request to delete multiple users
+								$.ajax({
+									url: `/delete-multiple-users/`, // Replace with your delete multiple users view URL
+									method: "POST", // or "GET" depending on your view
+									data: formData, // Send the FormData object
+									processData: false, // Prevent jQuery from processing the data
+									contentType: false, // Set content type to false to prevent jQuery from adding a content type header
+									success: function (data) {
+										// Handle success (e.g., remove the rows from the table)
+										userIds.forEach(userId => {
+											const rowToRemove = document.querySelector(`.user-row[data-user-id="${userId}"]`);
+											if (rowToRemove) {
+												rowToRemove.remove();
+											}
+										});
+				
+										// Disable the "Delete All" button after deletion
+										deleteAllButton.disabled = true;
+				
+										// Redirect to the user list page
+										window.location.href = "/userspanel/";
+									},
+									error: function (error) {
+										console.error("Error deleting users:", error);
+									},
+								});
+							}
+						});
+				
+						function fetchuserData(userId) {
+							$.ajax({
+								url: `/get_user_details/${userId}/`,
+								method: "GET",
+								dataType: "json", // Specify the expected data type as JSON
+								success: function (userData) {
+									// Populate the form fields with the retrieved data
+									document.getElementById("userName").value = userData.username;
+									document.getElementById("email").value = userData.email;
+									document.getElementById("FirstName").value = userData.first_name;
+									document.getElementById("LastName").value = userData.last_name;
+									document.getElementById("Password").value = userData.password;
+				
+									var previewImage = document.getElementById("previewImage");
+									previewImage.src = userData.user_image_url;
+									previewImage.style.display = "block"; // Show the image
+				
+									// Optionally, you can add logging to verify the data
+									console.log("user Data:", userData);
+								},
+								error: function () {
+									// Handle error if the AJAX request fails
+									console.error("Failed to fetch user data.");
+								},
+							});
+						}
+				
+						// Add an event listener for the update form
+						const updateButtons = document.querySelectorAll('.update-user');
+						const userFormPopup = document.getElementById('usersFormPopup');
+						const cancelButton = document.getElementById('cancelButton');
+				
+						updateButtons.forEach(button => {
+							button.addEventListener('click', () => {
+								userFormPopup.style.display = 'block';
+								const userId = button.getAttribute('data-user-id');
+								document.getElementById('user-id').value = userId;
+								fetchuserData(userId);
+							});
+						});
+				
+						cancelButton.addEventListener('click', () => {
+							userFormPopup.style.display = 'none';
+							window.location.href = "/userspanel/"; 
+						});
+				
+
+						$('#search-orders').on('input', function () {
+							var searchText = $(this).val().toLowerCase();
+							searchusers(searchText);
+						});
+				
+						// Function to search for users based on the user name
+						function searchusers(searchText) {
+							// Iterate through each user row
+							$('.user-row').each(function () {
+								var userName = $(this).find('.user-name').text().toLowerCase();
+								var row = $(this);
+				
+								// Check if the user name contains the search text
+								if (userName.includes(searchText)) {
+									row.show(); // Show the row if it matches
+								} else {
+									row.hide(); // Hide the row if it doesn't match
+								}
+							});
+						}
+				
+						const updateuserForm = document.getElementById("add-user-form");
+
+						updateuserForm.addEventListener("submit", function (e) {
+							e.preventDefault();
+
+							// Collect the updated data from the form
+							const formData = new FormData(updateuserForm);
+
+							// Extract the user_id from the form or data attributes
+							const userId = document.getElementById("user-id").value;
+
+							// Define the base URL for the AJAX request
+							let baseUrl =  `/add_user/`;
+
+							if (userId) {
+								// If userId is not null, append it to the base URL
+								baseUrl =  `/update_user/${userId}/`;
+							}
+
+							// Send an AJAX request to the dynamically determined URL
+							$.ajax({
+								url: baseUrl,
+								method: "POST",
+								data: formData,
+								processData: false,
+								contentType: false,
+								success: function (data) {
+									// Handle success (e.g., show a success message)
+									console.log(data.message);
+										// Redirect to the "add_user" URL if userId is null
+										window.location.href = "/userspanel/"; // Replace with the correct URL
+								},
+								error: function (error) {
+									// Handle errors (e.g., display an error message)
+									console.error("Error updating user:", error);
+								},
+							});
+						});
+
+						document.getElementById('generate-pdf-btn').addEventListener('click', function () {
+							generatePDF();
+						});
+				
+						function generatePDF() {
+							const pdf = new jsPDF();
+				
+							// Loop through each row of the table and add data to the PDF
+							const rows = document.querySelectorAll('.user-row');
+							rows.forEach((row, index) => {
+								const name = row.querySelector('.user-name').textContent;
+								const category = row.querySelectorAll('.cell')[2].textContent;
+								const subcategory = row.querySelectorAll('.cell')[3].textContent;
+				
+								// Add data to the PDF
+								pdf.text(`Row ${index + 1}`, 10, 10 + index * 10);
+								pdf.text(`Name: ${name}`, 20, 20 + index * 10);
+								pdf.text(`Category: ${category}`, 20, 30 + index * 10);
+								pdf.text(`Subcategory: ${subcategory}`, 20, 40 + index * 10);
+				
+								// Check if we need to add a new page for the next row
+								if (index < rows.length - 1) {
+									pdf.addPage();
+								}
+							});
+				
+							// Save the PDF as a file
+							pdf.save('user_report.pdf');
+						}
+				
+						function updateImagePreview(input, previewId) {
+							var preview = document.getElementById(previewId);
+							var imagePreview = document.getElementById(previewId + "Preview");
+				
+							if (input.files && input.files[0]) {
+								var reader = new FileReader();
+				
+								reader.onload = function (e) {
+									preview.src = e.target.result;
+									imagePreview.style.display = 'block'; // Show the preview container
+								};
+				
+								reader.readAsDataURL(input.files[0]);
+							} else {
+								preview.src = '';
+								imagePreview.style.display = 'none'; // Hide the preview container
+							}
+						}
+				
+						// Add an event listener to the file input field for the "Add user" form
+						var userImageInput = document.getElementById('userImage');
+						userImageInput.addEventListener('change', function () {
+							updateImagePreview(this, 'previewImage');
+						});
+				
+						// Add an event listener to the file input field for the "Update user" form
+				
+						/*const userName = document.querySelector("#userName");
+						const email = document.querySelector("#email");
+						const FirstName = document.querySelector("#FirstName");
+						const category = document.querySelector("#category");
+						const subcategory = document.querySelector("#subcategory");
+				
+						const userNameError = document.querySelector("#userNameError");
+						const emailError = document.querySelector("#emailError");
+						const FirstNameError = document.querySelector("#FirstNameError");
+						const categoryError = document.querySelector("#categoryError");
+						const subcategoryError = document.querySelector("#subcategoryError");
+				
+						// Regular expressions for validation
+						const nameRegex = /^[a-zA-Z0-9\s]+$/;
+
+						const numberRegex = /^[0-9]+$/;
+				
+						userName.addEventListener("input", function () {
+							if (!nameRegex.test(userName.value)) {
+								userNameError.textContent = "Please enter a valid user name (letters, numbers and spaces only).";
+							} else {
+								userNameError.textContent = "";
+							}
+						});
+				
+						email.addEventListener("input", function () {
+							if (!numberRegex.test(email.value)) {
+								emailError.textContent = "email must be numeric.";
+							} else {
+								emailError.textContent = "";
+							}
+						});
+				
+						FirstName.addEventListener("input", function () {
+							if (!numberRegex.test(FirstName.value)) {
+								FirstNameError.textContent = "Threshold Value must be numeric.";
+							} else {
+								FirstNameError.textContent = "";
+							}
+						});
+				
+						category.addEventListener("input", function () {
+							if (category.value === "") {
+								categoryError.textContent = "Please select a category.";
+							} else {
+								categoryError.textContent = "";
+							}
+						});
+				
+						subcategory.addEventListener("input", function () {
+							if (subcategory.value === "") {
+								subcategoryError.textContent = "Please select a subcategory.";
+							} else {
+								subcategoryError.textContent = "";
+							}
+						});
+				
+						const form = document.querySelector("form");
+						form.addEventListener("submit", function (event) {
+							if (
+								!nameRegex.test(userName.value) ||
+								!numberRegex.test(email.value) ||
+								!numberRegex.test(FirstName.value) ||
+								category.value === "" ||
+								subcategory.value === ""
+							) {
+								event.preventDefault();
+							}
+						});
+				
+						function validateImageFormat(input) {
+							const userImageError = document.querySelector("#userImageError");
+							const imageExtensions = ["jpg", "jpeg", "png", "gif"];
+							const selectedFile = input.files[0];
+				
+							if (selectedFile) {
+								const imageExtension = selectedFile.name.split(".").pop().toLowerCase();
+								if (!imageExtensions.includes(imageExtension)) {
+									userImageError.textContent = "Invalid image format. Supported formats: JPG, JPEG, PNG, GIF";
+									input.value = ""; // Clear the file input
+								} else {
+									userImageError.textContent = "";
+								}
+							}
+						}
+				
+						// Event listener for the user image input
+						const userImage = document.querySelector("#userImage");
+						userImage.addEventListener("input", function () {
+							validateImageFormat(this);
+						});*/
+
+
+
+
+						
+					});
+				</script>
+				
+						
+<nav class="app-pagination">
+    <ul class="pagination justify-content-center">
+        {% if page.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">&laquo; first</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page.previous_page_number }}">previous</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo; first</span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">previous</span>
+            </li>
+        {% endif %}
+        <li class="page-item active">
+            <span class="page-link">{{ page.number }}</span>
+        </li>
+        {% if page.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page.next_page_number }}">next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page.paginator.num_pages }}">last &raquo;</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">next</span>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">last &raquo;</span>
+            </li>
+        {% endif %}
+    </ul>
+</nav><!--//app-pagination-->
+
+						
+			        </div><!--//tab-pane-->
+				</div><!--//tab-content-->		    
+		    </div><!--//container-fluid-->
+	    </div><!--//app-content-->
+	    
+    
+    </div><!--//app-wrapper-->    					
+
+ 
+    <!-- Javascript -->          
+    <script src="{% static 'assets/plugins/popper.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/bootstrap/js/bootstrap.min.js' %}"></script>  
+	
+    
+    <!-- Page Specific JS -->
+    <script src="{% static 'assets/js/app.js' %}"></script> 
+	
+</body>
+</html> 

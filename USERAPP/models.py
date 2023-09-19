@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.auth.models import User
 
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True)
@@ -152,3 +153,10 @@ class ProductLocation(models.Model):
 
     def __str__(self):
         return f"{self.storage_location.location_name} ({self.quantity})"
+    
+class UserRole(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=255)  # Define your roles appropriately, e.g., 'admin', 'user', 'manager', etc.
+
+    def __str__(self):
+        return self.user.username

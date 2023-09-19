@@ -5,6 +5,8 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
+from .views import ExportPDF
+from .views import ExportSupplierPDF,ExportOrdersPDF
 
 urlpatterns = [
     path('index/',views.index, name='index'),
@@ -60,6 +62,11 @@ urlpatterns = [
     path('allocate_storages/<int:order_id>/', views.allocate_storages, name='allocate_storages'),
     path('add_storage', views.add_storage, name='add_storage'),
     path('list_storage', views.list_storage, name='list_storage'),
+    path('export_pdf/', ExportPDF.as_view(), name='export_pdf'),
+    path('export_supplier_pdf/', ExportSupplierPDF.as_view(), name='export_supplier_pdf'),
+    path('export_orders_pdf/', ExportOrdersPDF.as_view(), name='export_orders_pdf'),
+    
+    
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:

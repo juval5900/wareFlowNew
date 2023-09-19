@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout, get_u
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
-from .models import Category, Product, ProductLocation, StorageLocation,Subcategory,Supplier,Orders,UserProfile
+from .models import Category, Product, ProductLocation, StorageLocation,Subcategory,Supplier,Orders,UserProfile,UserRole
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -37,10 +37,24 @@ def login(request):
             # Retrieve the user_profile
             user_profile = get_object_or_404(UserProfile, user=user)
 
+
+            try:
+                user_role = UserRole.objects.get(user=user)
+                user_role_name = user_role.role
+            except UserRole.DoesNotExist:
+                user_role_name = None
+                
             # Set the profile picture URL in the session
             request.session['profile_picture_url'] = user_profile.profile_picture.url
-            
-            return redirect('index')  # Replace with your desired URL
+
+            # Redirect users based on their roles
+            if user_role_name == 'admin':
+                return redirect('adminindex')  # Replace with the admin app index URL
+            elif user_role_name == 'warehouse manager':
+                return redirect('index')  # Replace with the user app index URL
+            else:
+                messages.error(request, "Invalid role")  # Handle invalid roles
+                return redirect('login')
         else:
             messages.error(request, "Invalid credentials")
             return redirect('login')
@@ -639,3 +653,213 @@ def allocate_storages(request, order_id):
         return redirect('list_storage')  # Replace 'success_page' with your desired URL
 
     return HttpResponse("This view only accepts POST requests.")
+
+
+
+import tablib
+from django.http import HttpResponse
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+from .models import Product
+from django.views import View
+
+class ExportPDF(View):
+    def get(self, request):
+        # Get the data you want to export
+        products = Product.objects.all()
+
+        # Create a PDF buffer using BytesIO
+        buffer = BytesIO()
+
+        # Create the PDF object, using the buffer as its "file."
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+        # Create a list to store the data for the table
+        data = []
+
+        # Define the table's column headers
+        table_headers = ['Product Name', 'Category', 'Subcategory', 'Quantity', 'Threshold Value']
+
+        data.append(table_headers)
+
+        # Populate the table data with product information
+        for product in products:
+            data.append([product.product_name, product.category.category_name, product.subcategory.subcategory_name,
+                         product.quantity, product.threshold_value])
+
+        # Create the table
+        table = Table(data)
+
+        # Add style to the table
+        style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                            ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+        table.setStyle(style)
+
+        # Build the PDF
+        pdf = []
+
+        # Add a title to the PDF
+        styles = getSampleStyleSheet()
+        title = Paragraph("Product List", styles['Title'])
+        pdf.append(title)
+
+        # Add the table to the PDF
+        pdf.append(table)
+
+        # Build the PDF
+        doc.build(pdf)
+
+        # Set the buffer's position to the beginning
+        buffer.seek(0)
+
+        # Create an HTTP response with the PDF file
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="product_list.pdf"'
+        response.write(buffer.read())
+
+        # Close the buffer
+        buffer.close()
+
+        return response
+
+
+class ExportSupplierPDF(View):
+    def get(self, request):
+        # Get the data you want to export (in this case, Suppliers)
+        suppliers = Supplier.objects.all()
+
+        # Create a PDF buffer using BytesIO
+        buffer = BytesIO()
+
+        # Create the PDF object, using the buffer as its "file."
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+        # Create a list to store the data for the table
+        data = []
+
+        # Define the table's column headers
+        table_headers = ['Supplier Name', 'Address', 'Contact Number', 'Email', 'Type']
+
+        data.append(table_headers)
+
+        # Populate the table data with supplier information
+        for supplier in suppliers:
+            data.append([supplier.supplier_name, supplier.supplier_address, supplier.contact_number,
+                         supplier.supplier_email, supplier.supplier_type])
+
+        # Create the table
+        table = Table(data)
+
+        # Add style to the table
+        style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                            ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+        table.setStyle(style)
+
+        # Build the PDF
+        pdf = []
+
+        # Add a title to the PDF
+        styles = getSampleStyleSheet()
+        title = Paragraph("Supplier List", styles['Title'])
+        pdf.append(title)
+
+        # Add the table to the PDF
+        pdf.append(table)
+
+        # Build the PDF
+        doc.build(pdf)
+
+        # Set the buffer's position to the beginning
+        buffer.seek(0)
+
+        # Create an HTTP response with the PDF file
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="supplier_list.pdf"'
+        response.write(buffer.read())
+
+        # Close the buffer
+        buffer.close()
+
+        return response
+    
+    
+class ExportOrdersPDF(View):
+    def get(self, request):
+        # Get the data you want to export (in this case, Orders)
+        orders = Orders.objects.all()
+
+        # Create a PDF buffer using BytesIO
+        buffer = BytesIO()
+
+        # Create the PDF object, using the buffer as its "file."
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+        # Create a list to store the data for the table
+        data = []
+
+        # Define the table's column headers
+        table_headers = ['Order ID', 'Product', 'Supplier', 'Order Date & Time', 'Order Status', 'Warehouse', 'Quantity', 'Is Active', 'Cancelled At', 'Is Stored']
+
+        data.append(table_headers)
+
+        # Populate the table data with order information
+        for order in orders:
+            data.append([order.order_id, order.product.product_name, order.supplier.supplier_name,
+                         order.order_datetime, order.order_status, order.warehouse,
+                         order.quantity, order.is_active, order.cancelled_at, order.is_stored])
+
+        # Create the table
+        table = Table(data)
+
+        # Add style to the table
+        style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                            ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+
+        table.setStyle(style)
+
+        # Build the PDF
+        pdf = []
+
+        # Add a title to the PDF
+        styles = getSampleStyleSheet()
+        title = Paragraph("Orders List", styles['Title'])
+        pdf.append(title)
+
+        # Add the table to the PDF
+        pdf.append(table)
+
+        # Build the PDF
+        doc.build(pdf)
+
+        # Set the buffer's position to the beginning
+        buffer.seek(0)
+
+        # Create an HTTP response with the PDF file
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="orders_list.pdf"'
+        response.write(buffer.read())
+
+        # Close the buffer
+        buffer.close()
+
+        return response

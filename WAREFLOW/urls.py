@@ -7,4 +7,5 @@ urlpatterns = [
     path('', include('USERAPP.urls')),  # Replace 'your_app' with your app's name
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
+    path('', include('ADMINAPP.urls')),
 ]
