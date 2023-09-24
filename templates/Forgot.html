@@ -1,0 +1,318 @@
+{% load static %}
+{% load socialaccount %}
+{% providers_media_js %}
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Login</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--===============================================================================================-->
+		<link rel="icon" type="image/png"
+			href="{% static 'login/images/icons/favicon.ico' %}" />
+		<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'login/vendor/bootstrap/css/bootstrap.min.css' %}">
+		<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'login/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+		<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'login/vendor/animate/animate.css' %}">
+		<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'login/vendor/css-hamburgers/hamburgers.min.css' %}">
+		<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'login/vendor/select2/select2.min.css' %}">
+		<!--===============================================================================================-->
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'login/css/util.css' %}">
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'login/css/main.css' %}">
+		<link rel="stylesheet" type="text/css"
+			href="{% static 'login/css/social-login.css' %}">
+		<!--===============================================================================================-->
+
+		<style>
+.error-message {
+	color: red;
+	font-size: 14px;
+	border: 1px solid red;
+	padding: 10px;
+	background-color: #ffe6e6;
+	text-align: center;
+  }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	</head>
+	<body>
+
+		<div class="limiter">
+			<div class="container-login100">
+				<div class="wrap-login100">
+					<div class="login100-pic js-tilt" data-tilt>
+						<img src="{% static 'login/images/img-01.png' %}" alt="IMG">
+					</div>
+
+					<form class="login100-form validate-form" method="POST">
+                        {% csrf_token %}
+                        <span class="login100-form-title">
+                            Member Login
+                        </span>
+                    
+                        <!-- Email and Password Fields -->
+                        <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
+                            <input class="input100" type="text" name="username" placeholder="Email">
+                            <span class="focus-input100"></span>
+                            <span class="symbol-input100">
+                                <i class="fa fa-envelope" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                   
+                        <!-- OTP Field (Initially Hidden) -->
+                        <div class="otp-input-group" style="display: none;">
+                            <div class="wrap-input100 validate-input" data-validate="OTP is required">
+                                <input class="input100" type="text" name="otp" placeholder="OTP">
+                                <span class="focus-input100"></span>
+                                <span class="symbol-input100">
+                                    <i class="fa fa-key" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                        </div>
+                    
+                        <!-- New Password and Confirm Password Fields (Initially Hidden) -->
+                        <div class="password-input-group" style="display: none;">
+                            <div class="wrap-input100 validate-input" data-validate="New Password is required">
+                                <input class="input100" type="password" name="new_password" placeholder="New Password">
+                                <span class="focus-input100"></span>
+                                <span class="symbol-input100">
+                                    <i class="fa fa-key" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                            <div class="wrap-input100 validate-input" data-validate="Confirm Password is required">
+                                <input class="input100" type="password" name="confirm_password" placeholder="Confirm Password">
+                                <span class="focus-input100"></span>
+                                <span class="symbol-input100">
+                                    <i class="fa fa-key" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                        </div>
+                    
+                        <!-- Send OTP Button (Toggles OTP Field Visibility) -->
+                        <button type="button" class="send-otp-btn" id="send_otp">
+                            Send OTP
+                        </button>
+                        <div id="otp_message" style="display: none;"></div>
+                        <!-- Submit Button (Initially Disabled) -->
+                        <div class="container-login100-form-btn">
+                            <button class="login100-form-btn" id="submit-btn" disabled>
+                                Submit
+                            </button>
+                        </div>
+                    
+                        {% for message in messages %}
+                        <div class="error-message">{{ message }}</div>
+                        {% endfor %}
+                    </form>
+                    
+
+						<div class="button-container">
+							<a href="{% provider_login_url 'google'%}" class="social-btn btn-google">
+								<i class="fa fa-google fa-fw"></i>
+							</a>
+							{% comment %} <a href="{% provider_login_url 'facebook'%}"
+								class="social-btn btn-facebook">
+								<i class="fa fa-facebook fa-fw"></i>
+							</a>
+							<a href="#" class="social-btn btn-twitter">
+								<i class="fa fa-twitter fa-fw"></i>
+							</a> {% endcomment %}
+						</div>
+
+						<div class="text-center p-t-12">
+							<span class="txt1">
+							</span>
+							<a class="txt2" href="{% url 'password_reset' %}">
+								Forgot Username / Password?
+							</a>
+						</div>
+
+						<div class="text-center p-t-136">
+							<a class="txt2" href="{% url 'register' %}">
+								Create your Account
+								<i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
+
+							</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!--===============================================================================================-->
+		<script src="{% static 'login/vendor/jquery/jquery-3.2.1.min.js' %}"></script>
+		<!--===============================================================================================-->
+		<script src="{% static 'login/vendor/bootstrap/js/popper.js' %}"></script>
+		<script src="{% static 'login/vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+		<!--===============================================================================================-->
+		<script src="{% static 'login/vendor/select2/select2.min.js' %}"></script>
+		<!--===============================================================================================-->
+		<script src="{% static 'login/vendor/tilt/tilt.jquery.min.js' %}"></script>
+
+
+
+
+        <script>
+            $('.js-tilt').tilt({
+                scale: 1.1
+            });
+        
+            let userEmail;  // Declare userEmail as a global variable
+            let data;  // Declare data as a global variable
+            let generatedOTP;  // Declare generatedOTP as a global variable
+        
+            // Function to toggle OTP input field visibility
+            function toggleOTPInputVisibility(visible) {
+                if (visible) {
+                    $('.otp-input-group').show();
+                } else {
+                    $('.otp-input-group').hide();
+                }
+            }
+        
+            // Function to toggle password input field visibility
+            function togglePasswordInputVisibility(visible) {
+                if (visible) {
+                    $('.password-input-group').show();
+                } else {
+                    $('.password-input-group').hide();
+                }
+            }
+        
+            // Function to validate passwords
+            function validatePassword() {
+                const newPassword = $('input[name="new_password"]').val();
+                const confirmPassword = $('input[name="confirm_password"]').val();
+            
+                // Regular expression pattern for password validation
+                const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            
+                // Check if passwords match and meet the specified conditions
+                if (newPassword === confirmPassword && newPassword.match(passwordPattern)) {
+                    // Include the CSRF token in the data
+                    return { valid: true, csrfmiddlewaretoken: csrfToken };
+                } else {
+                    return { valid: false };
+                }
+            }
+            
+        
+            // Function to handle OTP generation
+            function generateOTP() {
+                userEmail = $('input[name="username"]').val();
+                $.ajax({
+                    url: '{% url "generate_otp" %}',
+                    method: 'POST',
+                    data: {
+                        'username': userEmail,  // Include the email address
+                        // Other data if needed
+                    },
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'  // Include the CSRF token
+                    },
+                    success: function (responseData) {
+                        if (typeof responseData === 'object' && responseData.success) {
+                            var isSuccess = responseData.success;
+                            generatedOTP = responseData.otp; // Store the OTP globally
+                            console.log(generatedOTP);
+                            $('#otp_message').html('OTP GENERATED SUCCESSFULLY');
+                            $('#otp_message').show();
+                            toggleOTPInputVisibility(true);
+                            verifyOTP();
+                        } else {
+                            $('#otp_message').html('Failed to generate OTP');
+                            $('#otp_message').show();
+                            toggleOTPInputVisibility(false);
+                        }
+                    },
+                    error: function (errorData) {
+                        $('#otp_message').html('Failed to generate OTP');
+                        $('#otp_message').show();
+                        toggleOTPInputVisibility(false);
+                    }
+                });
+            }
+        
+            // Function to handle OTP verification
+            function verifyOTP() {
+                const userOTP = $('input[name="otp"]').val();
+                if (userOTP === generatedOTP) {
+                    console.log("OTP verification successful");
+                    togglePasswordInputVisibility(true);
+                    $('#submit-btn').prop('disabled', false);
+                } else {
+                    console.log("OTP verification failed");
+                    togglePasswordInputVisibility(false);
+                    $('#submit-btn').prop('disabled', true);
+                }
+            }
+        
+            // Click event handler for the "Send OTP" button
+            $('#send_otp').on('click', function () {
+                $('.otp-input-group').show();
+                generateOTP();
+            });
+        
+            // Input event handler for the OTP input field
+            $('input[name="otp"]').on('input', function () {
+                verifyOTP();
+            });
+        
+            // Click event handler for the "Submit" button
+            $('#submit-btn').on('click', function () {
+                const validation = validatePassword();
+            
+                if (validation.valid) {
+                    const user_email = userEmail;
+                    const new_password = $('input[name="new_password"]').val();
+            
+                    // Include the CSRF token in the data
+                    validation.user_email = user_email;
+                    validation.new_password = new_password;
+            
+                    $.ajax({
+                        url: '/reset_password/',
+                        method: 'POST',
+                        data: validation, // Include the CSRF token
+                        success: function (responseData) {
+                            if (responseData.message === 'Password reset successfully') {
+                                window.location.href = '{% url "login" %}';
+                            } else {
+                                alert('Password reset failed: ' + responseData.error);
+                            }
+                        },
+                        error: function (errorData) {
+                            console.error('AJAX error:', errorData);
+                            alert('AJAX error: ' + errorData.statusText);
+                        }
+                    });
+                } else {
+                    alert('Invalid password. Password must be at least 8 characters long.');
+                }
+            });
+            
+        
+        </script>
+        
+        
+        
+        
+        
+		<!--===============================================================================================-->
+		<script src="{% static 'login/js/main.js' %}"></script>
+
+	</body>
+</html>

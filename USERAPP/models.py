@@ -157,6 +157,7 @@ class ProductLocation(models.Model):
 class UserRole(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=255)  # Define your roles appropriately, e.g., 'admin', 'user', 'manager', etc.
+    is_allocated = models.BooleanField(default=False)  # Added the is_allocated field with a default value of False
 
     def __str__(self):
         return self.user.username

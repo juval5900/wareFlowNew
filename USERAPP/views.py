@@ -1,22 +1,38 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login as auth_login, logout, get_user_model
-from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
-from .models import Category, Product, ProductLocation, StorageLocation,Subcategory,Supplier,Orders,UserProfile,UserRole
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
-from django.core.serializers.json import DjangoJSONEncoder
-from django.core.paginator import Paginator
-from django.utils import timezone
-from .forms import UserProfileForm
-from django.views import View  
-from django.db import transaction
-from django import forms
+# Standard Library Imports
 from datetime import date, timedelta
+from io import BytesIO
+
+# Django Imports
+from django.contrib import messages
+from django.contrib.auth import authenticate, login as auth_login, logout, get_user_model
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.core.paginator import Paginator
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db import transaction
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render, redirect
+from django.utils import timezone
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
+from django import forms
+from django.conf import settings
+
+# Third-Party Library Imports
+import pyotp
+import tablib
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+
+# Project-Specific Imports
+from .forms import UserProfileForm
+from .models import Category, Product, ProductLocation, StorageLocation, Subcategory, Supplier, Orders, UserProfile, UserRole
+from .models import Product  # Duplicate import, remove it
+
+
 
 
 
@@ -122,7 +138,7 @@ def inventory(request):
   context = {'categories': categories}
   return render(request, 'inventory.html', context)
 
-def settings(request):
+def settingshtml(request):
     return render(request, 'settings.html')
 
 
@@ -655,17 +671,6 @@ def allocate_storages(request, order_id):
     return HttpResponse("This view only accepts POST requests.")
 
 
-
-import tablib
-from django.http import HttpResponse
-from io import BytesIO
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib import colors
-from .models import Product
-from django.views import View
-
 class ExportPDF(View):
     def get(self, request):
         # Get the data you want to export
@@ -863,3 +868,63 @@ class ExportOrdersPDF(View):
         buffer.close()
 
         return response
+    
+    
+def forgot(request):
+    return render(request, 'forgot.html')
+    
+User = get_user_model()
+
+
+
+def generate_otp(request):
+    if request.method == 'POST':
+        user_email = request.POST.get('username')  # Get user's email from the request (change 'user_email' to match your form field name)
+        print(user_email)
+        # Generate a random OTP using pyotp
+        otp = pyotp.random_base32()
+       
+
+        # Store the OTP in the session or database for later verification
+        # For example, you can save it in the session like this:
+        request.session['generated_otp'] = otp
+
+        # Send the OTP in an email to the user
+        subject = 'Your OTP for account activation'
+        message = f'Your OTP for account activation is: {otp}'
+        from_email = settings.EMAIL_HOST_USER  # Your sender email address
+        recipient_list = [user_email]
+
+        send_mail(subject, message, from_email, recipient_list)
+
+        # Return the OTP as a JSON response
+        return JsonResponse({'otp': otp, 'success': True})
+
+    # Handle GET requests or other methods appropriately
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+
+def reset_password(request):
+    if request.method == 'POST':
+        user_email = request.POST.get('user_email')  # Get user's email from the request
+        new_password = request.POST.get('new_password')  # Get the new password from the request
+
+        try:
+            user = User.objects.get(email=user_email)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+
+        # Set the new password for the user
+        user.set_password(new_password)
+        user.save()
+
+        # Optionally, you can clear the session or database where you stored the OTP
+        if 'generated_otp' in request.session:
+            del request.session['generated_otp']
+
+        # Redirect to the login page upon successful password reset
+        return HttpResponseRedirect(reverse('login'))  # Replace 'login' with your login URL name
+
+    # Handle GET requests or other methods appropriately
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

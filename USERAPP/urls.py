@@ -27,7 +27,7 @@ urlpatterns = [
     path('docs',views.docs,name='docs'),
     path('help',views.help,name='help'),
     path('inventory',views.inventory,name='inventory'),
-    path('settings',views.settings,name='settings'),
+    path('settingshtml',views.settingshtml,name='settingshtml'),
     
     path('add_product/', views.add_product, name='add_product'),
     path('list_products/', views.list_products, name='list_products'),
@@ -65,8 +65,10 @@ urlpatterns = [
     path('export_pdf/', ExportPDF.as_view(), name='export_pdf'),
     path('export_supplier_pdf/', ExportSupplierPDF.as_view(), name='export_supplier_pdf'),
     path('export_orders_pdf/', ExportOrdersPDF.as_view(), name='export_orders_pdf'),
-    
-    
+    path('generate_otp', views.generate_otp, name='generate_otp'),
+    path('forgot', views.forgot, name='forgot'),
+    path('reset_password/', views.reset_password, name='reset_password'),
+
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:

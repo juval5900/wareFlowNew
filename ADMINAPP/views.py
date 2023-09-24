@@ -4,7 +4,10 @@ from django.shortcuts import render, redirect
 from USERAPP.models import UserRole,UserProfile
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
-
+from django.core.mail import send_mail
+from django.conf import settings
+import pyotp
+from .models import Warehouse, UserRole
 
 def adminindex(request):
     user = request.user  # Get the current logged-in user
@@ -18,24 +21,24 @@ def userspanel(request):
 def add_user(request):
     if request.method == 'POST':
         # Retrieve form data
-        username = request.POST['userName']
         email = request.POST['email']
         first_name = request.POST['FirstName']
         last_name = request.POST['LastName']
-        password = request.POST['Password']
         role = request.POST['userrole']
 
         # Get the profile picture from the form
         profile_picture = request.FILES.get('userImage')
-
+        totp_secret = pyotp.random_base32()
+        otp = pyotp.TOTP(totp_secret, digits=8)
+        otp_value = otp.now()  # Get the current OTP value
         # Create a new user
         user = User(
-            username=username,
+            username=email,
             email=email,
             first_name=first_name,
             last_name=last_name,
-            password=make_password(password),  # Hash the password
         )
+        user.set_password(str(otp_value))  # Set the OTP value as the user's password
         user.save()
 
         # Create or update user's role
@@ -47,6 +50,13 @@ def add_user(request):
         user_profile, created = UserProfile.objects.get_or_create(user=user)
         user_profile.profile_picture = profile_picture
         user_profile.save()
+
+        subject = 'Your account has been created'
+        message = f'Your account has been created successfully. Use OTP: {otp_value} to login. Login link:- http://127.0.0.1:8000/'
+        from_email = settings.EMAIL_HOST_USER  # Your sender email address
+        recipient_list = [user.email]
+
+        send_mail(subject, message, from_email, recipient_list)
 
         # Redirect to a success page or any other desired URL
         return redirect('userspanel')
@@ -74,18 +84,31 @@ def get_user_details(request, user_id):
         return JsonResponse({'error': 'User not found'}, status=404)
     
     
+
+
 def delete_user(request, user_id):
     try:
         user = User.objects.get(id=user_id)
         
-        # Deactivate the user by setting the 'is_active' field to False
-        user.is_active = False
-        user.save()
+        if user.is_active:
+            # Deactivate the user by setting the 'is_active' field to False
+            user.is_active = False
+            user.save()
+
+            # Send a deactivation email to the user
+            subject = 'Your account has been deactivated'
+            message = 'Your account has been deactivated.'
+            from_email = settings.EMAIL_HOST_USER  # Your sender email address
+            recipient_list = [user.email]
+
+            send_mail(subject, message, from_email, recipient_list)
         
-        return JsonResponse({'message': 'User deactivated successfully'})
+            return JsonResponse({'message': 'User deactivated successfully'})
+        else:
+            return JsonResponse({'message': 'User is already inactive'})
     except User.DoesNotExist:
         return JsonResponse({'error': 'User not found'}, status=404)
-    
+
 def activate_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
     
@@ -95,82 +118,92 @@ def activate_user(request, user_id):
     user.is_active = True
     user.save()
     
+    # Send an activation email to the user
+    subject = 'Your account has been activated'
+    message = 'Your account has been activated successfully.'
+    from_email = settings.EMAIL_HOST_USER  # Your sender email address
+    recipient_list = [user.email]
+
+    send_mail(subject, message, from_email, recipient_list)
+    
     response_data = {'message': 'User activated successfully', 'is_active': user.is_active}
     print(response_data)  # Print the response data for debugging
     
     return JsonResponse(response_data)
+
     
     
-def update_user(request, user_id=None):
-    if request.method == "POST":
-        # Process the form data, whether it's an update or addition
+def warehousepanel(request):
+    # Query all warehouse objects
+    warehouses = Warehouse.objects.all()
 
-        # Extract user_id from the form data or data attributes
-        user_id = request.POST.get("user-id", None)
+    # Query available warehouse managers and inventory controllers
+    available_managers = UserRole.objects.filter(role='warehouse manager', is_allocated=False, user__is_active=True)
+    available_controllers = UserRole.objects.filter(role='inventory controller', is_allocated=False, user__is_active=True)
 
-        # Collect updated data from the form
-        username = request.POST.get("userName")
-        email = request.POST.get("email")
-        first_name = request.POST.get("FirstName")
-        last_name = request.POST.get("LastName")
-        password = request.POST.get("Password")
-        userrole = request.POST.get("userrole")
-        # Add more fields as needed
+    # Check the values of available managers and controllers
+    print("Available Managers:", available_managers)
+    print("Available Controllers:", available_controllers)
 
-        # Depending on whether user_id is None, it's an addition or update
-        if user_id is None:
-            # Add a new user
-            # You can create a new User instance here and set its attributes
+    # Pass the warehouse objects and available users to the template context
+    context = {
+        'warehouses': warehouses,
+        'available_managers': available_managers,
+        'available_controllers': available_controllers,
+    }
 
-            # Example:
-            # user = User(username=username, email=email, first_name=first_name, last_name=last_name, password=password)
-            # user.save()
+    return render(request, 'WAREHOUSESPANEL.html', context)
 
-            # After saving the new user, you can create/update the associated UserProfile if needed
 
-            return JsonResponse({"message": "User added successfully"})
-        else:
-            # Update an existing user based on user_id
-            try:
-                user = User.objects.get(id=user_id)
 
-                # Update the user's attributes
-                user.username = username
-                user.email = email
-                user.first_name = first_name
-                user.last_name = last_name
-                # Update other user attributes as needed
-
-                user.save()
-
-                # Optionally, you can update the associated UserProfile if needed
-                # userProfile = UserProfile.objects.get(user=user)
-                # userProfile.country = country
-                # userProfile.district = district
-                # Update other UserProfile attributes as needed
-                # userProfile.save()
-
-                return JsonResponse({"message": "User updated successfully"})
-            except User.DoesNotExist:
-                return JsonResponse({"error": "User not found"}, status=404)
-
-    else:
-        # Handle GET requests, if needed
-        # You can return a rendered template for the form here
-        return redirect('userspanel')  # Replace with your template name
-    
-    
-    
-def delete_multiple_users(request):
+def add_warehouse(request):
     if request.method == 'POST':
-        # Get user IDs from the request
-        user_ids = request.POST.getlist('user_ids[]')
+        # Get data from the POST request
+        warehouse_name = request.POST.get('warehouse_name')
+        location = request.POST.get('location')
+        address = request.POST.get('address')
+        num_sectors = request.POST.get('num_sectors')
+        manager_allocated_id = request.POST.get('manager_allocated')
+        controller_allocated_id = request.POST.get('controller_allocated')
 
-        # Set the is_active field to null for the selected users
-        User.objects.filter(id__in=user_ids).update(is_active=False)
+        # Initialize manager and controller as None
+        manager = None
+        controller = None
 
-        # Return a JSON response to indicate successful deletion
-        return JsonResponse({'message': 'Users deleted successfully'})
+        # Retrieve the manager and controller based on their IDs
+        if manager_allocated_id:
+            try:
+                manager = UserRole.objects.get(id=manager_allocated_id)
+                print("Found Manager:", manager)
+                manager.is_allocated = True  # Update is_allocated field to True
+                manager.save()
+            except UserRole.DoesNotExist:
+                print("Manager not found")
 
-    # If the request method is not POST, return an error JSON response
-    return JsonResponse({'error': 'Invalid request method'}, status=400)
+        if controller_allocated_id:
+            try:
+                controller = UserRole.objects.get(id=controller_allocated_id)
+                print("Found Controller:", controller)
+                controller.is_allocated = True  # Update is_allocated field to True
+                controller.save()
+            except UserRole.DoesNotExist:
+                print("Controller not found")
+
+        # Create a new Warehouse object
+        warehouse = Warehouse(
+            warehouse_name=warehouse_name,
+            location=location,
+            address=address,
+            num_sectors=num_sectors,
+            manager=manager,  # Set the manager field
+            controller=controller,  # Set the controller field
+        )
+
+        # Save the warehouse object to the database
+        warehouse.save()
+
+        # Redirect to a success page or another appropriate view
+        return redirect('warehousepanel')  # Change 'success_page' to your desired URL name
+
+    # Render the template for GET requests
+    return render(request, 'warehousepanel.html')
