@@ -11,12 +11,12 @@ from .models import Warehouse, UserRole
 
 def adminindex(request):
     user = request.user  # Get the current logged-in user
-    return render(request, 'adminindex.html')
+    return render(request, 'Admin/adminindex.html')
 
 def userspanel(request):
     users_with_roles = User.objects.select_related('userrole').all()
     context = {'users_with_roles': users_with_roles}
-    return render(request, 'USERSpanel.html', context)
+    return render(request, 'Admin/USERSpanel.html', context)
 
 def add_user(request):
     if request.method == 'POST':
@@ -141,10 +141,6 @@ def warehousepanel(request):
     available_managers = UserRole.objects.filter(role='warehouse manager', is_allocated=False, user__is_active=True)
     available_controllers = UserRole.objects.filter(role='inventory controller', is_allocated=False, user__is_active=True)
 
-    # Check the values of available managers and controllers
-    print("Available Managers:", available_managers)
-    print("Available Controllers:", available_controllers)
-
     # Pass the warehouse objects and available users to the template context
     context = {
         'warehouses': warehouses,
@@ -152,7 +148,7 @@ def warehousepanel(request):
         'available_controllers': available_controllers,
     }
 
-    return render(request, 'WAREHOUSESPANEL.html', context)
+    return render(request, 'Admin/WAREHOUSESPANEL.html', context)
 
 
 
@@ -164,7 +160,8 @@ def add_warehouse(request):
         address = request.POST.get('address')
         num_sectors = request.POST.get('num_sectors')
         manager_allocated_id = request.POST.get('manager_allocated')
-        controller_allocated_id = request.POST.get('controller_allocated')
+        print(manager_allocated_id)
+        controller_allocated_id = int(request.POST.get('controller_allocated'))
 
         # Initialize manager and controller as None
         manager = None
@@ -173,19 +170,25 @@ def add_warehouse(request):
         # Retrieve the manager and controller based on their IDs
         if manager_allocated_id:
             try:
-                manager = UserRole.objects.get(id=manager_allocated_id)
+                manager_user = User.objects.get(id=manager_allocated_id)
+                manager = UserRole.objects.get(user=manager_user)
                 print("Found Manager:", manager)
                 manager.is_allocated = True  # Update is_allocated field to True
-                manager.save()
+                manager.save()  # Save the updated manager object
+            except User.DoesNotExist:
+                print("User not found")
             except UserRole.DoesNotExist:
                 print("Manager not found")
 
         if controller_allocated_id:
             try:
-                controller = UserRole.objects.get(id=controller_allocated_id)
+                controller_user = User.objects.get(id=controller_allocated_id)
+                controller = UserRole.objects.get(user=controller_user)
                 print("Found Controller:", controller)
                 controller.is_allocated = True  # Update is_allocated field to True
-                controller.save()
+                controller.save()  # Save the updated controller object
+            except User.DoesNotExist:
+                print("User not found")
             except UserRole.DoesNotExist:
                 print("Controller not found")
 
@@ -206,4 +209,4 @@ def add_warehouse(request):
         return redirect('warehousepanel')  # Change 'success_page' to your desired URL name
 
     # Render the template for GET requests
-    return render(request, 'warehousepanel.html')
+    return render(request, 'Admin/warehousepanel.html')

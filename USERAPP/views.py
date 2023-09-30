@@ -27,6 +27,8 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 
+from controllerapp.models import Stock
+
 # Project-Specific Imports
 from .forms import UserProfileForm
 from .models import Category, Product, ProductLocation, StorageLocation, Subcategory, Supplier, Orders, UserProfile, UserRole
@@ -68,6 +70,8 @@ def login(request):
                 return redirect('adminindex')  # Replace with the admin app index URL
             elif user_role_name == 'warehouse manager':
                 return redirect('index')  # Replace with the user app index URL
+            elif user_role_name == 'inventory controller':
+                return redirect('controllerindex')  # Replace with the user app index URL       
             else:
                 messages.error(request, "Invalid role")  # Handle invalid roles
                 return redirect('login')
@@ -438,12 +442,16 @@ def cancel_order(request, order_id):
     except Orders.DoesNotExist:
         return JsonResponse({'error': 'Order not found'}, status=404)
     
-@csrf_exempt
+
 def deliver_order(request, order_id):
     try:
         order = Orders.objects.get(pk=order_id)
-        order.order_status = 'Delivered'  # Set the order_status to "cancelled"
+        order.order_status = 'Delivered'  # Set the order_status to "Delivered"
+        order.delivered_at = timezone.now()  # Update the delivered_at field with the current time
         order.save()  # Save the changes to the order
+
+        # Create an entry in the Stock table
+        Stock.objects.create(order=order, is_stored=False)  # Assuming is_stored is False by default
 
         return JsonResponse({'message': 'Order has been delivered successfully'})
     except Orders.DoesNotExist:

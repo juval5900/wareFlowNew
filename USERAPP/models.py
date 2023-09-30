@@ -79,6 +79,7 @@ class Orders(models.Model):
     is_active = models.BooleanField(default=True)
     cancelled_at = models.DateTimeField(null=True, blank=True)
     is_stored = models.BooleanField(default=False)  # New field to indicate whether the order is stored or not
+    delivered_at = models.DateTimeField(null=True)  # New field to store the delivery date
 
     def soft_delete(self):
         self.is_active = False

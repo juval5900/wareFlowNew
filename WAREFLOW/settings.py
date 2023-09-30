@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'jazzmin',
     'USERAPP',
     'ADMINAPP',
+    'controllerapp',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
