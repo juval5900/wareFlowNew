@@ -232,7 +232,7 @@
 					   
 						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link active" href="{% url 'list_orders2' %}">
+							<a class="nav-link" href="{% url 'list_orders2' %}">
 								<span class="nav-icon">
 									<svg width="24" height="24" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M9.99998 15L9.99999 19C10 20.1046 9.10457 21 7.99999 21H4C2.89543 21 2 20.1046 2 19V15C2 13.8954 2.89543 13 4 13H7.99998C9.10455 13 9.99998 13.8954 9.99998 15Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> <path d="M16 4.99999L16 8.99999C16 10.1046 15.1046 11 14 11H10C8.89543 11 8 10.1046 8 9V5C8 3.89543 8.89543 3 10 3H14C15.1045 3 16 3.89543 16 4.99999Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> <path d="M22 15L22 19C22 20.1046 21.1046 21 20 21H16C14.8954 21 14 20.1046 14 19V15C14 13.8954 14.8954 13 16 13H20C21.1045 13 22 13.8954 22 15Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> <path d="M6 16V13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> <path d="M12 6V3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> <path d="M18 16V13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> </svg>
 								</span>
@@ -240,9 +240,9 @@
 							</a><!--//nav-link-->
 						</li><!--//nav-item-->
 										    
-					    <li class="nav-item">
+						<li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link" href="{% url 'sales' %}">
+							<a class="nav-link active" href="{% url 'sales' %}">
 								<span class="nav-icon">
 									<svg width="1em" height="1em" viewBox="0 0 16 16"
 										class="bi bi-question-circle" fill="currentColor"
@@ -343,15 +343,16 @@
 
 
 
-				<div id="orderFormPopup" class="popup" action="">
-					<h2>Add Order</h2>
-					<form method="post" enctype="multipart/form-data" id="add-order-form">
+				<div id="orderFormPopup" class="popup">
+					<h2>Add Sales</h2>
+					<form method="post" enctype="multipart/form-data" id="add-sales-form" action="{% url 'add_sales' %}">
 						{% csrf_token %}
 				
-						<input type="hidden" id="order-id" name="order-id">
+						<input type="hidden" id="sales-id" name="sales-id">
+				
 						<div class="form-group">
 							<label for="product">Product:</label>
-							<select id="product" name="product" class="form-control">
+							<select id="productfield" name="product" class="form-control">
 								<option value="" disabled selected>Select</option>
 								{% for Product in products %}
 								<option value="{{ Product.product_id }}">{{ Product.product_name }}</option>
@@ -359,37 +360,54 @@
 							</select>
 							<span id="product-error" class="error text-danger"></span> <!-- Error message for Product -->
 						</div>
+				
 						<div class="form-group">
-							<label for="supplier">Supplier:</label>
-							<select id="supplier" name="supplier" class="form-control">
+							<label for="stock">Stock:</label>
+							<select id="stockfield" name="stock" class="form-control">
 								<option value="" disabled selected>Select</option>
-								{% for Supplier in suppliers %}
-								<option value="{{ Supplier.supplier_id }}">{{ Supplier.supplier_name }}</option>
-								{% endfor %}
+								<!-- The options will be populated by the AJAX function -->
 							</select>
-							<span id="supplier-error" class="error text-danger"></span> <!-- Error message for Supplier -->
+							<span id="stock-error" class="error text-danger"></span> <!-- Error message for Stock -->
 						</div>
-						<!-- Replace orderstatus field with a hidden input -->
-						<input type="hidden" name="orderstatus" value="Order Placed">
-						<div class="form-group">
-							<label for="warehouse">Warehouse:</label>
-							<input type="text" id="warehouse" name="warehouse" class="form-control">
-							<span id="warehouse-error" class="error text-danger"></span> <!-- Error message for Warehouse -->
-						</div>
+				
+						<span id="buying-price-span" style="display: none;"></span>
+        
 						<div class="form-group">
 							<label for="quantity">Quantity:</label>
 							<input type="number" id="quantity" name="quantity" class="form-control">
 							<span id="quantity-error" class="error text-danger"></span> <!-- Error message for Quantity -->
 						</div>
+				
 						<div class="form-group">
-							<label for="buying_price">Buying Price:</label>
-							<input type="text" id="buying_price" name="buying_price" class="form-control">
-							<span id="buying_price-error" class="error text-danger"></span> <!-- Error message for Buying Price -->
+							<label for="delivery_address">Delivery Address:</label>
+							<textarea id="delivery_address" name="delivery_address" class="form-control"></textarea>
+							<span id="delivery_address-error" class="error text-danger"></span> <!-- Error message for Delivery Address -->
 						</div>
+				
+						<div class="form-group">
+							<label for="sales_price">Sales Price:</label>
+							<input type="number" id="sales_price" name="sales_price" class="form-control">
+							<span id="sales_price-error" class="error text-danger"></span> <!-- Error message for Sales Price -->
+						</div>
+				
+				
+						<div class="form-group">
+							<label for="buyer_name">Buyer Name:</label>
+							<input type="text" id="buyer_name" name="buyer_name" class="form-control">
+							<span id="buyer_name-error" class="error text-danger"></span> <!-- Error message for Buyer Name -->
+						</div>
+				
+						<div class="form-group">
+							<label for="buyer_contact_info">Buyer Contact Info:</label>
+							<input type="text" id="buyer_contact_info" name="buyer_contact_info" class="form-control">
+							<span id="buyer_contact_info-error" class="error text-danger"></span> <!-- Error message for Buyer Contact Info -->
+						</div>
+				
 						<input type="submit" value="Add" class="btn btn-primary">
 						<button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
 					</form>
 				</div>
+				
 				
 				  
                 
@@ -409,146 +427,194 @@
                 </script>
 				
 				
-				<div class="tab-content" id="orders-table-tab-content">
-					<div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
-						<div class="app-card app-card-orders-table shadow-sm mb-5">
-							<div class="app-card-body">
-								<div class="table-responsive">
-									<table class="table app-table-hover mb-0 text-left">
-										<thead>
-											<tr>
-												<th class="cell"></th> <!-- Add an empty header cell for checkboxes -->
-												<th class="cell">Product</th>
-												<th class="cell">Supplier</th>
-												<th class="cell">Warehouse</th>
-												<th class="cell">Date</th>
-												<th class="cell">Quantity</th>
-												<th class="cell">Buying Price</th> <!-- Added Buying Price column -->
-												<th class="cell">Total Price</th> <!-- Added Total Price column -->
-												<th class="cell">Status</th>
-												<th class="cell"></th>
-												<th class="cell"></th>
-												<th class="cell"></th>
-											</tr>
-										</thead>
-										<tbody>
-											{% for order in page %}
-												<tr class="order-row">
-													<td class="cell">
-														<input type="checkbox" class="order-checkbox" data-order-id="{{ order.order_id }}">
-														<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-													</td>
-													<td class="cell order-name"><span class="truncate">{{ order.product }}</span></td>
-													<td class="cell">{{ order.supplier }}</td>
-													<td class="cell">{{ order.warehouse }}</td>
-													<td class="cell">{{ order.order_datetime }}</td>
-													<td class="cell">{{ order.quantity }}</td>
-													<td class="cell">{{ order.buying_price }}</td> <!-- Display Buying Price -->
-													<td class="cell">{{ order.total_price }}</td> <!-- Calculate and Display Total Price -->
-													<td class="cell">{{ order.order_status }}</td>
-													<td class="cell">
-														{% if order.order_status == 'cancelled' %}
-															<button class="btn btn-danger text-white" disabled>Cancelled</button>
-														{% elif order.order_status == 'Delivered' %}
-															<a class="btn btn-danger text-white return-order" href="#" data-order-id="{{ order.order_id }}">Return</a>
-														{% elif order.order_status == 'Return Initiated' %}
-															<a class="btn btn-danger text-white delivered-order" href="#" data-order-id="{{ order.order_id }}">Cancel Return</a>
-														{% elif order.order_status == 'Return Completed' %}
-															<button class="btn btn-danger text-white" disabled>Returned</button>
-														{% else %}
-															<a class="btn btn-danger text-white cancel-order" href="#" data-order-id="{{ order.order_id }}">Cancel</a>
-														{% endif %}
-													</td>
-													<td class="cell">
-														{% if order.order_status == 'cancelled' %}
-															<button class="btn btn-primary text-white" disabled>Cancelled</button>
-														{% elif order.order_status == 'Delivered' %}
-															<button class="btn btn-primary text-white" disabled>Update</button>
-														{% elif order.order_status == 'Return Initiated' %}
-															<button class="btn btn-primary text-white" disabled>Update</button>
-														{% elif order.order_status == 'Return Completed' %}
-															<button class="btn btn-danger text-white" disabled>Returned</button>
-														{% else %}
-															<a class="btn btn-primary text-white update-order" href="#" data-order-id="{{ order.order_id }}">Update</a>
-														{% endif %}
-													</td>
-													<td class="cell">
-														{% if order.order_status == 'cancelled' %}
-															<button class="btn btn-danger text-white" disabled>Cancelled</button>
-														{% elif order.order_status == 'Delivered' %}
-															<button class="btn btn-danger text-white" disabled>Mark as Delivered</button>
-														{% elif order.order_status == 'Return Initiated' %}
-															<button class="btn btn-danger text-white returned-order" data-order-id="{{ order.order_id }}">Mark as Return Complete</button>
-														{% elif order.order_status == 'Return Completed' %}
-															<button class="btn btn-danger text-white" disabled>Returned</button>
-														{% else %}
-															<a class="btn btn-danger text-white delivered-order" href="#" data-order-id="{{ order.order_id }}">Mark as Delivered</a>
-														{% endif %}
-													</td>
-												</tr>
-											{% endfor %}
-										</tbody>
-									</table>
-									<!-- Add a "Delete All" button that starts as disabled -->
-								</div><!--//table-responsive-->
-							</div><!--//app-card-body-->
-						</div><!--//app-card-->
-					</div>
-				</div>
+				<!-- ... Rest of your HTML code ... -->
+<div class="tab-content" id="sales-table-tab-content">
+    <div class="tab-pane fade show active" id="sales-all" role="tabpanel" aria-labelledby="sales-all-tab">
+        <div class="app-card app-card-sales-table shadow-sm mb-5">
+            <div class="app-card-body">
+                <div class="table-responsive">
+                    <table class="table app-table-hover mb-0 text-left">
+                        <thead>
+                            <tr>
+                                <th class="cell"></th>
+                                <th class="cell">Product</th>
+                                <th class="cell">Supplier</th>
+                                <th class="cell">Date</th>
+                                <th class="cell">Quantity</th>
+                                <th class="cell">Delivery Address</th>
+                                <th class="cell">Sales Price</th>
+                                <th class="cell">Total Sales Price</th> <!-- Add this header -->
+                                <th class="cell">Total Buying Price</th> <!-- Add this header -->
+                                <th class="cell">Profit</th> <!-- Add this header -->
+                                <th class="cell">Status</th>
+                                <th class="cell"></th>
+                                <th class="cell"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in sales %}
+                                <tr class="sales-row">
+                                    <td class="cell">
+                                        <input type="checkbox" class="sales-checkbox" data-sale-id="{{ sale.id }}">
+                                        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                    </td>
+                                    <td class="cell">{{ sale.product }}</td>
+                                    <td class="cell">{{ sale.stock.order.supplier }}</td>
+                                    <td class="cell">{{ sale.date_field }}</td>
+                                    <td class="cell">{{ sale.quantity }}</td>
+                                    <td class="cell">{{ sale.delivery_address }}</td>
+                                    <td class="cell">{{ sale.sales_price }}</td>
+                                    <td class="cell">{{ sale.total_sales_price }}</td> <!-- Display the total sales price here -->
+                                    <td class="cell">{{ sale.total_buying_price }}</td> <!-- Display the total buying price here -->
+                                    <td class="cell">{{ sale.profit }}</td> <!-- Display the profit here -->
+                                    <td class="cell">{{ sale.status }}</td>
+                                    <td class="cell">
+                                        {% if sale.status == "Order Placed" %}
+                                            <button class="btn btn-success deliver-sale" id="deliver-sale" data-sale-id="{{ sale.id }}">Mark as Delivered</button>
+                                        {% else %}
+                                            <button class="btn btn-success deliver-sale" id="deliver-sale" data-sale-id="{{ sale.id }}" disabled>Mark as Delivered</button>
+                                        {% endif %}
+                                    </td>
+                                    <td class="cell">
+                                        {% if sale.status == "Order Placed" %}
+                                            <button class="btn btn-danger cancel-sale" id="cancel-sale" data-sale-id="{{ sale.id }}">Cancel</button>
+                                        {% else %}
+                                            <button class="btn btn-danger cancel-sale" id="cancel-sale" data-sale-id="{{ sale.id }}" disabled>Cancel</button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 				
+
+				
+				
+	
 		
 <script>
     $(document).ready(function () {
+
+		const productSelectq = $("#productfield");
+const stockSelect = $("#stockfield");
+const buyingPriceSpan = $("#buying-price-span");
+
+// Add an event listener to the product select element
+productSelectq.on("change", function () {
+    // Get the selected product ID
+    const selectedProductId = $(this).val();
+
+    // Fetch the corresponding stock data for the selected product using AJAX
+    $.ajax({
+        url: `/get-stock-for-product/${selectedProductId}/`,
+        method: "GET",
+        dataType: "json",
+        success: function (data) {
+            // Clear existing options in the stock select element
+            stockSelect.empty();
+
+            // Add a default "Select" option
+            stockSelect.append($('<option>', {
+                value: "",
+                text: "Select",
+                disabled: true,
+                selected: true
+            }));
+
+            // Populate the stock select element with the retrieved stock data
+            $.each(data.stocks, function (index, stock) {
+                stockSelect.append($('<option>', {
+                    value: stock.id,
+                    text: stock.stock_name
+                }));
+            });
+        },
+        error: function (error) {
+            console.error("Error fetching stock data:", error);
+        }
+    });
+});
+
+// Add an event listener to the stock select element
+stockSelect.on("change", function () {
+    // Fetch the buying price for the selected stock using an AJAX request
+    const selectedStockId = $(this).val(); // Get the selected stock ID
+    if (selectedStockId) {
+        $.ajax({
+            url: `/get-buying-price-for-stock/${selectedStockId}/`,
+            method: "GET",
+            dataType: "json",
+            success: function (buyingPriceData) {
+                // Display the buying price in the buying_price span
+                buyingPriceSpan.text("Buying Price: " + buyingPriceData.buying_price);
+                buyingPriceSpan.show(); // Show the span
+            },
+            error: function (error) {
+                console.error("Error fetching buying price:", error);
+            }
+        });
+    } else {
+        // If no stock is selected, hide the buying price span
+        buyingPriceSpan.hide();
+    }
+});
+
+
 		// Add an event listener to handle delete clicks
-		const deleteLinks = document.querySelectorAll(".cancel-order");
-	
-		deleteLinks.forEach(link => {
+		const cancelOrderLinks = document.querySelectorAll(".cancel-sale");
+
+		cancelOrderLinks.forEach(link => {
 			link.addEventListener("click", function (e) {
 				e.preventDefault();
-				const orderId = link.getAttribute("data-order-id");
-	
-				if (orderId) {
+				const orderId = link.getAttribute("data-sale-id");
 
+				if (orderId) {
 					const confirmation = window.confirm("Are you sure you want to Cancel this order?");
 
-                
-                if (confirmation) {
-					// Send an AJAX request to the Django view to delete the order
-					$.ajax({
-						url: `/cancel_order/${orderId}/`, // Replace with your delete view URL
-						method: "POST", // or "GET" depending on your view
-						data: {
-							csrfmiddlewaretoken: '{{ csrf_token }}', // Include CSRF token
-						},
-						success: function (data) {
-							// Handle success (e.g., remove the row from the table)
-							link.closest("tr").remove();
-							window.location.href = "/list_orders2/";
-						},
-						error: function (error) {
-							console.error("Error cancelling order:", error);
-						},
-					});
-				}
+					if (confirmation) {
+						// Send an AJAX request to cancel the sale
+						$.ajax({
+							url: `/cancel_sale/${orderId}/`, // Updated URL for cancelling sales
+							method: "POST", // or "GET" depending on your view
+							data: {
+								csrfmiddlewaretoken: '{{ csrf_token }}', // Include CSRF token
+							},
+							success: function (data) {
+								// Handle success (e.g., remove the row from the table)
+								link.closest("tr").remove();
+								window.location.href = "/sales/";
+							},
+							error: function (error) {
+								console.error("Error cancelling sale:", error);
+							},
+						});
+					}
 				}
 			});
 		});
+
 	
 
-		const deliverLinks = document.querySelectorAll(".delivered-order");
+		const deliverLinks = document.querySelectorAll(".deliver-sale");
 	
 		deliverLinks.forEach(link => {
 			link.addEventListener("click", function (e) {
 				e.preventDefault();
-				const orderId = link.getAttribute("data-order-id");
+				const saleId = link.getAttribute("data-sale-id");
 	
-				if (orderId) {
+				if (saleId) {
 					const confirmation = window.confirm("Are you sure you want to mark this order as Delivered?");
                 
                 if (confirmation) {
 					// Send an AJAX request to the Django view to delete the order
 					$.ajax({
-						url: `/deliver_order/${orderId}/`, // Replace with your delete view URL
+						url: `/deliver_sale/${saleId}/`, // Replace with your delete view URL
 						method: "POST", // or "GET" depending on your view
 						data: {
 							csrfmiddlewaretoken: '{{ csrf_token }}', // Include CSRF token
@@ -556,7 +622,7 @@
 						success: function (data) {
 							// Handle success (e.g., remove the row from the table)
 							link.closest("tr").remove();
-							window.location.href = "/list_orders2/";
+							window.location.href = "/sales/";
 						},
 						error: function (error) {
 							console.error("Error delivering order:", error);
@@ -569,204 +635,88 @@
 
 
 
-		const returnedLinks = document.querySelectorAll(".returned-order");
-	
-		returnedLinks.forEach(link => {
-			link.addEventListener("click", function (e) {
-				e.preventDefault();
-				const orderId = link.getAttribute("data-order-id");
-	
-				if (orderId) {
-					const confirmation = window.confirm("Are you sure you want to mark this order as Return Completed?");
-                
-                if (confirmation) {
-					// Send an AJAX request to the Django view to delete the order
-					$.ajax({
-						url: `/returned_order/${orderId}/`, // Replace with your delete view URL
-						method: "POST", // or "GET" depending on your view
-						data: {
-							csrfmiddlewaretoken: '{{ csrf_token }}', // Include CSRF token
-						},
-						success: function (data) {
-							// Handle success (e.g., remove the row from the table)
-							link.closest("tr").remove();
-							window.location.href = "/list_orders2/";
-						},
-						error: function (error) {
-							console.error("Error returning order:", error);
-						},
-					});
-				}
-				}
-			});
-		});
 
 
-		const returnLinks = document.querySelectorAll(".return-order");
-	
-		returnLinks.forEach(link => {
-			link.addEventListener("click", function (e) {
-				e.preventDefault();
-				const orderId = link.getAttribute("data-order-id");
-	
-				if (orderId) {
-					const confirmation = window.confirm("Are you sure you want to mark this order as returned?");
-                
-                if (confirmation) {
-					// Send an AJAX request to the Django view to delete the order
-					$.ajax({
-						url: `/return_order/${orderId}/`, // Replace with your delete view URL
-						method: "POST", // or "GET" depending on your view
-						data: {
-							csrfmiddlewaretoken: '{{ csrf_token }}', // Include CSRF token
-						},
-						success: function (data) {
-							// Handle success (e.g., remove the row from the table)
-							link.closest("tr").remove();
-							window.location.href = "/list_orders2/";
-						},
-						error: function (error) {
-							console.error("Error returning order:", error);
-						},
-					});
-				}
-				}
-			});
-		});
 
-		// Add event listeners for checkboxes
-		const checkboxes = document.querySelectorAll(".order-checkbox");
-	
+			// Add event listeners for checkboxes
+		// Assuming you have a list of checkboxes with the class "sales-checkbox"
+		const checkboxes = document.querySelectorAll(".sales-checkbox");
+
 		checkboxes.forEach(checkbox => {
 			checkbox.addEventListener("change", function () {
 				// Check if at least one checkbox is checked
 				const isChecked = Array.from(checkboxes).some(cb => cb.checked);
 				const deleteAllButton = document.getElementById("deleteAllButton");
-				
+
 				// Enable or disable the "Delete All" button based on checkbox state
 				deleteAllButton.disabled = !isChecked;
 			});
 		});
-	
-		// Add an event listener for the "Delete All" button
-		const csrfToken = "{{ csrf_token }}";	
+
+
+		const csrfToken = "{{ csrf_token }}"; // Replace with your Django CSRF token
+
 		const deleteAllButton = document.getElementById("deleteAllButton");
-		
 
 		deleteAllButton.addEventListener("click", function () {
-			const checkedCheckboxes = document.querySelectorAll(".order-checkbox:checked");
-		
-		
+			const checkedCheckboxes = document.querySelectorAll(".sales-checkbox:checked");
+
 			// Show a confirmation dialog
-			const confirmation = window.confirm("Are you sure you want to delete the selected orders?");
-			
+			const confirmation = window.confirm("Are you sure you want to delete the selected sales?");
+
 			if (confirmation) {
-				// Get the order IDs of selected checkboxes
-				const orderIds = Array.from(checkedCheckboxes).map(cb => cb.getAttribute("data-order-id"));
-		
+				// Get the sale IDs of selected checkboxes
+				const saleIds = Array.from(checkedCheckboxes).map(cb => cb.getAttribute("data-sale-id"));
+
 				// Create a FormData object to send the data including the CSRF token
 				const formData = new FormData();
-				orderIds.forEach(orderId => {
-					formData.append("order_ids[]", orderId);
+				saleIds.forEach(saleId => {
+					formData.append("sale_ids[]", saleId);
 				});
-		
+
 				formData.append("csrfmiddlewaretoken", csrfToken);
-		
-				// Send an AJAX request to delete multiple orders
+
+				// Send an AJAX request to delete multiple sales
 				$.ajax({
-					url: `/cancel-multiple-orders/`, // Replace with your delete multiple orders view URL
+					url: `/delete-multiple-sales/`, // Replace with your delete multiple sales view URL
 					method: "POST", // or "GET" depending on your view
 					data: formData, // Send the FormData object
 					processData: false, // Prevent jQuery from processing the data
 					contentType: false, // Set content type to false to prevent jQuery from adding a content type header
 					success: function (data) {
 						// Handle success (e.g., remove the rows from the table)
-						orderIds.forEach(orderId => {
-							const rowToRemove = document.querySelector(`.order-row[data-order-id="${orderId}"]`);
+						saleIds.forEach(saleId => {
+							const rowToRemove = document.querySelector(`.sales-row[data-sale-id="${saleId}"]`);
 							if (rowToRemove) {
 								rowToRemove.remove();
 							}
 						});
-		
+
 						// Disable the "Delete All" button after deletion
 						deleteAllButton.disabled = true;
-						
-						// Redirect to the order list page
-						window.location.href = "/list_orders2/";
+
+						// Redirect to the sales list page
+						window.location.href = "/sales/";
 					},
 					error: function (error) {
-						console.error("Error deleting orders:", error);
+						console.error("Error deleting sales:", error);
 					},
 				});
 			}
 		});
-		
-
-
-		function fetchorderData(orderId) {
-			$.ajax({
-				url: `/get-order-details/${orderId}/`,
-				method: "GET",
-				dataType: "json", // Specify the expected data type as JSON
-				success: function (orderData) {
-					// Populate the form fields with the retrieved data
-
-                    
-                    //document.getElementById("orderImageupdate").value = orderData.order_name;
-					document.getElementById("product").value = orderData.product_id;
-					document.getElementById("supplier").value = orderData.supplier_id;
-					document.getElementById("warehouse").value = orderData.warehouse;
-					document.getElementById("quantity").value = orderData.quantity;
-
-					// Optionally, you can add logging to verify the data
-					console.log("order Data:", orderData);
-				},
-				error: function () {
-					// Handle error if the AJAX request fails
-					console.error("Failed to fetch order data.");
-				},
-			});
-		}
-		
-		
-		
-
-        // Add an event listener for the update form
-        const updateButtons = document.querySelectorAll('.update-order');
-        
-        const orderFormPopup = document.getElementById('orderFormPopup');
-        const cancelupdateButton = document.getElementById('cancelButton');
-
-        
-
-        updateButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                orderFormPopup.style.display = 'block';
-                
-                const orderId = button.getAttribute('data-order-id');
-                document.getElementById('order-id').value = orderId;
-				fetchorderData(orderId);
-            });
-        });
-
-        cancelButton.addEventListener('click', () => {
-            orderFormPopup.style.display = 'none';
-			window.location.href = "/list_orders2/";
-        });
-
 
 		$('#search-orders').on('input', function () {
 			var searchText = $(this).val().toLowerCase();
-			searchorders(searchText);
+			searchOrders(searchText);
 		});
-	
+
 		// Function to search for orders based on the order name
-		function searchorders(searchText) {
+		function searchOrders(searchText) {
 			// Iterate through each order row
-			$('.order-row').each(function () {
-				var orderName = $(this).find('.order-name').text().toLowerCase();
+			$('.sales-row').each(function () {
+				var orderName = $(this).find('.cell').eq(1).text().toLowerCase(); // Get the product cell (index 1) text
 				var row = $(this);
-	
+
 				// Check if the order name contains the search text
 				if (orderName.includes(searchText)) {
 					row.show(); // Show the row if it matches
@@ -775,156 +725,10 @@
 				}
 			});
 		}
+
+
+		
    
-
-        const updateorderForm = document.getElementById("add-order-form");
-
-        updateorderForm.addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            // Collect the updated data from the form
-            const formData = new FormData(updateorderForm);
-
-            // Extract the order_id from the form or data attributes
-            const orderId = document.getElementById("order-id").value;
-
-
-			let baseUrl =  `/add_orders/`;
-
-							if (orderId) {
-								// If productId is not null, append it to the base URL
-								baseUrl =  `/update_order/${orderId}/`;
-							}
-            // Send an AJAX request to the update URL
-            $.ajax({
-				headers: {
-					'X-CSRFToken': csrfToken
-				},
-                url: baseUrl,
-                method: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (data) {
-                    // Handle success (e.g., show a success message)
-                    console.log(data.message);
-					window.location.href = "/list_orders2/"; // Replace with the correct URL
-                },
-                error: function (error) {
-                    // Handle errors (e.g., display an error message)
-                    console.error("Error updating order:", error);
-                },
-            });
-			
-        });
-
-		
-		
-		  function generatePDF() {
-			const pdf = new jsPDF();
-		
-			// Loop through each row of the table and add data to the PDF
-			const rows = document.querySelectorAll('.order-row');
-			rows.forEach((row, index) => {
-			  const name = row.querySelector('.order-name').textContent;
-			  const category = row.querySelectorAll('.cell')[2].textContent;
-			  const subcategory = row.querySelectorAll('.cell')[3].textContent;
-		
-			  // Add data to the PDF
-			  pdf.text(`Row ${index + 1}`, 10, 10 + index * 10);
-			  pdf.text(`Name: ${name}`, 20, 20 + index * 10);
-			  pdf.text(`Category: ${category}`, 20, 30 + index * 10);
-			  pdf.text(`Subcategory: ${subcategory}`, 20, 40 + index * 10);
-		
-			  // Check if we need to add a new page for the next row
-			  if (index < rows.length - 1) {
-				pdf.addPage();
-			  }
-			});
-		
-			// Save the PDF as a file
-			pdf.save('order_report.pdf');
-		  }
-			
-		  document.getElementById('generate-pdf-btn').addEventListener('click', function () {
-			generatePDF();
-		  });
-
-
-		  const orderForm = document.getElementById("add-order-form");
-		  const productSelect = document.getElementById("product");
-		  const supplierSelect = document.getElementById("supplier");
-		  const warehouseInput = document.getElementById("warehouse");
-		  const quantityInput = document.getElementById("quantity");
-		
-		  // Function to validate the "Product" field
-		  function validateProduct() {
-			const selectedProductValue = productSelect.value;
-			const productError = document.getElementById("product-error");
-			if (selectedProductValue === "") {
-			  productError.textContent = "Please select a product.";
-			} else {
-			  productError.textContent = "";
-			}
-		  }
-		
-		  // Function to validate the "Supplier" field
-		  function validateSupplier() {
-			const selectedSupplierValue = supplierSelect.value;
-			const supplierError = document.getElementById("supplier-error");
-			if (selectedSupplierValue === "") {
-			  supplierError.textContent = "Please select a supplier.";
-			} else {
-			  supplierError.textContent = "";
-			}
-		  }
-		
-		  // Function to validate the warehouse field (only alphabets and numbers, no spaces or special symbols)
-		  function validateWarehouse() {
-			const warehouseValue = warehouseInput.value;
-			const warehouseError = document.getElementById("warehouse-error");
-			const warehouseRegex = /^[A-Za-z0-9]+$/;
-			if (!warehouseRegex.test(warehouseValue)) {
-			  warehouseError.textContent = "Warehouse field must contain only alphabets and numbers.";
-			} else {
-			  warehouseError.textContent = "";
-			}
-		  }
-		
-		  // Function to validate the quantity field (only numerical values)
-		  function validateQuantity() {
-			const quantityValue = quantityInput.value;
-			const quantityError = document.getElementById("quantity-error");
-			if (!/^\d+$/.test(quantityValue)) {
-			  quantityError.textContent = "Quantity field must contain only numerical values.";
-			} else {
-			  quantityError.textContent = "";
-			}
-		  }
-		
-		  // Add input event listeners to trigger field validation on input
-		  productSelect.addEventListener("input", validateProduct);
-		  supplierSelect.addEventListener("input", validateSupplier);
-		  warehouseInput.addEventListener("input", validateWarehouse);
-		  quantityInput.addEventListener("input", validateQuantity);
-		
-		  // Add submit event listener to prevent form submission if there are errors
-		  orderForm.addEventListener("submit", function (e) {
-			// Call validation functions before form submission
-			validateProduct();
-			validateSupplier();
-			validateWarehouse();
-			validateQuantity();
-		
-			// Check for any error messages
-			const errorMessages = document.querySelectorAll(".error");
-			for (const errorMessage of errorMessages) {
-			  if (errorMessage.textContent) {
-				e.preventDefault(); // Prevent form submission if there are errors
-				return;
-			  }
-			}
-		  });
 	});
 </script>
 

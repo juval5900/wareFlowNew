@@ -72,14 +72,16 @@ class Orders(models.Model):
     order_id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
-    order_datetime = models.DateTimeField(unique=True)  # Combining date and time in a single field
+    order_datetime = models.DateTimeField(unique=True)
     order_status = models.CharField(max_length=255)
     warehouse = models.CharField(max_length=255, null=True)
     quantity = models.PositiveIntegerField()
+    buying_price = models.DecimalField(max_digits=10, decimal_places=2,default='100')  # New field for buying price
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)  # New field for total price
     is_active = models.BooleanField(default=True)
     cancelled_at = models.DateTimeField(null=True, blank=True)
-    is_stored = models.BooleanField(default=False)  # New field to indicate whether the order is stored or not
-    delivered_at = models.DateTimeField(null=True)  # New field to store the delivery date
+    is_stored = models.BooleanField(default=False)
+    delivered_at = models.DateTimeField(null=True)
 
     def soft_delete(self):
         self.is_active = False
@@ -90,6 +92,11 @@ class Orders(models.Model):
         self.is_active = True
         self.cancelled_at = None
         self.save()
+
+    def save(self, *args, **kwargs):
+        # Calculate the total price based on buying price and quantity
+        self.total_price = self.buying_price * self.quantity
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return str(self.order_id)

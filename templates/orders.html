@@ -353,45 +353,51 @@
 				<div id="orderFormPopup" class="popup" action="">
 					<h2>Add Order</h2>
 					<form method="post" enctype="multipart/form-data" id="add-order-form">
-					  {% csrf_token %}
-				  
-					  <input type="hidden" id="order-id" name="order-id">
-					  <div class="form-group">
-						<label for="product">Product:</label>
-						<select id="product" name="product" class="form-control">
-						  <option value="" disabled selected>Select</option>
-						  {% for Product in products %}
-						  <option value="{{ Product.product_id }}">{{ Product.product_name }}</option>
-						  {% endfor %}
-						</select>
-						<span id="product-error" class="error text-danger"></span> <!-- Error message for Product -->
-					  </div>
-					  <div class="form-group">
-						<label for="supplier">Supplier:</label>
-						<select id="supplier" name="supplier" class="form-control">
-						  <option value="" disabled selected>Select</option>
-						  {% for Supplier in suppliers %}
-						  <option value="{{ Supplier.supplier_id }}">{{ Supplier.supplier_name }}</option>
-						  {% endfor %}
-						</select>
-						<span id="supplier-error" class="error text-danger"></span> <!-- Error message for Supplier -->
-					  </div>
-					  <!-- Replace orderstatus field with a hidden input -->
-					  <input type="hidden" name="orderstatus" value="Order Placed">
-					  <div class="form-group">
-						<label for="warehouse">Warehouse:</label>
-						<input type="text" id="warehouse" name="warehouse" class="form-control">
-						<span id="warehouse-error" class="error text-danger"></span> <!-- Error message for Warehouse -->
-					  </div>
-					  <div class="form-group">
-						<label for="quantity">Quantity:</label>
-						<input type="number" id="quantity" name="quantity" class="form-control">
-						<span id="quantity-error" class="error text-danger"></span> <!-- Error message for Quantity -->
-					  </div>
-					  <input type="submit" value="Add" class="btn btn-primary">
-					  <button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
+						{% csrf_token %}
+				
+						<input type="hidden" id="order-id" name="order-id">
+						<div class="form-group">
+							<label for="product">Product:</label>
+							<select id="product" name="product" class="form-control">
+								<option value="" disabled selected>Select</option>
+								{% for Product in products %}
+								<option value="{{ Product.product_id }}">{{ Product.product_name }}</option>
+								{% endfor %}
+							</select>
+							<span id="product-error" class="error text-danger"></span> <!-- Error message for Product -->
+						</div>
+						<div class="form-group">
+							<label for="supplier">Supplier:</label>
+							<select id="supplier" name="supplier" class="form-control">
+								<option value="" disabled selected>Select</option>
+								{% for Supplier in suppliers %}
+								<option value="{{ Supplier.supplier_id }}">{{ Supplier.supplier_name }}</option>
+								{% endfor %}
+							</select>
+							<span id="supplier-error" class="error text-danger"></span> <!-- Error message for Supplier -->
+						</div>
+						<!-- Replace orderstatus field with a hidden input -->
+						<input type="hidden" name="orderstatus" value="Order Placed">
+						<div class="form-group">
+							<label for="warehouse">Warehouse:</label>
+							<input type="text" id="warehouse" name="warehouse" class="form-control">
+							<span id="warehouse-error" class="error text-danger"></span> <!-- Error message for Warehouse -->
+						</div>
+						<div class="form-group">
+							<label for="quantity">Quantity:</label>
+							<input type="number" id="quantity" name="quantity" class="form-control">
+							<span id="quantity-error" class="error text-danger"></span> <!-- Error message for Quantity -->
+						</div>
+						<div class="form-group">
+							<label for="buying_price">Buying Price:</label>
+							<input type="text" id="buying_price" name="buying_price" class="form-control">
+							<span id="buying_price-error" class="error text-danger"></span> <!-- Error message for Buying Price -->
+						</div>
+						<input type="submit" value="Add" class="btn btn-primary">
+						<button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
 					</form>
-				  </div>
+				</div>
+				
 				  
                 
                 <script>
@@ -420,82 +426,83 @@
 											<tr>
 												<th class="cell"></th> <!-- Add an empty header cell for checkboxes -->
 												<th class="cell">Product</th>
-                                                <th class="cell">Supplier</th>
+												<th class="cell">Supplier</th>
 												<th class="cell">Warehouse</th>
 												<th class="cell">Date</th>
 												<th class="cell">Quantity</th>
+												<th class="cell">Buying Price</th> <!-- Added Buying Price column -->
+												<th class="cell">Total Price</th> <!-- Added Total Price column -->
 												<th class="cell">Status</th>
 												<th class="cell"></th>
-                                                <th class="cell"></th>
+												<th class="cell"></th>
 												<th class="cell"></th>
 											</tr>
 										</thead>
 										<tbody>
 											{% for order in page %}
-													<tr class="order-row">
-														<td class="cell">
-															<input type="checkbox" class="order-checkbox" data-order-id="{{ order.order_id }}">
-															<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-														</td>
-														<td class="cell order-name"><span class="truncate">{{ order.product }}</span></td>
-														<td class="cell">{{ order.supplier }}</td>
-														<td class="cell">{{ order.warehouse }}</td>
-														<td class="cell">{{ order.order_datetime }}</td>
-														<td class="cell">{{ order.quantity }}</td>
-														<td class="cell">{{ order.order_status }}</td>
-														<td class="cell">
-															{% if order.order_status == 'cancelled' %}
-																<button class="btn btn-danger text-white" disabled>Cancelled</button>
-															{% elif order.order_status == 'Delivered' %}
-																<a class="btn btn-danger text-white return-order" href="#" data-order-id="{{ order.order_id }}">Return</a>
-															{% elif order.order_status == 'Return Initiated' %}
-																<a class="btn btn-danger text-white delivered-order" href="#" data-order-id="{{ order.order_id }}">Cancel Return</a>
-															{% elif order.order_status == 'Return Completed' %}
-															<button class="btn btn-danger text-white" disabled>Returned</a>
-															{% else %}
-																<a class="btn btn-danger text-white cancel-order" href="#" data-order-id="{{ order.order_id }}">Cancel</a>
-															{% endif %}
-														</td>
-														<td class="cell">
-															{% if order.order_status == 'cancelled' %}
-																<button class="btn btn-primary text-white" disabled>Cancelled</button>
-															{% elif order.order_status == 'Delivered' %}
-																<button class="btn btn-primary text-white" disabled>Update</button>
-															{% elif order.order_status == 'Return Initiated' %}
+												<tr class="order-row">
+													<td class="cell">
+														<input type="checkbox" class="order-checkbox" data-order-id="{{ order.order_id }}">
+														<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+													</td>
+													<td class="cell order-name"><span class="truncate">{{ order.product }}</span></td>
+													<td class="cell">{{ order.supplier }}</td>
+													<td class="cell">{{ order.warehouse }}</td>
+													<td class="cell">{{ order.order_datetime }}</td>
+													<td class="cell">{{ order.quantity }}</td>
+													<td class="cell">{{ order.buying_price }}</td> <!-- Display Buying Price -->
+													<td class="cell">{{ order.total_price }}</td> <!-- Calculate and Display Total Price -->
+													<td class="cell">{{ order.order_status }}</td>
+													<td class="cell">
+														{% if order.order_status == 'cancelled' %}
+															<button class="btn btn-danger text-white" disabled>Cancelled</button>
+														{% elif order.order_status == 'Delivered' %}
+															<a class="btn btn-danger text-white return-order" href="#" data-order-id="{{ order.order_id }}">Return</a>
+														{% elif order.order_status == 'Return Initiated' %}
+															<a class="btn btn-danger text-white delivered-order" href="#" data-order-id="{{ order.order_id }}">Cancel Return</a>
+														{% elif order.order_status == 'Return Completed' %}
+															<button class="btn btn-danger text-white" disabled>Returned</button>
+														{% else %}
+															<a class="btn btn-danger text-white cancel-order" href="#" data-order-id="{{ order.order_id }}">Cancel</a>
+														{% endif %}
+													</td>
+													<td class="cell">
+														{% if order.order_status == 'cancelled' %}
+															<button class="btn btn-primary text-white" disabled>Cancelled</button>
+														{% elif order.order_status == 'Delivered' %}
 															<button class="btn btn-primary text-white" disabled>Update</button>
-															{% elif order.order_status == 'Return Completed' %}
-															<button class="btn btn-danger text-white" disabled>Returned</a>
-															{% else %}
-									
-																<a class="btn btn-primary text-white update-order" href="#" data-order-id="{{ order.order_id }}">Update</a>
-															{% endif %}
-														</td>
-														<td class="cell">
-															{% if order.order_status == 'cancelled' %}
-																<button class="btn btn-danger text-white" disabled>Cancelled</button>
-															{% elif order.order_status == 'Delivered' %}
-																<button class="btn btn-danger text-white" disabled>Mark as Delivered</button>
-															{% elif order.order_status == 'Return Initiated' %}
+														{% elif order.order_status == 'Return Initiated' %}
+															<button class="btn btn-primary text-white" disabled>Update</button>
+														{% elif order.order_status == 'Return Completed' %}
+															<button class="btn btn-danger text-white" disabled>Returned</button>
+														{% else %}
+															<a class="btn btn-primary text-white update-order" href="#" data-order-id="{{ order.order_id }}">Update</a>
+														{% endif %}
+													</td>
+													<td class="cell">
+														{% if order.order_status == 'cancelled' %}
+															<button class="btn btn-danger text-white" disabled>Cancelled</button>
+														{% elif order.order_status == 'Delivered' %}
+															<button class="btn btn-danger text-white" disabled>Mark as Delivered</button>
+														{% elif order.order_status == 'Return Initiated' %}
 															<button class="btn btn-danger text-white returned-order" data-order-id="{{ order.order_id }}">Mark as Return Complete</button>
-															{% elif order.order_status == 'Return Completed' %}
-															<button class="btn btn-danger text-white" disabled>Returned</a>
-															{% else %}
-																<a class="btn btn-danger text-white delivered-order" href="#" data-order-id="{{ order.order_id }}">Mark as Delivered</a>
-															{% endif %}
-														</td>
-													</tr>
+														{% elif order.order_status == 'Return Completed' %}
+															<button class="btn btn-danger text-white" disabled>Returned</button>
+														{% else %}
+															<a class="btn btn-danger text-white delivered-order" href="#" data-order-id="{{ order.order_id }}">Mark as Delivered</a>
+														{% endif %}
+													</td>
+												</tr>
 											{% endfor %}
 										</tbody>
-										
 									</table>
-									
 									<!-- Add a "Delete All" button that starts as disabled -->
-									
 								</div><!--//table-responsive-->
 							</div><!--//app-card-body-->
 						</div><!--//app-card-->
 					</div>
 				</div>
+				
 				
 	
 		

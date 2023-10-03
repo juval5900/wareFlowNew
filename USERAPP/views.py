@@ -393,30 +393,41 @@ def check_suppliercontact(request):
     return JsonResponse({'exists': exists})
 
 
+from django.shortcuts import render, redirect
+from django.utils import timezone
+from .models import Orders, Product, Supplier
+
 def add_orders(request):
     if request.method == 'POST':
         product_id = request.POST['product']
         supplier_id = request.POST.get('supplier')
+        buying_price_str = request.POST.get('buying_price')
+        # Convert buying_price to a float (or integer, if it's always a whole number)
+        buying_price = float(buying_price_str) if buying_price_str else 0.0  # Default to 0.0 if empty
         product = Product.objects.get(pk=product_id)
         supplier = Supplier.objects.get(pk=supplier_id)
         order_status = request.POST['orderstatus']
         warehouse = request.POST.get('warehouse')
-        quantity = request.POST.get('quantity')
-        
+        quantity_str = request.POST.get('quantity')
+        # Convert quantity to an integer
+        quantity = int(quantity_str) if quantity_str else 0  # Default to 0 if empty
 
         order = Orders(
             product=product,
             supplier=supplier,
-            order_datetime=timezone.now(),  # Set the current date and time
+            buying_price=buying_price,
+            order_datetime=timezone.now(),
             order_status=order_status,
             warehouse=warehouse,
             quantity=quantity,
-            is_active=True  # Assuming new orders are active by default
+            is_active=True
         )
+        # Calculate the total price
+        order.total_price = buying_price * quantity
         order.save()
 
         # Redirect to a success page or wherever you want
-        return redirect('list_orders')  # Change 'success_page' to the actual URL
+        return redirect('list_orders')
     
     
 def list_orders(request):
@@ -450,8 +461,12 @@ def deliver_order(request, order_id):
         order.delivered_at = timezone.now()  # Update the delivered_at field with the current time
         order.save()  # Save the changes to the order
 
-        # Create an entry in the Stock table
-        Stock.objects.create(order=order, is_stored=False)  # Assuming is_stored is False by default
+        # Create an entry in the Stock table with the remaining_quantity set to the order's quantity
+        Stock.objects.create(
+            order=order,
+            is_stored=False,
+            remaining_quantity=order.quantity
+        )
 
         return JsonResponse({'message': 'Order has been delivered successfully'})
     except Orders.DoesNotExist:
@@ -513,24 +528,38 @@ def cancel_multiple_orders(request):
         return redirect('list_orders')
     
     
-@csrf_exempt
 def return_order(request, order_id):
     try:
         order = Orders.objects.get(pk=order_id)
-        order.order_status = 'Return Initiated'  # Set the order_status to "cancelled"
+        order.order_status = 'Return Initiated'  # Set the order_status to "Return Initiated"
         order.save()  # Save the changes to the order
+
+        # Get the corresponding stock entry and perform a soft delete
+        try:
+            stock = Stock.objects.get(order=order)
+            stock.is_active = False
+            
+            stock.save()
+        except Stock.DoesNotExist:
+            pass  # Stock entry not found, nothing to delete
 
         return JsonResponse({'message': 'Return has been initiated successfully'})
     except Orders.DoesNotExist:
         return JsonResponse({'error': 'Order not found'}, status=404)
     
     
-@csrf_exempt
 def returned_order(request, order_id):
     try:
         order = Orders.objects.get(pk=order_id)
-        order.order_status = 'Return Completed'  # Set the order_status to "cancelled"
+        order.order_status = 'Return Completed'  # Set the order_status to "Return Completed"
         order.save()  # Save the changes to the order
+
+        # Get the corresponding stock entry and delete it
+        try:
+            stock = Stock.objects.get(order=order)
+            stock.delete()  # Delete the stock entry
+        except Stock.DoesNotExist:
+            pass  # Stock entry not found, nothing to delete
 
         return JsonResponse({'message': 'Return has been completed successfully'})
     except Orders.DoesNotExist:
