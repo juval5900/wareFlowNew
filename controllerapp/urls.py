@@ -21,6 +21,7 @@ urlpatterns=[
     path('get_stock_and_sales_data/', views.get_stock_and_sales_data, name='get_stock_and_sales_data'),
     path('get_order_status_data/', views.get_order_status_data, name='get_order_status_data'),
     path('get_top_selling_products/', views.get_top_selling_products, name='get_top_selling_products'),
-    
+    path('get_sales_data/', views.get_sales_data, name='get_sales_data'),
+    path('view_invoice/<int:sale_id>/', views.view_invoice, name='view_invoice'),
     
     ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

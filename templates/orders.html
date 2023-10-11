@@ -386,7 +386,9 @@
 						<div class="form-group">
 							<label for="quantity">Quantity:</label>
 							<input type="number" id="quantity" name="quantity" class="form-control">
+							<span id="available-stock" class="error text-danger"></span> <!-- Error message for Warehouse -->
 							<span id="quantity-error" class="error text-danger"></span> <!-- Error message for Quantity -->
+							<span id="available_quantity-error" class="error text-danger"></span> <!-- Error message for Warehouse -->
 						</div>
 						<div class="form-group">
 							<label for="buying_price">Buying Price:</label>
@@ -509,6 +511,31 @@
 <script>
     $(document).ready(function () {
 		// Add an event listener to handle delete clicks
+
+
+
+		$('#product').on('change', function() {
+			var productId = $(this).val();
+			if (productId) {
+				$.ajax({
+					url: '{% url "get_stock_count" %}',
+					data: {
+						'product_id': productId
+					},
+					success: function(data) {
+						var availableStock = data.available_stock;
+						console.log("availableStock", availableStock);
+						$('#available-stock').text(availableStock); // Display available stock in some element
+					}
+				});
+			}
+		});
+		
+		// Listen for form submission outside of the change event handler
+		
+		
+		
+
 		const deleteLinks = document.querySelectorAll(".cancel-order");
 	
 		deleteLinks.forEach(link => {
@@ -865,7 +892,8 @@
 		  const supplierSelect = document.getElementById("supplier");
 		  const warehouseInput = document.getElementById("warehouse");
 		  const quantityInput = document.getElementById("quantity");
-		
+		  const submitButton = document.querySelector('input[type="submit"]');
+		  
 		  // Function to validate the "Product" field
 		  function validateProduct() {
 			const selectedProductValue = productSelect.value;
@@ -876,7 +904,7 @@
 			  productError.textContent = "";
 			}
 		  }
-		
+		  
 		  // Function to validate the "Supplier" field
 		  function validateSupplier() {
 			const selectedSupplierValue = supplierSelect.value;
@@ -887,7 +915,7 @@
 			  supplierError.textContent = "";
 			}
 		  }
-		
+		  
 		  // Function to validate the warehouse field (only alphabets and numbers, no spaces or special symbols)
 		  function validateWarehouse() {
 			const warehouseValue = warehouseInput.value;
@@ -899,7 +927,7 @@
 			  warehouseError.textContent = "";
 			}
 		  }
-		
+		  
 		  // Function to validate the quantity field (only numerical values)
 		  function validateQuantity() {
 			const quantityValue = quantityInput.value;
@@ -909,14 +937,29 @@
 			} else {
 			  quantityError.textContent = "";
 			}
+		  
+			var enteredQuantity = parseInt(quantityValue);
+			var availableStock = parseInt(document.getElementById("available-stock").textContent);
+		  
+			console.log("Entered Quantity:", enteredQuantity);
+			console.log("Available Stock:", availableStock);
+		  
+			if (enteredQuantity > availableStock) {
+			  quantityError.textContent = 'Entered quantity is higher than available stock.';
+			  submitButton.disabled = true; // Disable the submit button
+			} else {
+			  console.log("Form submitted.");
+			  quantityError.textContent = ''; // Clear any previous error message
+			  submitButton.disabled = false; // Enable the submit button
+			}
 		  }
-		
+		  
 		  // Add input event listeners to trigger field validation on input
 		  productSelect.addEventListener("input", validateProduct);
 		  supplierSelect.addEventListener("input", validateSupplier);
 		  warehouseInput.addEventListener("input", validateWarehouse);
 		  quantityInput.addEventListener("input", validateQuantity);
-		
+		  
 		  // Add submit event listener to prevent form submission if there are errors
 		  orderForm.addEventListener("submit", function (e) {
 			// Call validation functions before form submission
@@ -924,7 +967,7 @@
 			validateSupplier();
 			validateWarehouse();
 			validateQuantity();
-		
+		  
 			// Check for any error messages
 			const errorMessages = document.querySelectorAll(".error");
 			for (const errorMessage of errorMessages) {
@@ -934,6 +977,9 @@
 			  }
 			}
 		  });
+		  
+		  
+
 	});
 </script>
 

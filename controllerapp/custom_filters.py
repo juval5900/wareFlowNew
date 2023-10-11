@@ -2,6 +2,9 @@ from django import template
 
 register = template.Library()
 
-@register.filter(name='format_date')
-def format_date(value, format_str):
-    return value.strftime(format_str)
+@register.filter
+def multiply(value, arg):
+    try:
+        return float(value) * float(arg)
+    except (ValueError, TypeError):
+        return value

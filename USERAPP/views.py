@@ -26,20 +26,105 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
-
-from controllerapp.models import Stock
+from django.db.models.functions import TruncMonth
+from controllerapp.models import Sales, Stock
 
 # Project-Specific Imports
-from .forms import UserProfileForm
+from django.db.models import Sum, Count
 from .models import Category, Product, ProductLocation, StorageLocation, Subcategory, Supplier, Orders, UserProfile, UserRole
-from .models import Product  # Duplicate import, remove it
-
-
+from .models import Product,Orders  # Duplicate import, remove it
+from django.db.models import Sum  # Import the Sum aggregation function
 
 
 
 def index(request):
-    return render(request, 'index.html')
+
+    current_datetime = timezone.now()  # Get the current date and time
+    # Calculate the total number of products
+    total_products = Product.objects.count()
+
+    # Calculate the total quantity from the Product model
+    total_quantity_products = Product.objects.aggregate(total_quantity=Sum('quantity'))['total_quantity']
+
+    # Calculate the total remaining quantity from the Stock model
+    total_remaining_quantity = Stock.objects.aggregate(total_remaining=Sum('remaining_quantity'))['total_remaining']
+
+    # Calculate the total quantity from the Orders model where order_status is 'Order Placed'
+    total_ordered_quantity = Orders.objects.filter(order_status='Order Placed').aggregate(total_ordered=Sum('quantity'))['total_ordered']
+
+    # Calculate the total number of suppliers
+    total_suppliers = Supplier.objects.count()
+
+    # Calculate the number of active suppliers
+    active_suppliers = Supplier.objects.filter(is_active=True).count()
+
+    # Calculate the number of inactive suppliers
+    inactive_suppliers = Supplier.objects.filter(is_active=False).count()
+    
+    total_categories = Category.objects.count()
+
+
+    unique_monthly_sales = (
+            Sales.objects
+            .annotate(month=TruncMonth('date_field'))
+            .values('month')
+            .annotate(
+                total_sales=Sum('total_sales_price'),
+                total_profit=Sum('profit'),
+                total_buying=Sum('total_buying_price'),
+                total_sales_count=Count('id')
+            )
+            .order_by('-month')
+        )
+    
+    unique_months = [entry['month'].strftime('%Y-%m') for entry in unique_monthly_sales]
+
+    top_selling_products = (
+        Sales.objects
+        .filter(date_field__year=current_datetime.year, date_field__month=current_datetime.month)
+        .values('product__product_name')  # Group by product name
+        .annotate(
+            total_sales=Sum('quantity'),  # Calculate total quantity sold
+            total_sales_price=Sum('total_sales_price'),  # Calculate total sales price
+            remaining_quantity=Sum('stock__remaining_quantity')  # Calculate remaining quantity
+        )
+        .order_by('-total_sales')[:5]  # Get the top 5 products by total quantity sold
+    )
+    
+    threshold_values = Product.objects.values('product_name', 'threshold_value')
+
+    # Calculate the total remaining quantity for each product in the Stock model
+    products_below_threshold = []
+
+    for product in threshold_values:
+        product_name = product['product_name']
+        threshold_value = product['threshold_value']
+        total_remaining_stock = Stock.objects.filter(order__product__product_name=product_name).aggregate(
+        total_remaining_stock=Sum('remaining_quantity'))['total_remaining_stock'] or 0
+
+    # Compare total remaining stock with the threshold value
+    if total_remaining_stock <= threshold_value:
+        products_below_threshold.append({
+            'product_name': product_name,
+            'threshold_value': threshold_value,
+            'total_remaining_stock': total_remaining_stock,
+        })
+
+    context = {
+        'total_products': total_products,
+        'total_quantity_products': total_quantity_products,
+        'total_remaining_quantity': total_remaining_quantity,
+        'total_ordered_quantity': total_ordered_quantity,
+        'total_suppliers': total_suppliers,
+        'active_suppliers': active_suppliers,
+        'unique_months': unique_months,
+        'inactive_suppliers': inactive_suppliers,
+        'total_categories' : total_categories,
+        'top_selling_products': top_selling_products,  # Include top-selling products in the context
+        'products_below_threshold': products_below_threshold,
+    }
+
+    return render(request, 'index.html', context)
 
 def login(request):
     if request.method == 'POST':
@@ -102,7 +187,6 @@ def register(request):
 
 
 def loggout(request):
-    print('Logged Out')
     logout(request)
     if 'username' in request.session:
         del request.session['username']
@@ -138,9 +222,11 @@ def help(request):
     return render(request, 'help.html')
 
 def inventory(request):
-  categories = Category.objects.all()
-  context = {'categories': categories}
-  return render(request, 'inventory.html', context)
+    categories = Category.objects.all()
+    suppliers = Supplier.objects.all()
+    print(suppliers)
+    context = {'categories': categories, 'suppliers': suppliers}  # Include suppliers in the context dictionary
+    return render(request, 'inventory.html', context)
 
 def settingshtml(request):
     return render(request, 'settings.html')
@@ -154,13 +240,10 @@ def add_product(request):
         subcategory = Subcategory.objects.get(pk=subcategory_id)
         product_image = request.FILES['productImage']
         product_name = request.POST['productName']
-        #buying_price = request.POST['buyingPrice']
         quantity = request.POST['quantity']
-        # unit = request.POST['unit']
-        # expiry_date = request.POST['expiryDate']
         threshold_value = request.POST['thresholdValue']
-        
 
+        # Create the product instance
         product = Product(category=category, 
                           subcategory=subcategory,
                           product_image=product_image, 
@@ -168,6 +251,12 @@ def add_product(request):
                           quantity=quantity,
                           threshold_value=threshold_value)
         product.save()
+
+        # Handle multiple suppliers
+        selected_supplier_ids = request.POST.getlist('suppliers[]')
+        for supplier_id in selected_supplier_ids:
+            supplier = Supplier.objects.get(pk=supplier_id)
+            product.suppliers.add(supplier)  # Associate the product with the selected suppliers
 
         # Redirect to a success page or wherever you want
         return redirect('list_products')  # Change 'success_page' to the actual URL
@@ -181,7 +270,8 @@ def list_products(request):
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     categories = Category.objects.all()
-    return render(request, 'inventory.html', {'page': page, 'categories': categories})
+    suppliers = Supplier.objects.all()
+    return render(request, 'inventory.html', {'page': page, 'categories': categories, 'suppliers': suppliers})
 
 def get_subcategories(request):
     category_id = request.GET.get('category_id')
@@ -436,8 +526,9 @@ def list_orders(request):
     paginator = Paginator(active_orders, orders_per_page)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    products = Product.objects.all()
-    suppliers=Supplier.objects.all()
+    products = Product.objects.filter(is_active=True)
+    suppliers= Supplier.objects.filter(is_active=True)
+
     return render(request, 'orders.html', {'page': page, 'products': products, 'suppliers':suppliers})
 
 
@@ -917,7 +1008,6 @@ User = get_user_model()
 def generate_otp(request):
     if request.method == 'POST':
         user_email = request.POST.get('username')  # Get user's email from the request (change 'user_email' to match your form field name)
-        print(user_email)
         # Generate a random OTP using pyotp
         otp = pyotp.random_base32()
        
@@ -965,3 +1055,37 @@ def reset_password(request):
 
     # Handle GET requests or other methods appropriately
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+
+from django.db.models import Sum, F, Value
+from django.db.models.functions import Coalesce
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt  # Remove this line in production for proper CSRF handling
+def get_stock_count(request):
+    product_id = request.GET.get('product_id')
+
+    if product_id:
+        try:
+            product = Product.objects.get(pk=product_id)
+
+            # Calculate total stock count as the sum of remaining stock and quantity of orders where order status is 'order placed'
+            total_stock_count = Stock.objects.filter(order__product=product).aggregate(total_stock=Coalesce(Sum('remaining_quantity'), Value(0)))['total_stock']
+
+
+            total_order_quantity = Orders.objects.filter(
+                product=product,
+                order_status='Order Placed'
+            ).aggregate(
+                total_quantity=Coalesce(Sum('quantity'), Value(0))
+            )['total_quantity']
+            max_quantity = product.quantity
+            available_stock = max_quantity - (total_order_quantity + total_stock_count)
+            return JsonResponse({'available_stock': available_stock})
+
+        except Product.DoesNotExist:
+            return JsonResponse({'error': 'Product not found'}, status=404)
+
+    return JsonResponse({'error': 'Invalid product_id'}, status=400)

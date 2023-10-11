@@ -7,7 +7,7 @@ from USERAPP.models import Orders, Product
 from django.db import models
 
 class Stock(models.Model):
-    order = models.ForeignKey(Orders, on_delete=models.CASCADE)
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='stocks')  # Add related_name='stocks'
     is_stored = models.BooleanField(default=False)
     sector = models.CharField(max_length=255, null=True, blank=True)
     row_start = models.CharField(max_length=255, null=True, blank=True)
@@ -24,7 +24,7 @@ class Stock(models.Model):
 
     def __str__(self):
         return f'Stock for Order ID: {self.order.order_id}'
-
+    
 
 
 

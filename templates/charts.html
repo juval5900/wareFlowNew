@@ -302,50 +302,25 @@
 			</div><!--//app-sidepanel-->
 		</header><!--//app-header-->
 
+
+
+
+
 		<div class="app-wrapper">
 
 			<div class="app-content pt-3 p-md-3 p-lg-4">
 				<div class="container-xl">
 
 					<h1 class="app-page-title">Charts</h1>
-					<div class="app-card shadow-sm mb-4 border-left-decoration">
-						<div class="inner">
-							<div class="app-card-body p-4">
-								<div class="row gx-5 gy-3">
-									<div class="col-12 col-lg-9">
-
-										<div>You can use <a href="https://www.chartjs.org/" target="_blank">Chart.js</a>
-											to create charts for your app. To configure the charts on this page
-											you can edit the relevant JavaScript file: <code>assets/js/charts-demo.js</code>
-										</div>
-									</div><!--//col-->
-									<div class="col-12 col-lg-3">
-										<a class="btn app-btn-primary"
-											href="https://www.chartjs.org/docs/latest/" target="_blank"><svg
-												width="1em" height="1em" viewBox="0 0 16 16"
-												class="bi bi-arrow-up-right-square me-2" fill="currentColor"
-												xmlns="http://www.w3.org/2000/svg">
-												<path fill-rule="evenodd"
-													d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
-												<path fill-rule="evenodd"
-													d="M5.172 10.828a.5.5 0 0 0 .707 0l4.096-4.096V9.5a.5.5 0 1 0 1 0V5.525a.5.5 0 0 0-.5-.5H6.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z" />
-											</svg>Learn More</a>
-									</div><!--//col-->
-								</div><!--//row-->
-
-							</div><!--//app-card-body-->
-
-						</div><!--//inner-->
-					</div><!--//app-card-->
 					<div class="row g-4 mb-4">
 						<div class="col-12 col-lg-6">
 							<div class="app-card app-card-chart h-100 shadow-sm">
 								<div class="app-card-header p-3 border-0">
-									<h4 class="app-card-title">Area Line Chart Demo</h4>
+									<h4 class="app-card-title">PROFIT CHART</h4>
 								</div><!--//app-card-header-->
 								<div class="app-card-body p-4">
-									<div class="chart-container">
-										<canvas id="chart-line"></canvas>
+									<div id="profit-chart-container">
+										<canvas id="profit-chart"></canvas>
 									</div>
 								</div><!--//app-card-body-->
 							</div><!--//app-card-->
@@ -353,11 +328,11 @@
 						<div class="col-12 col-lg-6">
 							<div class="app-card app-card-chart h-100 shadow-sm">
 								<div class="app-card-header p-3 border-0">
-									<h4 class="app-card-title">Bar Chart Demo</h4>
+									<h4 class="app-card-title">STOCK v/s SALE OVERVIEW</h4>
 								</div><!--//app-card-header-->
 								<div class="app-card-body p-4">
 									<div class="chart-container">
-										<canvas id="chart-bar"></canvas>
+										<canvas id="stock-sales-chart"></canvas>
 									</div>
 								</div><!--//app-card-body-->
 							</div><!--//app-card-->
@@ -365,11 +340,11 @@
 						<div class="col-12 col-lg-6">
 							<div class="app-card app-card-chart h-100 shadow-sm">
 								<div class="app-card-header p-3 border-0">
-									<h4 class="app-card-title">Pie Chart Demo</h4>
+									<h4 class="app-card-title">ORDER STATUS OVERVIEW</h4>
 								</div><!--//app-card-header-->
 								<div class="app-card-body p-4">
 									<div class="chart-container">
-										<canvas id="chart-pie"></canvas>
+										<canvas id="order-status-chart"></canvas>
 									</div>
 								</div><!--//app-card-body-->
 							</div><!--//app-card-->
@@ -377,11 +352,11 @@
 						<div class="col-12 col-lg-6">
 							<div class="app-card app-card-chart h-100 shadow-sm">
 								<div class="app-card-header p-3 border-0">
-									<h4 class="app-card-title">Doughnut Chart Demo</h4>
+									<h4 class="app-card-title">Top Selling Products</h4>
 								</div><!--//app-card-header-->
 								<div class="app-card-body p-4">
 									<div class="chart-container">
-										<canvas id="chart-doughnut"></canvas>
+										<canvas id="top-selling-chart"></canvas>
 									</div>
 								</div><!--//app-card-body-->
 							</div><!--//app-card-->
@@ -390,16 +365,183 @@
 				</div><!--//container-fluid-->
 			</div><!--//app-content-->
 
-			<footer class="app-footer">
-				<div class="container text-center py-3">
-					<!--/* This template is free as long as you keep the footer attribution link. If you'd like to use the template without the attribution link, you can buy the commercial license via our website: themes.3rdwavemedia.com Thank you for your support. :) */-->
-					<small class="copyright">Designed with <span class="sr-only">love</span><i
-							class="fas fa-heart" style="color: #fb866a;"></i> by <a class="app-link"
-							href="http://themes.3rdwavemedia.com" target="_blank">Xiaoying Riley</a>
-						for developers</small>
+			{% comment %} <div id="profit-chart-container">
+				<canvas id="profit-chart"></canvas>
+			</div> {% endcomment %}
 
-				</div>
-			</footer><!--//app-footer-->
+			<script>
+				// Function to fetch profit data from the view and create the line chart
+				function createProfitChart() {
+					fetch('/get_profit_data/')
+						.then(response => {
+							if (!response.ok) {
+								throw new Error('Network response was not ok');
+							}
+							return response.json();
+						})
+						.then(data => {
+							// Parse the JSON string into an array of objects
+							const profitData = JSON.parse(data.profit_data);
+							console.log(profitData);
+							// Extract month and profit values
+							const months = profitData.map(item => item.month);
+							const profits = profitData.map(item => item.total_profit);
+			
+							// Get the canvas element and create a chart
+							const ctx = document.getElementById('profit-chart').getContext('2d');
+							const chart = new Chart(ctx, {
+								type: 'line', // Change the chart type to 'line'
+								data: {
+									labels: months,
+									datasets: [{
+										label: 'Total Profit',
+										data: profits,
+										borderColor: 'rgba(75, 192, 192, 1)',
+										borderWidth: 2,
+										pointRadius: 4, // Optional: Customize point size
+										pointBackgroundColor: 'rgba(75, 192, 192, 1)' // Optional: Customize point color
+									}]
+								},
+								options: {
+									scales: {
+										y: {
+											beginAtZero: true
+										}
+									}
+								}
+							});
+						})
+						.catch(error => {
+							console.error('Fetch error:', error);
+						});
+				}
+			
+				// Call the function to create the line chart
+				createProfitChart();
+
+
+
+				function createStockSalesChart() {
+					fetch('/get_stock_and_sales_data/')
+						.then(response => {
+							if (!response.ok) {
+								throw new Error('Network response was not ok');
+							}
+							return response.json();
+						})
+						.then(data => {
+							const ctx = document.getElementById('stock-sales-chart').getContext('2d');
+							new Chart(ctx, {
+								type: 'bar',
+								data: {
+									labels: data.months,
+									datasets: [
+										{
+											label: 'Total Stocks',
+											data: data.total_stocks,
+											backgroundColor: 'rgba(75, 192, 192, 0.2)',
+											borderColor: 'rgba(75, 192, 192, 1)',
+											borderWidth: 1
+										},
+										{
+											label: 'Total Sales',
+											data: data.total_sales,
+											backgroundColor: 'rgba(255, 99, 132, 0.2)',
+											borderColor: 'rgba(255, 99, 132, 1)',
+											borderWidth: 1
+										}
+									]
+								},
+								options: {
+									scales: {
+										y: {
+											beginAtZero: true
+										}
+									}
+								}
+							});
+						})
+						.catch(error => {
+							console.error('Fetch error:', error);
+						});
+				}
+			
+				// Call the function to create the chart
+				createStockSalesChart();
+	
+
+				function createOrderStatusChart() {
+					fetch('/get_order_status_data/')  // Replace with your API endpoint
+						.then(response => {
+							if (!response.ok) {
+								throw new Error('Network response was not ok');
+							}
+							return response.json();
+						})
+						.then(data => {
+							const ctx = document.getElementById('order-status-chart').getContext('2d');
+							new Chart(ctx, {
+								type: 'pie',
+								data: {
+									labels: Object.keys(data),  // Use the keys from the data object
+									datasets: [{
+										data: Object.values(data),  // Use the values from the data object
+										backgroundColor: ['red', 'green', 'blue'],  // You can customize colors here
+									}]
+								},
+							});
+						})
+						.catch(error => {
+							console.error('Fetch error:', error);
+						});
+				}
+				
+				// Call the function to create the chart
+				createOrderStatusChart();
+			
+
+
+				function createTopSellingChart() {
+					fetch('/get_top_selling_products/')
+						.then(response => {
+							if (!response.ok) {
+								throw new Error('Network response was not ok');
+							}
+							return response.json();
+						})
+						.then(data => {
+							const productNames = data.product_names;
+							const quantities = data.quantities;
+				
+							const ctx = document.getElementById('top-selling-chart').getContext('2d');
+							new Chart(ctx, {
+								type: 'doughnut',
+								data: {
+									labels: productNames,
+									datasets: [{
+										data: quantities,
+										backgroundColor: [
+											'rgba(255, 99, 132, 0.8)',
+											'rgba(54, 162, 235, 0.8)',
+											'rgba(255, 206, 86, 0.8)',
+											'rgba(75, 192, 192, 0.8)',
+											'rgba(153, 102, 255, 0.8)',
+										],
+									}]
+								},
+							});
+						})
+						.catch(error => {
+							console.error('Fetch error:', error);
+						});
+				}
+				
+				// Call the function to create the doughnut chart
+				createTopSellingChart();
+				
+			</script>
+			
+			
 
 		</div><!--//app-wrapper-->
 

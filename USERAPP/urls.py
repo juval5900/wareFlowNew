@@ -68,6 +68,7 @@ urlpatterns = [
     path('generate_otp', views.generate_otp, name='generate_otp'),
     path('forgot', views.forgot, name='forgot'),
     path('reset_password/', views.reset_password, name='reset_password'),
+     path('get_stock_count/', views.get_stock_count, name='get_stock_count'),
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

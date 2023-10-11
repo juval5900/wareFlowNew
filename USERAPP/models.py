@@ -24,6 +24,7 @@ class Product(models.Model):
     product_name = models.CharField(max_length=255)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
+    suppliers = models.ManyToManyField('Supplier', blank=True, related_name='products')
     quantity = models.PositiveIntegerField()
     threshold_value = models.PositiveIntegerField()
     product_image = models.ImageField(upload_to='product_images/')  # Add this field

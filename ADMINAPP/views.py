@@ -10,8 +10,46 @@ import pyotp
 from .models import Warehouse, UserRole
 
 def adminindex(request):
-    user = request.user  # Get the current logged-in user
-    return render(request, 'Admin/adminindex.html')
+    # Get the total number of users
+    total_users = User.objects.count()
+
+    # Get the number of active users (users with is_active=True)
+    active_users = User.objects.filter(is_active=True).count()
+
+    # Get the number of inactive users (users with is_active=False)
+    inactive_users = User.objects.filter(is_active=False).count()
+
+    # Get the total number of warehouse managers (based on role)
+    total_warehouse_managers = User.objects.filter(userrole__role='warehouse manager').count()
+
+    # Get the number of active warehouse managers (based on role and is_active=True)
+    active_warehouse_managers = User.objects.filter(userrole__role='warehouse manager', is_active=True).count()
+
+    # Get the number of inactive warehouse managers (based on role and is_active=False)
+    inactive_warehouse_managers = User.objects.filter(userrole__role='warehouse manager', is_active=False).count()
+
+    # Get the total number of inventory controllers (based on role)
+    total_inventory_controllers = User.objects.filter(userrole__role='inventory controller').count()
+
+    # Get the number of active inventory controllers (based on role and is_active=True)
+    active_inventory_controllers = User.objects.filter(userrole__role='inventory controller', is_active=True).count()
+
+    # Get the number of inactive inventory controllers (based on role and is_active=False)
+    inactive_inventory_controllers = User.objects.filter(userrole__role='inventory controller', is_active=False).count()
+
+    context = {
+        'total_users': total_users,
+        'active_users': active_users,
+        'inactive_users': inactive_users,
+        'total_warehouse_managers': total_warehouse_managers,
+        'active_warehouse_managers': active_warehouse_managers,
+        'inactive_warehouse_managers': inactive_warehouse_managers,
+        'total_inventory_controllers': total_inventory_controllers,
+        'active_inventory_controllers': active_inventory_controllers,
+        'inactive_inventory_controllers': inactive_inventory_controllers,
+    }
+
+    return render(request, 'Admin/adminindex.html', context)
 
 def userspanel(request):
     users_with_roles = User.objects.select_related('userrole').all()

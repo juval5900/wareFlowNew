@@ -1,25 +1,39 @@
 import json
+from decimal import Decimal
+from datetime import datetime
+from django.forms import DecimalField
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core.paginator import Paginator
-from USERAPP.models import Orders, Product, StorageLocation, Supplier
-from controllerapp.models import Sales, Stock
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, F, Count
+from django.db.models.functions import TruncMonth, ExtractMonth
+from django.template.loader import render_to_string
+from django.utils.html import escape
 
-
-from django.db.models import Sum, Count
-from django.db.models.functions import TruncMonth
-
+from USERAPP.models import Orders, Product, StorageLocation, Supplier
+from controllerapp.models import Sales, Stock
+from django.db.models.functions import Now
+from django.db.models.functions import ExtractMonth
+from django.db.models import Sum, Count, Case, When, IntegerField
 from datetime import datetime
+from django.db import models
+from django.db.models import Sum, Count, Case, When, DecimalField, F
+from django.db.models.functions import TruncMonth
+from .models import Sales, Orders  # Import your Sales and Orders models
+from django.db.models import F, ExpressionWrapper, fields
 
 def controllerindex(request):
     user = request.user  # Get the current logged-in user
 
-    # Calculate total sales amount per month
+    # Get the current date and time
+    current_datetime = datetime.now()
+
+    # Calculate total sales amount for the current month
     monthly_sales = (
         Sales.objects
+        .filter(date_field__year=current_datetime.year, date_field__month=current_datetime.month)
         .annotate(month=TruncMonth('date_field'))
         .values('month')
         .annotate(
@@ -28,26 +42,112 @@ def controllerindex(request):
             total_buying=Sum('total_buying_price'),
             total_sales_count=Count('id')
         )
-        .order_by('-month')
     )
 
-    # Get a list of unique months in "YYYY-MM" format
-    unique_months = [entry['month'].strftime('%Y-%m') for entry in monthly_sales]
+    unique_monthly_sales = (
+            Sales.objects
+            .annotate(month=TruncMonth('date_field'))
+            .values('month')
+            .annotate(
+                total_sales=Sum('total_sales_price'),
+                total_profit=Sum('profit'),
+                total_buying=Sum('total_buying_price'),
+                total_sales_count=Count('id')
+            )
+            .order_by('-month')
+        )
+    
+    # Calculate the monthly data for the current year
+   
+
+# ...
+
+    monthly_data = (
+        Orders.objects
+        .filter(order_datetime__year=current_datetime.year, order_datetime__month=current_datetime.month)
+        .annotate(month=ExtractMonth('order_datetime'))
+        .values('month')
+        .annotate(
+            total_delivered_orders=Sum(
+                Case(
+                    When(order_status='Delivered', then=1),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            ),
+            total_cancelled_orders=Sum(
+                Case(
+                    When(order_status='cancelled', then=1),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            ),
+            total_returned_orders=Sum(
+                Case(
+                    When(order_status='Return Completed', then=1),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            ),
+            total_purchase_price=Sum(
+                Case(
+                    When(order_status='Delivered', then=F('total_price')),
+                    default=0,
+                    output_field=DecimalField(max_digits=10, decimal_places=2, default=0.00)
+                )
+            )
+        )
+    )
+
+    # Get a list of unique months in "YYYY-MM" format for the current year
+    unique_months = [entry['month'].strftime('%Y-%m') for entry in unique_monthly_sales]
 
     # Get the current month and year in "YYYY-MM" format
-    current_month = datetime.now().strftime('%Y-%m')
+    current_month = current_datetime.strftime('%Y-%m')
+
+    top_selling_products = (
+        Sales.objects
+        .filter(date_field__year=current_datetime.year, date_field__month=current_datetime.month)
+        .values('product__product_name')  # Group by product name
+        .annotate(
+            total_sales=Sum('quantity'),  # Calculate total quantity sold
+            total_sales_price=Sum('total_sales_price'),  # Calculate total sales price
+            remaining_quantity=Sum('stock__remaining_quantity')  # Calculate remaining quantity
+        )
+        .order_by('-total_sales')[:5]  # Get the top 5 products by total quantity sold
+    )
+    
+    threshold_values = Product.objects.values('product_name', 'threshold_value')
+
+    # Calculate the total remaining quantity for each product in the Stock model
+    products_below_threshold = []
+
+    for product in threshold_values:
+        product_name = product['product_name']
+        threshold_value = product['threshold_value']
+        total_remaining_stock = Stock.objects.filter(order__product__product_name=product_name).aggregate(
+            total_remaining_stock=models.Sum('remaining_quantity'))['total_remaining_stock'] or 0
+
+        # Compare total remaining stock with the threshold value
+        if total_remaining_stock <= threshold_value:
+            products_below_threshold.append({
+                'product_name': product_name,
+                'threshold_value': threshold_value,
+                'total_remaining_stock': total_remaining_stock,
+            })
+
 
     context = {
         'user': user,
         'monthly_sales': monthly_sales,
         'current_month': current_month,
-        'unique_months': unique_months,  # Add the list of unique months to the context
+        'unique_months': unique_months,
+        'monthly_data': monthly_data,
+        'top_selling_products': top_selling_products,  # Include top-selling products in the context
+        'products_below_threshold': products_below_threshold,
     }
 
     return render(request, 'Controller/controllerindex.html', context)
-
-
-
 
 def list_orders2(request):
     active_orders = Orders.objects.filter(is_active=True).order_by('order_id')
@@ -55,10 +155,10 @@ def list_orders2(request):
     paginator = Paginator(active_orders, orders_per_page)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    products = list(Product.objects.order_by('-product_id'))
-    products.reverse()
-    suppliers = Supplier.objects.all()
-    return render(request, 'Controller/orders2.html', {'page': page, 'products': products, 'suppliers': suppliers})
+    products = Product.objects.filter(is_active=True)
+    suppliers= Supplier.objects.filter(is_active=True)
+
+    return render(request, 'Controller/orders2.html', {'page': page, 'products': products, 'suppliers':suppliers})
 
 
 
@@ -114,7 +214,7 @@ def get_stock_details(request, stock_id):
         return JsonResponse({'error': 'Stock not found'}, status=404)
     
     
-from decimal import Decimal  # Import the Decimal class
+
 
 def get_stock_for_product(request, product_id):
     try:
@@ -153,8 +253,8 @@ def sales(request):
     sales = Sales.objects.all()
 
     # Retrieve other data for the template
-    stocks = Stock.objects.all()
-    orders = Orders.objects.all()
+    stocks = Stock.objects.filter(is_active=True)
+    orders = Orders.objects.filter(is_active=True)
     products = Product.objects.all()
 
     context = {
@@ -165,10 +265,6 @@ def sales(request):
     }
 
     return render(request, 'Controller/sales.html', context)
-
-
-
-from decimal import Decimal  # Import the Decimal class
 
 def add_sales(request):
     if request.method == 'POST':
@@ -208,7 +304,6 @@ def add_sales(request):
 
     # Handle GET requests or other cases
     return redirect('sales')
-
 
 
 @csrf_exempt
@@ -277,8 +372,6 @@ def controllercharts(request):
     user = request.user  # Get the current logged-in user
     return render(request, 'Controller/charts.html')
 
-from django.db.models import Sum, F
-from django.db.models.functions import ExtractMonth
 
 def get_profit_data(request):
     # Query your Sales model and calculate profit data by month
@@ -321,8 +414,7 @@ def get_profit_data(request):
     return JsonResponse({'profit_data': profit_data_json})
 
 
-from django.db.models import Sum, F
-from django.http import JsonResponse
+
 
 def get_stock_and_sales_data(request):
     # Query total stocks and total sales per month
@@ -362,9 +454,7 @@ def get_stock_and_sales_data(request):
 
 
 
-from django.http import JsonResponse
-from django.db.models import Count
-from datetime import datetime
+
 
 def get_order_status_data(request):
     # Get the current month and year
@@ -412,7 +502,6 @@ def get_top_selling_products(request):
     return JsonResponse(data)
 
 
-from django.http import JsonResponse
 
 def get_monthly_sales_data(request):
     selected_month = request.GET.get('selected_month')
@@ -440,10 +529,7 @@ def get_monthly_sales_data(request):
 
 
 
-from django.http import JsonResponse
-from django.template.loader import render_to_string
-from django.utils.html import escape
-from django.db.models import Sum
+
 
 def fetch_data_view(request):
     # Ensure this view is only accessible via AJAX
@@ -472,3 +558,118 @@ def fetch_data_view(request):
     escaped_html_data = escape(html_data)
 
     return JsonResponse({'html_data': escaped_html_data})
+
+
+def get_sales_data(request):
+    selected_month = request.GET.get('selected_month')
+
+    # Query the data for the selected month
+    monthly_sales = (
+        Sales.objects
+        .filter(date_field__year=selected_month.split('-')[0], date_field__month=selected_month.split('-')[1])
+        .annotate(month=TruncMonth('date_field'))
+        .values('month')
+        .annotate(
+            total_sales=Sum('total_sales_price'),
+            total_profit=Sum('profit'),
+            total_buying=Sum('total_buying_price'),
+            total_sales_count=Count('id')
+        )
+    )
+
+    monthly_data = (
+        Orders.objects
+        .filter(order_datetime__year=selected_month.split('-')[0], order_datetime__month=selected_month.split('-')[1])
+        .annotate(month=TruncMonth('order_datetime'))
+        .values('month')
+        .annotate(
+            total_delivered_orders=Sum(
+                Case(
+                    When(order_status='Delivered', then=1),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            ),
+            total_cancelled_orders=Sum(
+                Case(
+                    When(order_status='cancelled', then=1),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            ),
+            total_returned_orders=Sum(
+                Case(
+                    When(order_status='Return Completed', then=1),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            ),
+            total_purchase_price=Sum(
+                Case(
+                    When(order_status='Delivered', then=F('total_price')),
+                    default=0,
+                    output_field=DecimalField(max_digits=10, decimal_places=2, default=0.00)
+                )
+            )
+        )
+    )
+    
+    # Convert monthly_sales and monthly_data to lists of dictionaries
+    monthly_sales_values = list(monthly_sales)
+    monthly_data_values = list(monthly_data)
+
+    # Check if monthly_sales is empty and replace with 0s
+    if not monthly_sales_values:
+        monthly_sales_values = [{'total_sales': 0, 'total_profit': 0, 'total_buying': 0, 'total_sales_count': 0}]
+    
+    # Check if monthly_data is empty and replace with 0s
+    if not monthly_data_values:
+        monthly_data_values = [{'total_delivered_orders': 0, 'total_cancelled_orders': 0, 'total_returned_orders': 0, 'total_purchase_price': 0.00}]
+
+    selected_datetime = datetime.strptime(selected_month, '%Y-%m')
+    
+    top_selling_products = (
+        Sales.objects
+        .filter(date_field__year=selected_datetime.year, date_field__month=selected_datetime.month)
+        .values('product__product_name')  # Group by product name
+        .annotate(
+            total_sales=Sum('quantity'),  # Calculate total quantity sold
+            total_sales_price=Sum('total_sales_price'),  # Calculate total sales price
+            remaining_quantity=Sum('stock__remaining_quantity')  # Calculate remaining quantity
+        )
+        .order_by('-total_sales')[:5]  # Get the top 5 products by total quantity sold
+    )
+
+    # Create a list of dictionaries from the top-selling products queryset
+    top_selling_data = list(top_selling_products)
+
+    # Return both sets of data in the JSON response
+    return JsonResponse({'monthly_sales': monthly_sales_values, 'monthly_data': monthly_data_values, 'top_selling_products':top_selling_data })
+
+
+
+def view_invoice(request, sale_id):
+    # Retrieve the sale object or data as per your application
+    # Replace this with your actual logic to retrieve sale data
+    sale = Sales.objects.get(id=sale_id)
+    
+    if sale:
+        # Calculate GST (5%)
+        gst = Decimal('0.05') * sale.sales_price
+
+        # Calculate Service Charges (3%)
+        service_charges = Decimal('0.03') * sale.sales_price
+
+        # Calculate Packing Fee (10%)
+        packing_fee = Decimal('0.2') * sale.sales_price
+
+        context = {
+            'sale': sale,
+            'gst': gst,
+            'service_charges': service_charges,
+            'packing_fee': packing_fee,
+        }
+
+        return render(request, 'Controller/invoice.html', context)
+    else:
+        return render(request, 'Controller/invoice.html', {'sale': None})

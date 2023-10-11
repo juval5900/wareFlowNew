@@ -294,7 +294,7 @@
 			    
 			    <div class="row g-3 mb-4 align-items-center justify-content-between">
 				    <div class="col-auto">
-			            <h1 class="app-page-title mb-0">Orders</h1>
+			            <h1 class="app-page-title mb-0">SALES</h1>
 				    </div>
 				    <div class="col-auto">
 					     <div class="page-utilities">
@@ -323,7 +323,7 @@
 											<path fill-rule="evenodd" d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
 											<path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
 										{% comment %} </svg> {% endcomment %}
-										Add Orders
+										Add Sale
 									</a>
 								    
 							    </div>
@@ -449,6 +449,7 @@
                                 <th class="cell">Status</th>
                                 <th class="cell"></th>
                                 <th class="cell"></th>
+								<th class="cell"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -482,6 +483,13 @@
                                             <button class="btn btn-danger cancel-sale" id="cancel-sale" data-sale-id="{{ sale.id }}" disabled>Cancel</button>
                                         {% endif %}
                                     </td>
+									<td class="cell">
+                                        {% if sale.status == "Cancelled" %}
+                                            <button class="btn btn-danger view_invoice" id="view_invoice" data-sale-id="{{ sale.id }}" disabled>View Invoice</button>
+                                        {% else %}
+                                            <button class="btn btn-danger view_invoice" id="view_invoice" data-sale-id="{{ sale.id }}" >View Invoice</button>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -502,69 +510,78 @@
     $(document).ready(function () {
 
 		const productSelectq = $("#productfield");
-const stockSelect = $("#stockfield");
-const buyingPriceSpan = $("#buying-price-span");
+		const stockSelect = $("#stockfield");
+		const buyingPriceSpan = $("#buying-price-span");
+		// Add an event listener to the product select element
+		productSelectq.on("change", function () {
+			// Get the selected product ID
+			const selectedProductId = $(this).val();
+				// Fetch the corresponding stock data for the selected product using AJAX
+			$.ajax({
+				url: `/get-stock-for-product/${selectedProductId}/`,
+				method: "GET",
+				dataType: "json",
+				success: function (data) {
+					// Clear existing options in the stock select element
+					stockSelect.empty();
+						// Add a default "Select" option
+					stockSelect.append($('<option>', {
+						value: "",
+						text: "Select",
+						disabled: true,
+						selected: true
+					}));
+						// Populate the stock select element with the retrieved stock data
+					$.each(data.stocks, function (index, stock) {
+						stockSelect.append($('<option>', {
+						value: stock.id,
+							text: stock.stock_name
+						}));
+					});
+				},
+				error: function (error) {
+					console.error("Error fetching stock data:", error);
+				}
+			});
+		});
 
-// Add an event listener to the product select element
-productSelectq.on("change", function () {
-    // Get the selected product ID
-    const selectedProductId = $(this).val();
 
-    // Fetch the corresponding stock data for the selected product using AJAX
-    $.ajax({
-        url: `/get-stock-for-product/${selectedProductId}/`,
-        method: "GET",
-        dataType: "json",
-        success: function (data) {
-            // Clear existing options in the stock select element
-            stockSelect.empty();
+		// Add an event listener to the stock select element
+		stockSelect.on("change", function () {
+			// Fetch the buying price for the selected stock using an AJAX request
+			const selectedStockId = $(this).val(); // Get the selected stock ID
+			if (selectedStockId) {
+				$.ajax({
+					url: `/get-buying-price-for-stock/${selectedStockId}/`,
+					method: "GET",
+					dataType: "json",
+					success: function (buyingPriceData) {
+						// Display the buying price in the buying_price span
+						buyingPriceSpan.text("Buying Price: " + buyingPriceData.buying_price);
+						buyingPriceSpan.show(); // Show the span
+					},
+					error: function (error) {
+						console.error("Error fetching buying price:", error);
+					}
+				});
+			} else {
+				// If no stock is selected, hide the buying price span
+				buyingPriceSpan.hide();
+			}
+		});
 
-            // Add a default "Select" option
-            stockSelect.append($('<option>', {
-                value: "",
-                text: "Select",
-                disabled: true,
-                selected: true
-            }));
 
-            // Populate the stock select element with the retrieved stock data
-            $.each(data.stocks, function (index, stock) {
-                stockSelect.append($('<option>', {
-                    value: stock.id,
-                    text: stock.stock_name
-                }));
+		const viewInvoiceButtons = document.querySelectorAll('.view_invoice');
+        
+        viewInvoiceButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const saleId = this.getAttribute('data-sale-id');
+                const url = `/view_invoice/${saleId}`; // Replace with your actual URL
+                
+                // You can use any method to navigate to the URL, for example, window.location.href
+                window.location.href = url;
             });
-        },
-        error: function (error) {
-            console.error("Error fetching stock data:", error);
-        }
-    });
-});
-
-// Add an event listener to the stock select element
-stockSelect.on("change", function () {
-    // Fetch the buying price for the selected stock using an AJAX request
-    const selectedStockId = $(this).val(); // Get the selected stock ID
-    if (selectedStockId) {
-        $.ajax({
-            url: `/get-buying-price-for-stock/${selectedStockId}/`,
-            method: "GET",
-            dataType: "json",
-            success: function (buyingPriceData) {
-                // Display the buying price in the buying_price span
-                buyingPriceSpan.text("Buying Price: " + buyingPriceData.buying_price);
-                buyingPriceSpan.show(); // Show the span
-            },
-            error: function (error) {
-                console.error("Error fetching buying price:", error);
-            }
         });
-    } else {
-        // If no stock is selected, hide the buying price span
-        buyingPriceSpan.hide();
-    }
-});
-
 
 		// Add an event listener to handle delete clicks
 		const cancelOrderLinks = document.querySelectorAll(".cancel-sale");

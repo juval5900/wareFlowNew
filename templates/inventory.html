@@ -19,6 +19,11 @@
     <link id="theme-style" rel="stylesheet" href="{% static 'assets/css/portal.css' %}">
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="{% static 'assets/js/jspdf.umd.min.js' %}"></script>
+<!-- Add these to your HTML to include Bootstrap and jQuery -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 
 	<style>
@@ -35,6 +40,28 @@
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
 			z-index: 9999;
         }
+
+		/* Custom dropdown styles */
+		.custom-dropdown {
+			position: relative;
+			display: inline-block;
+		}
+
+		/* Dropdown menu styles */
+		.dropdown-menu {
+			max-height: 200px; /* Adjust as needed */
+			overflow-y: auto;
+			width: 100%;
+		}
+
+		/* Custom checkbox styles */
+		.custom-control-label::before {
+			width: 1.25rem;
+			height: 1.25rem;
+		}
+
+		/* Adjust other styles as needed */
+
     </style>
 
 </head> 
@@ -328,7 +355,7 @@
 									<button id="deleteAllButton" class="btn text-white btn-danger" disabled>Delete All</button>
 								</div>
 								<div class="col-auto">						  
-									<a id="generate-pdf-btn" class="btn btn-secondary" href="{% url 'export_pdf' %}">Generate PDF</a>
+									<a id="generate-pdf-btn" class="btn btn-secondary generate-pdf" href="{% url 'export_pdf' %}">Generate PDF</a>
 								</div>
 						    </div><!--//row-->
 					    </div><!--//table-utilities-->
@@ -387,6 +414,31 @@
 							<span id="quantityError" class="text-danger"></span> <!-- Error message for Quantity -->
 						</div>
 				
+
+						<div class="form-group">
+							<label for="suppliers">Suppliers:</label>
+							<div class="custom-dropdown" id="supplierDropdown">
+								<button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown">
+									Select Suppliers
+								</button>
+								<div class="dropdown-menu" id="supplierDropdownMenu">
+									{% for supplier in suppliers %}
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" id="supplier_{{ supplier.supplier_id }}"
+												name="suppliers[]" value="{{ supplier.supplier_id }}">
+											<label class="custom-control-label" for="supplier_{{ supplier.supplier_id }}">
+												{{ supplier.supplier_name }}
+											</label>
+										</div>
+									{% endfor %}
+								</div>
+							</div>
+							<span id="suppliersError" class="text-danger"></span>
+						</div>
+						
+						
+						
+
 						<!-- Threshold Value -->
 						<div class="form-group">
 							<label for="thresholdValue">Threshold Value:</label>
@@ -446,6 +498,25 @@
 						});
 					});
 
+
+					 // Prevent the dropdown from closing when a checkbox is clicked
+					 $('#supplierDropdownMenu').on('click', function (e) {
+						e.stopPropagation();
+					});
+			
+					// Toggle the dropdown menu when the button is clicked
+					$('#supplierDropdown button').on('click', function () {
+						$('#supplierDropdownMenu').toggleClass('show');
+					});
+			
+					// Close the dropdown when the user clicks outside of it or focuses on another form field
+					$(document).on('click focusin', function (e) {
+						if (!$('#supplierDropdown').is(e.target) && $('#supplierDropdown').has(e.target).length === 0) {
+							// Close the dropdown
+							$('#supplierDropdownMenu').removeClass('show');
+						}
+					});
+
 				</script>
 		    			
 				<div class="tab-content" id="orders-table-tab-content">
@@ -460,7 +531,7 @@
 												<th class="cell">Product</th>
 												<th class="cell">Category</th>
 												<th class="cell">Subcategory</th>
-												<th class="cell">Quantity</th>
+												<th class="cell">Maximum Quantity</th>
 												<th class="cell">Threshold Value</th>
 												<th class="cell"></th>
 												<th class="cell"></th>
@@ -602,6 +673,10 @@
 							}
 						});
 				
+
+
+
+						
 						function fetchProductData(productId) {
 							$.ajax({
 								url: `/get-product-details/${productId}/`,
