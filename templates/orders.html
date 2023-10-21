@@ -18,7 +18,7 @@
     <link id="theme-style" rel="stylesheet" href="{% static 'assets/css/portal.css' %}">
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 
 	<style>
@@ -46,6 +46,36 @@
 			background-color: #ffe6e6;
 			text-align: center;
 		}
+
+
+		 /* Style the tab links */
+		 .nav-tabs {
+			list-style: none;
+			padding: 0;
+			display: flex;
+		}
+		
+		.nav-tabs li {
+			margin-right: 10px;
+		}
+		
+		.nav-tabs a {
+			text-decoration: none;
+			padding: 10px 20px;
+			background-color: #007BFF;
+			color: #fff;
+			border-radius: 5px;
+		}
+		
+		.nav-tabs a:hover {
+			background-color: #0056b3;
+		}
+		
+		.nav-tabs a.active {
+			background-color: #fff;
+			color: #007BFF;
+		}
+		
     </style>
 
 </head> 
@@ -64,7 +94,7 @@
 				    </div><!--//col-->
 		            
 		            <div class="app-utilities col-auto ml-auto">
-			            <div class="app-utility-item app-notifications-dropdown dropdown">    
+			            {% comment %} <div class="app-utility-item app-notifications-dropdown dropdown">    
 				            <a class="dropdown-toggle no-toggle-arrow" id="notifications-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" title="Notifications">
 					            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
 					            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bell icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -151,16 +181,7 @@
 						        </div>
 															
 							</div><!--//dropdown-menu-->					        
-				        </div><!--//app-utility-item-->
-			            <div class="app-utility-item">
-				            <a href={% url 'settingshtml' %} title="Settings">
-					            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-					            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-gear icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"/>
-  <path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z"/>
-</svg>
-					        </a>
-					    </div><!--//app-utility-item-->
+				        </div><!--//app-utility-item--> {% endcomment %}
 			            
 			            <div class="app-utility-item app-user-dropdown dropdown">
 							<a class="dropdown-toggle" id="user-dropdown-toggle"
@@ -170,7 +191,6 @@
 							<ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
 								<li><span class="dropdown-item">{{ request.session.name }}</span></li>
 								<li><a class="dropdown-item" href={% url 'profile_view' %}>Account</a></li>
-								<li><a class="dropdown-item" href={% url 'settingshtml' %}>Settings</a></li>
 								<li><hr class="dropdown-divider"></li>
 								<li><a class="dropdown-item" href={% url 'loggout' %}>Log Out</a></li>
 							</ul>
@@ -268,18 +288,6 @@
 			    <div class="app-sidepanel-footer">
 				    <nav class="app-nav app-nav-footer">
 					    <ul class="app-menu footer-menu list-unstyled">
-						    <li class="nav-item">
-						        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-						        <a class="nav-link" href={% url 'settingshtml' %}>
-							        <span class="nav-icon">
-							            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-gear" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-	  <path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"/>
-	  <path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z"/>
-	</svg>
-							        </span>
-			                        <span class="nav-link-text">Settings</span>
-						        </a><!--//nav-link-->
-						    </li><!--//nav-item-->
 							<li class="nav-item">
 								<a class="nav-link" href={% url 'loggout' %}>
 									<span class="nav-icon">
@@ -416,96 +424,411 @@
                     });
 					
                 </script>
-				
-				
-				<div class="tab-content" id="orders-table-tab-content">
-					<div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
-						<div class="app-card app-card-orders-table shadow-sm mb-5">
-							<div class="app-card-body">
-								<div class="table-responsive">
-									<table class="table app-table-hover mb-0 text-left">
-										<thead>
-											<tr>
-												<th class="cell"></th> <!-- Add an empty header cell for checkboxes -->
-												<th class="cell">Product</th>
-												<th class="cell">Supplier</th>
-												<th class="cell">Warehouse</th>
-												<th class="cell">Date</th>
-												<th class="cell">Quantity</th>
-												<th class="cell">Buying Price</th> <!-- Added Buying Price column -->
-												<th class="cell">Total Price</th> <!-- Added Total Price column -->
-												<th class="cell">Status</th>
-												<th class="cell"></th>
-												<th class="cell"></th>
-												<th class="cell"></th>
-											</tr>
-										</thead>
-										<tbody>
-											{% for order in page %}
-												<tr class="order-row">
-													<td class="cell">
-														<input type="checkbox" class="order-checkbox" data-order-id="{{ order.order_id }}">
-														<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-													</td>
-													<td class="cell order-name"><span class="truncate">{{ order.product }}</span></td>
-													<td class="cell">{{ order.supplier }}</td>
-													<td class="cell">{{ order.warehouse }}</td>
-													<td class="cell">{{ order.order_datetime }}</td>
-													<td class="cell">{{ order.quantity }}</td>
-													<td class="cell">{{ order.buying_price }}</td> <!-- Display Buying Price -->
-													<td class="cell">{{ order.total_price }}</td> <!-- Calculate and Display Total Price -->
-													<td class="cell">{{ order.order_status }}</td>
-													<td class="cell">
-														{% if order.order_status == 'cancelled' %}
-															<button class="btn btn-danger text-white" disabled>Cancelled</button>
-														{% elif order.order_status == 'Delivered' %}
-															<a class="btn btn-danger text-white return-order" href="#" data-order-id="{{ order.order_id }}">Return</a>
-														{% elif order.order_status == 'Return Initiated' %}
-															<a class="btn btn-danger text-white delivered-order" href="#" data-order-id="{{ order.order_id }}">Cancel Return</a>
-														{% elif order.order_status == 'Return Completed' %}
-															<button class="btn btn-danger text-white" disabled>Returned</button>
-														{% else %}
-															<a class="btn btn-danger text-white cancel-order" href="#" data-order-id="{{ order.order_id }}">Cancel</a>
-														{% endif %}
-													</td>
-													<td class="cell">
-														{% if order.order_status == 'cancelled' %}
-															<button class="btn btn-primary text-white" disabled>Cancelled</button>
-														{% elif order.order_status == 'Delivered' %}
-															<button class="btn btn-primary text-white" disabled>Update</button>
-														{% elif order.order_status == 'Return Initiated' %}
-															<button class="btn btn-primary text-white" disabled>Update</button>
-														{% elif order.order_status == 'Return Completed' %}
-															<button class="btn btn-danger text-white" disabled>Returned</button>
-														{% else %}
-															<a class="btn btn-primary text-white update-order" href="#" data-order-id="{{ order.order_id }}">Update</a>
-														{% endif %}
-													</td>
-													<td class="cell">
-														{% if order.order_status == 'cancelled' %}
-															<button class="btn btn-danger text-white" disabled>Cancelled</button>
-														{% elif order.order_status == 'Delivered' %}
-															<button class="btn btn-danger text-white" disabled>Mark as Delivered</button>
-														{% elif order.order_status == 'Return Initiated' %}
-															<button class="btn btn-danger text-white returned-order" data-order-id="{{ order.order_id }}">Mark as Return Complete</button>
-														{% elif order.order_status == 'Return Completed' %}
-															<button class="btn btn-danger text-white" disabled>Returned</button>
-														{% else %}
-															<a class="btn btn-danger text-white delivered-order" href="#" data-order-id="{{ order.order_id }}">Mark as Delivered</a>
-														{% endif %}
-													</td>
+			
+				<ul class="nav nav-tabs" id="orderTabs" role="tablist">
+					<li><a class="tab-link" href="#all-orders">All Orders</a></li>
+					<li><a class="tab-link" href="#delivered-orders">Delivered Orders</a></li>
+					<li><a class="tab-link" href="#cancelled-orders">Cancelled Orders</a></li>
+					<li><a class="tab-link" href="#returned-orders">Returned Orders</a></li>
+					<li><a class="tab-link" href="#in-return">In Return</a></li>
+					<li><a class="tab-link" href="#in-transit">In Transit</a></li>
+				</ul>
+			
+				<div id="all-orders" class="tab">
+					<div class="tab-content" id="orders-table-tab-content">
+						<div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+							<div class="app-card app-card-orders-table shadow-sm mb-5">
+								<div class="app-card-body">
+									<div class="table-responsive">
+										<table class="table app-table-hover mb-0 text-left">
+											<thead>
+												<tr>
+													<th class="cell"></th> <!-- Add an empty header cell for checkboxes -->
+													<th class="cell">Product</th>
+													<th class="cell">Supplier</th>
+													<th class="cell">Warehouse</th>
+													<th class="cell">Date</th>
+													<th class="cell">Quantity</th>
+													<th class="cell">Buying Price</th> <!-- Added Buying Price column -->
+													<th class="cell">Total Price</th> <!-- Added Total Price column -->
+													<th class="cell">Status</th>
+													<th class="cell"></th>
+													<th class="cell"></th>
+													<th class="cell"></th>
 												</tr>
-											{% endfor %}
-										</tbody>
-									</table>
-									<!-- Add a "Delete All" button that starts as disabled -->
-								</div><!--//table-responsive-->
-							</div><!--//app-card-body-->
-						</div><!--//app-card-->
+											</thead>
+											<tbody>
+												{% for order in page %}
+													<tr class="order-row">
+														<td class="cell">
+															<input type="checkbox" class="order-checkbox" data-order-id="{{ order.order_id }}">
+															<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+														</td>
+														<td class="cell order-name"><span class="truncate">{{ order.product }}</span></td>
+														<td class="cell">{{ order.supplier }}</td>
+														<td class="cell">{{ order.warehouse }}</td>
+														<td class="cell">{{ order.order_datetime }}</td>
+														<td class="cell">{{ order.quantity }}</td>
+														<td class="cell">{{ order.buying_price }}</td> <!-- Display Buying Price -->
+														<td class="cell">{{ order.total_price }}</td> <!-- Calculate and Display Total Price -->
+														<td class="cell">{{ order.order_status }}</td>
+														<td class="cell">
+															{% if order.order_status == 'cancelled' %}
+																<button class="btn btn-danger text-white" disabled>Cancelled</button>
+															{% elif order.order_status == 'Delivered' %}
+																<a class="btn btn-danger text-white return-order" href="#" data-order-id="{{ order.order_id }}">Return</a>
+															{% elif order.order_status == 'Return Initiated' %}
+																<a class="btn btn-danger text-white delivered-order" href="#" data-order-id="{{ order.order_id }}">Cancel Return</a>
+															{% elif order.order_status == 'Return Completed' %}
+																<button class="btn btn-danger text-white" disabled>Returned</button>
+															{% else %}
+																<a class="btn btn-danger text-white cancel-order" href="#" data-order-id="{{ order.order_id }}">Cancel</a>
+															{% endif %}
+														</td>
+														<td class="cell">
+															{% if order.order_status == 'cancelled' %}
+																<button class="btn btn-primary text-white" disabled>Cancelled</button>
+															{% elif order.order_status == 'Delivered' %}
+																<button class="btn btn-primary text-white" disabled>Update</button>
+															{% elif order.order_status == 'Return Initiated' %}
+																<button class="btn btn-primary text-white" disabled>Update</button>
+															{% elif order.order_status == 'Return Completed' %}
+																<button class="btn btn-danger text-white" disabled>Returned</button>
+															{% else %}
+																<a class="btn btn-primary text-white update-order" href="#" data-order-id="{{ order.order_id }}">Update</a>
+															{% endif %}
+														</td>
+														<td class="cell">
+															{% if order.order_status == 'cancelled' %}
+																<button class="btn btn-danger text-white" disabled>Cancelled</button>
+															{% elif order.order_status == 'Delivered' %}
+																<button class="btn btn-danger text-white" disabled>Mark as Delivered</button>
+															{% elif order.order_status == 'Return Initiated' %}
+																<button class="btn btn-danger text-white returned-order" data-order-id="{{ order.order_id }}">Mark as Return Complete</button>
+															{% elif order.order_status == 'Return Completed' %}
+																<button class="btn btn-danger text-white" disabled>Returned</button>
+															{% else %}
+																<a class="btn btn-danger text-white delivered-order" href="#" data-order-id="{{ order.order_id }}">Mark as Delivered</a>
+															{% endif %}
+														</td>
+													</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+										<!-- Add a "Delete All" button that starts as disabled -->
+									</div><!--//table-responsive-->
+								</div><!--//app-card-body-->
+							</div><!--//app-card-->
+						</div>
+					</div>
+				</div>
+			
+				<div id="delivered-orders" class="tab">
+					<div class="tab-content" id="orders-table-tab-content">
+						<div class="tab-pane fade show active" id="orders-delivered" role="tabpanel" aria-labelledby="orders-delivered-tab">
+							<div class="app-card app-card-orders-table shadow-sm mb-5">
+								<div class="app-card-body">
+									<div class="table-responsive">
+										<table class="table app-table-hover mb-0 text-left">
+											<thead>
+												<tr>
+													<th class="cell"></th>
+													<th class="cell">Product</th>
+													<th class "cell">Supplier</th>
+													<th class="cell">Warehouse</th>
+													<th class="cell">Date</th>
+													<th class="cell">Quantity</th>
+													<th class="cell">Buying Price</th>
+													<th class="cell">Total Price</th>
+													<th class="cell">Status</th>
+													<th class="cell"></th>
+													<th class="cell"></th>
+													<th class="cell"></th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for order in page %}
+													{% if order.order_status == 'Delivered' %}
+													<tr class="order-row">
+														<td class="cell">
+															<input type="checkbox" class="order-checkbox" data-order-id="{{ order.order_id }}">
+															<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+														</td>
+														<td class="cell order-name"><span class="truncate">{{ order.product }}</span></td>
+														<td class="cell">{{ order.supplier }}</td>
+														<td class="cell">{{ order.warehouse }}</td>
+														<td class="cell">{{ order.order_datetime }}</td>
+														<td class="cell">{{ order.quantity }}</td>
+														<td class="cell">{{ order.buying_price }}</td>
+														<td class="cell">{{ order.total_price }}</td>
+														<td class="cell">{{ order.order_status }}</td>
+														<td class="cell">
+															<button class="btn btn-danger text-white" disabled>Delivered</button>
+														</td>
+														<td class="cell">
+															<button class="btn btn-primary text-white" disabled>Update</button>
+														</td>
+														<td class="cell">
+															<button class="btn btn-danger text-white" disabled>Mark as Delivered</button>
+														</td>
+													</tr>
+													{% endif %}
+												{% endfor %}
+											</tbody>
+										</table>
+										<!-- Add a "Delete All" button that starts as disabled -->
+									</div><!--//table-responsive-->
+								</div><!--//app-card-body-->
+							</div><!--//app-card-->
+						</div>
+					</div>
+				</div>
+			
+				<div id="cancelled-orders" class="tab">
+					<div class="tab-content" id="orders-table-tab-content">
+						<div class="tab-pane fade show active" id="orders-delivered" role="tabpanel" aria-labelledby="orders-delivered-tab">
+							<div class="app-card app-card-orders-table shadow-sm mb-5">
+								<div class="app-card-body">
+									<div class="table-responsive">
+										<table class="table app-table-hover mb-0 text-left">
+											<thead>
+												<tr>
+													<th class="cell"></th>
+													<th class="cell">Product</th>
+													<th class "cell">Supplier</th>
+													<th class="cell">Warehouse</th>
+													<th class="cell">Date</th>
+													<th class="cell">Quantity</th>
+													<th class="cell">Buying Price</th>
+													<th class="cell">Total Price</th>
+													<th class="cell">Status</th>
+													<th class="cell"></th>
+													<th class="cell"></th>
+													<th class="cell"></th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for order in page %}
+													{% if order.order_status == 'cancelled' %}
+													<tr class="order-row">
+														<td class="cell">
+															<input type="checkbox" class="order-checkbox" data-order-id="{{ order.order_id }}">
+															<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+														</td>
+														<td class="cell order-name"><span class="truncate">{{ order.product }}</span></td>
+														<td class="cell">{{ order.supplier }}</td>
+														<td class="cell">{{ order.warehouse }}</td>
+														<td class="cell">{{ order.order_datetime }}</td>
+														<td class="cell">{{ order.quantity }}</td>
+														<td class="cell">{{ order.buying_price }}</td>
+														<td class="cell">{{ order.total_price }}</td>
+														<td class="cell">{{ order.order_status }}</td>
+														<td class="cell">
+															<button class="btn btn-danger text-white" disabled>Delivered</button>
+														</td>
+														<td class="cell">
+															<button class="btn btn-primary text-white" disabled>Update</button>
+														</td>
+														<td class="cell">
+															<button class="btn btn-danger text-white" disabled>Mark as Delivered</button>
+														</td>
+													</tr>
+													{% endif %}
+												{% endfor %}
+											</tbody>
+										</table>
+										<!-- Add a "Delete All" button that starts as disabled -->
+									</div><!--//table-responsive-->
+								</div><!--//app-card-body-->
+							</div><!--//app-card-->
+						</div>
+					</div>
+				</div>
+			
+				<div id="returned-orders" class="tab">
+					<div class="tab-content" id="orders-table-tab-content">
+						<div class="tab-pane fade show active" id="orders-delivered" role="tabpanel" aria-labelledby="orders-delivered-tab">
+							<div class="app-card app-card-orders-table shadow-sm mb-5">
+								<div class="app-card-body">
+									<div class="table-responsive">
+										<table class="table app-table-hover mb-0 text-left">
+											<thead>
+												<tr>
+													<th class="cell"></th>
+													<th class="cell">Product</th>
+													<th class "cell">Supplier</th>
+													<th class="cell">Warehouse</th>
+													<th class="cell">Date</th>
+													<th class="cell">Quantity</th>
+													<th class="cell">Buying Price</th>
+													<th class="cell">Total Price</th>
+													<th class="cell">Status</th>
+													<th class="cell"></th>
+													<th class="cell"></th>
+													<th class="cell"></th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for order in page %}
+													{% if order.order_status == 'Return Completed' %}
+													<tr class="order-row">
+														<td class="cell">
+															<input type="checkbox" class="order-checkbox" data-order-id="{{ order.order_id }}">
+															<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+														</td>
+														<td class="cell order-name"><span class="truncate">{{ order.product }}</span></td>
+														<td class="cell">{{ order.supplier }}</td>
+														<td class="cell">{{ order.warehouse }}</td>
+														<td class="cell">{{ order.order_datetime }}</td>
+														<td class="cell">{{ order.quantity }}</td>
+														<td class="cell">{{ order.buying_price }}</td>
+														<td class="cell">{{ order.total_price }}</td>
+														<td class="cell">{{ order.order_status }}</td>
+														<td class="cell">
+															<button class="btn btn-danger text-white" disabled>Delivered</button>
+														</td>
+														<td class="cell">
+															<button class="btn btn-primary text-white" disabled>Update</button>
+														</td>
+														<td class="cell">
+															<button class="btn btn-danger text-white" disabled>Mark as Delivered</button>
+														</td>
+													</tr>
+													{% endif %}
+												{% endfor %}
+											</tbody>
+										</table>
+										<!-- Add a "Delete All" button that starts as disabled -->
+									</div><!--//table-responsive-->
+								</div><!--//app-card-body-->
+							</div><!--//app-card-->
+						</div>
+					</div>
+				</div>
+			
+				<div id="in-return" class="tab">
+					<div class="tab-content" id="orders-table-tab-content">
+						<div class="tab-pane fade show active" id="orders-delivered" role="tabpanel" aria-labelledby="orders-delivered-tab">
+							<div class="app-card app-card-orders-table shadow-sm mb-5">
+								<div class="app-card-body">
+									<div class="table-responsive">
+										<table class="table app-table-hover mb-0 text-left">
+											<thead>
+												<tr>
+													<th class="cell"></th>
+													<th class="cell">Product</th>
+													<th class "cell">Supplier</th>
+													<th class="cell">Warehouse</th>
+													<th class="cell">Date</th>
+													<th class="cell">Quantity</th>
+													<th class="cell">Buying Price</th>
+													<th class="cell">Total Price</th>
+													<th class="cell">Status</th>
+													<th class="cell"></th>
+													<th class="cell"></th>
+													<th class="cell"></th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for order in page %}
+													{% if order.order_status == 'Return Initiated' %}
+													<tr class="order-row">
+														<td class="cell">
+															<input type="checkbox" class="order-checkbox" data-order-id="{{ order.order_id }}">
+															<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+														</td>
+														<td class="cell order-name"><span class="truncate">{{ order.product }}</span></td>
+														<td class="cell">{{ order.supplier }}</td>
+														<td class="cell">{{ order.warehouse }}</td>
+														<td class="cell">{{ order.order_datetime }}</td>
+														<td class="cell">{{ order.quantity }}</td>
+														<td class="cell">{{ order.buying_price }}</td>
+														<td class="cell">{{ order.total_price }}</td>
+														<td class="cell">{{ order.order_status }}</td>
+														<td class="cell">
+															<button class="btn btn-danger text-white" disabled>Delivered</button>
+														</td>
+														<td class="cell">
+															<button class="btn btn-primary text-white" disabled>Update</button>
+														</td>
+														<td class="cell">
+															<button class="btn btn-danger text-white" disabled>Mark as Delivered</button>
+														</td>
+													</tr>
+													{% endif %}
+												{% endfor %}
+											</tbody>
+										</table>
+										<!-- Add a "Delete All" button that starts as disabled -->
+									</div><!--//table-responsive-->
+								</div><!--//app-card-body-->
+							</div><!--//app-card-->
+						</div>
+					</div>
+				</div>
+			
+				<div id="in-transit" class="tab">
+					<div class="tab-content" id="orders-table-tab-content">
+						<div class="tab-pane fade show active" id="orders-delivered" role="tabpanel" aria-labelledby="orders-delivered-tab">
+							<div class="app-card app-card-orders-table shadow-sm mb-5">
+								<div class="app-card-body">
+									<div class="table-responsive">
+										<table class="table app-table-hover mb-0 text-left">
+											<thead>
+												<tr>
+													<th class="cell"></th>
+													<th class="cell">Product</th>
+													<th class "cell">Supplier</th>
+													<th class="cell">Warehouse</th>
+													<th class="cell">Date</th>
+													<th class="cell">Quantity</th>
+													<th class="cell">Buying Price</th>
+													<th class="cell">Total Price</th>
+													<th class="cell">Status</th>
+													<th class="cell"></th>
+													<th class="cell"></th>
+													<th class="cell"></th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for order in page %}
+													{% if order.order_status == 'Order Placed' %}
+													<tr class="order-row">
+														<td class="cell">
+															<input type="checkbox" class="order-checkbox" data-order-id="{{ order.order_id }}">
+															<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+														</td>
+														<td class="cell order-name"><span class="truncate">{{ order.product }}</span></td>
+														<td class="cell">{{ order.supplier }}</td>
+														<td class="cell">{{ order.warehouse }}</td>
+														<td class="cell">{{ order.order_datetime }}</td>
+														<td class="cell">{{ order.quantity }}</td>
+														<td class="cell">{{ order.buying_price }}</td>
+														<td class="cell">{{ order.total_price }}</td>
+														<td class="cell">{{ order.order_status }}</td>
+														<td class="cell">
+															<button class="btn btn-danger text-white" disabled>Delivered</button>
+														</td>
+														<td class="cell">
+															<button class="btn btn-primary text-white" disabled>Update</button>
+														</td>
+														<td class="cell">
+															<button class="btn btn-danger text-white" disabled>Mark as Delivered</button>
+														</td>
+													</tr>
+													{% endif %}
+												{% endfor %}
+											</tbody>
+										</table>
+										<!-- Add a "Delete All" button that starts as disabled -->
+									</div><!--//table-responsive-->
+								</div><!--//app-card-body-->
+							</div><!--//app-card-->
+						</div>
 					</div>
 				</div>
 				
-				
+			
 	
 		
 <script>
@@ -533,7 +856,33 @@
 		
 		// Listen for form submission outside of the change event handler
 		
-		
+		const tabLinks = document.querySelectorAll(".tab-link");
+		const tabs = document.querySelectorAll(".tab");
+
+		tabLinks.forEach((link) => {
+			link.addEventListener("click", () => {
+				// Hide all tabs
+				tabs.forEach((tab) => {
+					tab.style.display = "none";
+				});
+
+				// Show the selected tab
+				const targetTabId = link.getAttribute("href").substring(1);
+				const targetTab = document.getElementById(targetTabId);
+				targetTab.style.display = "block";
+			});
+		});
+
+		// Initially, hide all tabs except the "All Orders" tab
+		tabs.forEach((tab) => {
+			if (tab.id !== "all-orders") {
+				tab.style.display = "none";
+			}
+		});
+
+		// Show the "All Orders" tab
+		document.getElementById("all-orders").style.display = "block";
+
 		
 
 		const deleteLinks = document.querySelectorAll(".cancel-order");

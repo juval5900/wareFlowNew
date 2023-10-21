@@ -39,6 +39,8 @@
             padding: 20px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
 			z-index: 9999;
+			overflow-y: scroll;
+			max-height: 800px;
         }
 
 		/* Custom dropdown styles */
@@ -61,6 +63,29 @@
 		}
 
 		/* Adjust other styles as needed */
+		  /* CSS styles for the table */
+		.product-details-table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		/* CSS styles for table rows */
+		.product-details-row {
+			border: 1px solid #ddd;
+		}
+
+		/* CSS styles for table cells */
+		.product-details-key {
+			font-weight: bold;
+			padding: 10px;
+			text-align: right;
+			background-color: #f0f0f0;
+		}
+
+		.product-details-value {
+			padding: 10px;
+		}
+
 
     </style>
 
@@ -79,7 +104,7 @@
 					    </a>
 				    </div><!--//col-->		            
 		            <div class="app-utilities col-auto ml-auto">
-			            <div class="app-utility-item app-notifications-dropdown dropdown">    
+			            {% comment %} <div class="app-utility-item app-notifications-dropdown dropdown">    
 				            <a class="dropdown-toggle no-toggle-arrow" id="notifications-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" title="Notifications">
 					            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
 					            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bell icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -166,16 +191,7 @@
 						        </div>
 															
 							</div><!--//dropdown-menu-->					        
-				        </div><!--//app-utility-item-->
-			            <div class="app-utility-item">
-				            <a href={% url 'settingshtml' %} title="Settings">
-					            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-					            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-gear icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"/>
-  <path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z"/>
-</svg>
-					        </a>
-					    </div><!--//app-utility-item-->
+				        </div><!--//app-utility-item--> {% endcomment %}
 			            
 			            <div class="app-utility-item app-user-dropdown dropdown">
 							<a class="dropdown-toggle" id="user-dropdown-toggle"
@@ -185,7 +201,6 @@
 							<ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
 								<li><span class="dropdown-item">{{ request.session.name }}</span></li>
 								<li><a class="dropdown-item" href={% url 'profile_view' %}>Account</a></li>
-								<li><a class="dropdown-item" href={% url 'settingshtml' %}>Settings</a></li>
 								<li><hr class="dropdown-divider"></li>
 								<li><a class="dropdown-item" href={% url 'loggout' %}>Log Out</a></li>
 							</ul>
@@ -285,18 +300,6 @@
 			    <div class="app-sidepanel-footer">
 				    <nav class="app-nav app-nav-footer">
 					    <ul class="app-menu footer-menu list-unstyled">
-						    <li class="nav-item">
-						        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-						        <a class="nav-link" href={% url 'settingshtml' %}>
-							        <span class="nav-icon">
-							            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-gear" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-	  <path fill-rule="evenodd" d="M8.837 1.626c-.246-.835-1.428-.835-1.674 0l-.094.319A1.873 1.873 0 0 1 4.377 3.06l-.292-.16c-.764-.415-1.6.42-1.184 1.185l.159.292a1.873 1.873 0 0 1-1.115 2.692l-.319.094c-.835.246-.835 1.428 0 1.674l.319.094a1.873 1.873 0 0 1 1.115 2.693l-.16.291c-.415.764.42 1.6 1.185 1.184l.292-.159a1.873 1.873 0 0 1 2.692 1.116l.094.318c.246.835 1.428.835 1.674 0l.094-.319a1.873 1.873 0 0 1 2.693-1.115l.291.16c.764.415 1.6-.42 1.184-1.185l-.159-.291a1.873 1.873 0 0 1 1.116-2.693l.318-.094c.835-.246.835-1.428 0-1.674l-.319-.094a1.873 1.873 0 0 1-1.115-2.692l.16-.292c.415-.764-.42-1.6-1.185-1.184l-.291.159A1.873 1.873 0 0 1 8.93 1.945l-.094-.319zm-2.633-.283c.527-1.79 3.065-1.79 3.592 0l.094.319a.873.873 0 0 0 1.255.52l.292-.16c1.64-.892 3.434.901 2.54 2.541l-.159.292a.873.873 0 0 0 .52 1.255l.319.094c1.79.527 1.79 3.065 0 3.592l-.319.094a.873.873 0 0 0-.52 1.255l.16.292c.893 1.64-.902 3.434-2.541 2.54l-.292-.159a.873.873 0 0 0-1.255.52l-.094.319c-.527 1.79-3.065 1.79-3.592 0l-.094-.319a.873.873 0 0 0-1.255-.52l-.292.16c-1.64.893-3.433-.902-2.54-2.541l.159-.292a.873.873 0 0 0-.52-1.255l-.319-.094c-1.79-.527-1.79-3.065 0-3.592l.319-.094a.873.873 0 0 0 .52-1.255l-.16-.292c-.892-1.64.902-3.433 2.541-2.54l.292.159a.873.873 0 0 0 1.255-.52l.094-.319z"/>
-	  <path fill-rule="evenodd" d="M8 5.754a2.246 2.246 0 1 0 0 4.492 2.246 2.246 0 0 0 0-4.492zM4.754 8a3.246 3.246 0 1 1 6.492 0 3.246 3.246 0 0 1-6.492 0z"/>
-	</svg>
-							        </span>
-			                        <span class="nav-link-text">Settings</span>
-						        </a><!--//nav-link-->
-						    </li><!--//nav-item-->
 							<li class="nav-item">
 								<a class="nav-link" href={% url 'loggout' %}>
 									<span class="nav-icon">
@@ -367,9 +370,10 @@
 					<h2 class="mb-4">Add Product</h2>
 					<form method="post" enctype="multipart/form-data" id="add-product-form">
 						{% csrf_token %}
-						
+				
 						<input type="hidden" id="product-id" name="product-id" class="form-control">
-
+				
+						<!-- Product Image -->
 						<div class="form-group">
 							<div id="imagePreview" class="mt-3 text-center">
 								<img id="previewImage" src="" alt="Image Preview" class="rounded-circle" style="max-width: 150px; max-height: 150px;">
@@ -378,7 +382,7 @@
 							<input type="file" id="productImage" name="productImage" class="form-control-file">
 							<span id="productImageError" class="text-danger"></span>
 						</div>
-						
+				
 						<!-- Category -->
 						<div class="form-group">
 							<label for="category">Category:</label>
@@ -390,14 +394,50 @@
 							</select>
 							<span id="categoryError" class="text-danger"></span> <!-- Error message for Category -->
 						</div>
-						
+				
 						<!-- Subcategory -->
 						<div class="form-group">
 							<label for="subcategory">Subcategory:</label>
 							<select id="subcategory" name="subcategory" class="form-control">
 								<option value="">Select a category first</option>
 							</select>
-							<span id="subcategoryError" class="text-danger"></span> <!-- Error message for Category -->
+							<span id="subcategoryError" class="text-danger"></span> <!-- Error message for Subcategory -->
+						</div>
+				
+						<!-- Brand -->
+						<div class="form-group">
+							<label for="brand">Brand:</label>
+							<select id="brand" name="brand" class="form-control">
+								<option value="" disabled selected>Select</option>
+								{% for Brand in brands %}
+									<option value="{{ Brand.brand_id }}">{{ Brand.brand_name }}</option>
+								{% endfor %}
+							</select>
+							<span id="brandError" class="text-danger"></span> <!-- Error message for Brand -->
+						</div>
+				
+						<!-- Product Type -->
+						<div class="form-group">
+							<label for="productType">Product Type:</label>
+							<select id="productType" name="productType" class="form-control">
+								<option value="" disabled selected>Select</option>
+								{% for ProductType in productTypes %}
+									<option value="{{ ProductType.product_type_id }}">{{ ProductType.type_name }}</option>
+								{% endfor %}
+							</select>
+							<span id="productTypeError" class="text-danger"></span> <!-- Error message for Product Type -->
+						</div>
+				
+						<!-- Subtype -->
+						<div class="form-group">
+							<label for="subtype">Subtype:</label>
+							<select id="subtype" name="subtype" class="form-control">
+								<option value="" disabled selected>Select</option>
+								{% for Subtype in subtypes %}
+									<option value="{{ Subtype.subtype_id }}">{{ Subtype.subtype_name }}</option>
+								{% endfor %}
+							</select>
+							<span id="subtypeError" class="text-danger"></span> <!-- Error message for Subtype -->
 						</div>
 				
 						<!-- Product Name -->
@@ -414,7 +454,7 @@
 							<span id="quantityError" class="text-danger"></span> <!-- Error message for Quantity -->
 						</div>
 				
-
+						<!-- Suppliers -->
 						<div class="form-group">
 							<label for="suppliers">Suppliers:</label>
 							<div class="custom-dropdown" id="supplierDropdown">
@@ -435,20 +475,17 @@
 							</div>
 							<span id="suppliersError" class="text-danger"></span>
 						</div>
-						
-						
-						
-
+				
 						<!-- Threshold Value -->
 						<div class="form-group">
-							<label for="thresholdValue">Threshold Value:</label>
+							<label for "thresholdValue">Threshold Value:</label>
 							<input type="number" id="thresholdValue" name="thresholdValue" class="form-control">
 							<span id="thresholdValueError" class="text-danger"></span> <!-- Error message for Threshold Value -->
 						</div>
 				
 						<!-- Buttons -->
 						<div class="form-group">
-							<input type="submit" value="Add" class="btn btn-primary">
+							<input type="submit" value="Add" class="btn btn-primary add-product">
 							<button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
 						</div>
 					</form>
@@ -456,68 +493,217 @@
 				
 				
 				<script>
-					const showFormButton = document.getElementById('showFormButton');
-					const productFormPopup = document.getElementById('productFormPopup');
-					const cancelButton = document.getElementById('cancelButton');
-
-					showFormButton.addEventListener('click', () => {
-						productFormPopup.style.display = 'block';
-					});
-						cancelButton.addEventListener('click', () => {
-                        productFormPopup.style.display = 'none';
-                  
-					});
-
+					// Wrap your code in a document ready function
 					$(document).ready(function() {
-						$('#category').on('change', function() {
-							var categoryId = $(this).val();
-							if (categoryId) {
-								$.ajax({
-									url: '{% url "get_subcategories" %}',  // Use the URL pattern name
-									data: {
-										'category_id': categoryId
-									},
-									success: function(data) {
-										var subcategorySelect = $('#subcategory');
-										subcategorySelect.empty();  // Clear previous options
-										subcategorySelect.append($('<option>', {
-											value: '',
-											text: 'Select a subcategory'
-										}));
-										$.each(data.subcategories, function(index, subcategory) {
-											subcategorySelect.append($('<option>', {
-												value: subcategory.id,
-												text: subcategory.name
-											}));
-										});
-									}
-								});
-							} else {
-								$('#subcategory').html('<option value="">Select a category first</option>');
+					  const showFormButton = document.getElementById('showFormButton');
+					  const productFormPopup = document.getElementById('productFormPopup');
+					  const cancelButton = document.getElementById('cancelButton');
+				  
+					  showFormButton.addEventListener('click', () => {
+						productFormPopup.style.display = 'block';
+					  });
+				  
+					  cancelButton.addEventListener('click', () => {
+						productFormPopup.style.display = 'none';
+					  });
+				  
+					  $('#category').on('change', function() {
+						var categoryId = $(this).val();
+						if (categoryId) {
+						  $.ajax({
+							url: '{% url "get_subcategories" %}',
+							data: {
+							  'category_id': categoryId
+							},
+							success: function(data) {
+							  var subcategorySelect = $('#subcategory');
+							  subcategorySelect.empty();
+							  subcategorySelect.append($('<option>', {
+								value: '',
+								text: 'Select a subcategory'
+							  }));
+							  $.each(data.subcategories, function(index, subcategory) {
+								subcategorySelect.append($('<option>', {
+								  value: subcategory.id,
+								  text: subcategory.name
+								}));
+							  });
 							}
-						});
-					});
-
-
-					 // Prevent the dropdown from closing when a checkbox is clicked
-					 $('#supplierDropdownMenu').on('click', function (e) {
-						e.stopPropagation();
-					});
-			
-					// Toggle the dropdown menu when the button is clicked
-					$('#supplierDropdown button').on('click', function () {
-						$('#supplierDropdownMenu').toggleClass('show');
-					});
-			
-					// Close the dropdown when the user clicks outside of it or focuses on another form field
-					$(document).on('click focusin', function (e) {
-						if (!$('#supplierDropdown').is(e.target) && $('#supplierDropdown').has(e.target).length === 0) {
-							// Close the dropdown
-							$('#supplierDropdownMenu').removeClass('show');
+						  });
+						} else {
+						  $('#subcategory').html('<option value="">Select a category first</option>');
 						}
+					  });
+				  
+					  $('#subcategory').on('change', function() {
+						var subcategoryId = $(this).val();
+						if (subcategoryId) {
+						  $.ajax({
+							url: '{% url "get_brands" %}',
+							data: {
+							  'subcategory_id': subcategoryId
+							},
+							success: function(data) {
+							  var brandSelect = $('#brand');
+							  brandSelect.empty();
+							  brandSelect.append($('<option>', {
+								value: '',
+								text: 'Select a brand'
+							  }));
+							  $.each(data.brands, function(index, brand) {
+								brandSelect.append($('<option>', {
+								  value: brand.id,
+								  text: brand.name
+								}));
+							  });
+							}
+						  });
+						} else {
+						  $('#brand').html('<option value="">Select a subcategory first</option>');
+						}
+					  });
+				  
+					  $('#brand').on('change', function() {
+						var brandId = $(this).val();
+						if (brandId) {
+						  $.ajax({
+							url: '{% url "get_type" %}',
+							data: {
+							  'brand_id': brandId
+							},
+							success: function(data) {
+							  var typeSelect = $('#productType');
+							  typeSelect.empty();
+							  typeSelect.append($('<option>', {
+								value: '',
+								text: 'Select a type'
+							  }));
+							  $.each(data.types, function(index, type) {
+								typeSelect.append($('<option>', {
+								  value: type.id,
+								  text: type.name
+								}));
+							  });
+							}
+						  });
+						} else {
+						  $('#productType').html('<option value="">Select a brand first</option>');
+						}
+					  });
+				  
+					  $('#productType').on('change', function() {
+						var typeId = $(this).val();
+						if (typeId) {
+						  $.ajax({
+							url: '{% url "get_subtype" %}',
+							data: {
+							  'type_id': typeId
+							},
+							success: function(data) {
+							  var subtypeSelect = $('#subtype');
+							  subtypeSelect.empty();
+							  subtypeSelect.append($('<option>', {
+								value: '',
+								text: 'Select a subtype'
+							  }));
+							  $.each(data.subtypes, function(index, subtype) {
+								subtypeSelect.append($('<option>', {
+								  value: subtype.id,
+								  text: subtype.name
+								}));
+							  });
+							}
+						  });
+						} else {
+						  $('#subtype').html('<option value="">Select a type first</option>');
+						}
+					  });
+				  
+					  // Prevent the dropdown from closing when a checkbox is clicked
+					  $('#supplierDropdownMenu').on('click', function(e) {
+						e.stopPropagation();
+					  });
+				  
+					  // Toggle the dropdown menu when the button is clicked
+					  $('#supplierDropdown button').on('click', function() {
+						$('#supplierDropdownMenu').toggleClass('show');
+					  });
+				  
+					  // Close the dropdown when the user clicks outside of it or focuses on another form field
+					  $(document).on('click focusin', function(e) {
+						if (!$('#supplierDropdown').is(e.target) && $('#supplierDropdown').has(e.target).length === 0) {
+						  // Close the dropdown
+						  $('#supplierDropdownMenu').removeClass('show');
+						}
+					  });
 					});
+				  </script>
+				  
 
-				</script>
+
+
+
+
+				<div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-xl" role="document">
+					  <div class="modal-content">
+						<div class="modal-header">
+						  <h5 class="modal-title" id="productModalLabel">Product Details</h5>
+						  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						  </button>
+						</div>
+						<div class="modal-body">
+						  <ul class="nav nav-tabs" id="productTabs" role="tablist">
+							<li class="nav-item">
+							  <a class="nav-link active" id="product-details-tab" data-toggle="tab" href="#product-details" role="tab" aria-controls="product-details" aria-selected="true">Product Details</a>
+							</li>
+							<li class="nav-item">
+							  <a class="nav-link supplier" id="supplier-details-tab" data-toggle="tab" href="#supplier-details" role="tab" aria-controls="supplier-details" aria-selected="false">Supplier Details</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link stocktab" id="stock-details-tab" data-toggle="tab" href="#stock-details" role="tab" aria-controls="stock-details" aria-selected="false">Stock Details</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link storagetab" id="storage-details-tab" data-toggle="tab" href="#storage-details" role="tab" aria-controls="storage-details" aria-selected="false">Storage Details</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link orderstab" id="orders-details-tab" data-toggle="tab" href="#orders-details" role="tab" aria-controls="orders-details" aria-selected="false">Orders Details</a>
+							</li>
+							<li class="nav-item ">
+								<a class="nav-link salestab" id="sales-details-tab" data-toggle="tab" href="#sales-details" role="tab" aria-controls="sales-details" aria-selected="false">sales Details</a>
+							</li>
+							<!-- Add tabs for other sections here -->
+						  </ul>
+						  <div class="tab-content" id="productTabContent">
+							<div class="tab-pane fade show active" id="product-details" role="tabpanel" aria-labelledby="product-details-tab">
+							  <!-- Content for the Product Details tab goes here -->
+							</div>
+							<div class="tab-pane fade" id="supplier-details" role="tabpanel" aria-labelledby="supplier-details-tab">
+							  <!-- Content for the Supplier Details tab goes here -->
+							</div>
+							<div class="tab-pane fade" id="stock-details" role="tabpanel" aria-labelledby="stock-details-tab">
+								<!-- Content for the Supplier Details tab goes here -->
+							  </div>
+							  <div class="tab-pane fade" id="storage-details" role="tabpanel" aria-labelledby="storage-details-tab">
+								<!-- Content for the Supplier Details tab goes here -->
+							  </div>
+							  <div class="tab-pane fade" id="orders-details" role="tabpanel" aria-labelledby="orders-details-tab">
+								<!-- Content for the Supplier Details tab goes here -->
+							  </div>
+							  <div class="tab-pane fade" id="sales-details" role="tabpanel" aria-labelledby="sales-details-tab">
+								<!-- Content for the Supplier Details tab goes here -->
+							  </div>
+							<!-- Add content for other tabs here -->
+						  </div>
+						</div>
+					  </div>
+					</div>
+				  </div>
+				</div>
+				  
+
+
 		    			
 				<div class="tab-content" id="orders-table-tab-content">
 					<div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
@@ -545,7 +731,11 @@
 													<input type="checkbox" class="product-checkbox" data-product-id="{{ product.product_id }}">
 													<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 												</td>
-												<td class="cell product-name"><span class="truncate">{{ product.product_name }}</span></td>
+												<td class="cell product-name">
+													<a class="product-details-link" href="#" data-toggle="modal" data-target="#productModal" data-product-id="{{ product.product_id }}" data-product-details="{{ product.brand }} {{ product.product_type }} {{ product.subtype }} {{ product.product_name }}">
+													{{ product.brand }} {{ product.product_type }} {{ product.subtype }} {{ product.product_name }}
+													</a>
+												  </td>
 												<td class="cell">{{ product.category }}</td>
 												<td class="cell">{{ product.subcategory }}</td>
 												<td class="cell">{{ product.quantity }}</td>
@@ -566,12 +756,6 @@
 						</div><!--//app-card-->
 					</div>
 				</div>
-				
-
-
-
-				
-				
 		
 				<script>
 					$(document).ready(function () {
@@ -608,6 +792,416 @@
 							});
 						});
 				
+
+						let productId; // Declare a global variable to store the product ID
+
+						$(document).ready(function () {
+							$('.product-details-link').on('click', function () {
+								productId = $(this).data('product-id'); // Store the product ID globally
+								// Make an AJAX request to retrieve product details
+								$.ajax({
+									url: '/get_product_details/',  // Replace with the correct URL in your Django application
+									method: 'GET',
+									data: { product_id: productId },
+									success: function (response) {
+										if (response.error) {
+											// Handle error if the product is not found
+											$('#product-details').html(`<p>${response.error}</p>`);
+										} else {
+											// Build an HTML table to display all product details with formatting and styles
+											let productDetailsHTML = '<table class="product-details-table">';
+											for (const key in response) {
+												let formattedValue = response[key];
+
+												// Apply special formatting for specific fields
+												if (key === 'product_image') {
+													formattedValue = `<img src="${formattedValue}" alt="Product Image" style="max-width: 100px;" />`;
+												} else if (key === 'is_active') {
+													formattedValue = formattedValue ? 'Active' : 'Inactive';
+												}
+
+												productDetailsHTML += `<tr class="product-details-row"><td class="product-details-key">${key}</td> <td class="product-details-value">${formattedValue}</td></tr>`;
+											}
+											productDetailsHTML += '</table>';
+											$('#product-details').html(productDetailsHTML);
+
+											// Populate other tabs as needed
+
+											// Select the Product Details tab by default
+											$('#productTabs a[href="#product-details"]').tab('show');
+										}
+									},
+									error: function () {
+										// Handle error if the request fails
+										console.error('Failed to retrieve product details.');
+									}
+								});
+							});
+
+							$('.supplier').on('click', function (e) {
+								e.preventDefault();
+								const tabId = $(this).attr('href');
+								if (tabId === '#supplier-details') {
+									// Clear existing content
+									$('#supplier-details').empty();
+							
+									// Make an AJAX request to retrieve supplier details
+									$.ajax({
+										url: '/get_supplier_details/',
+										method: 'GET',
+										data: { product_id: productId },
+										success: function (response) {
+											if (response.error) {
+												// Handle error if the product is not found
+												$('#supplier-details').html(`<p>${response.error}</p>`);
+											} else if (Array.isArray(response) && response.length > 0) {
+												// Create a styled table
+												let supplierDetailsHTML = `
+													<table class="table table-striped">
+														<thead>
+															<tr>
+																<th>Name</th>
+																<th>Contact</th>
+																<th>Image</th>
+																<!-- Add more table headers for additional fields -->
+															</tr>
+														</thead>
+														<tbody>
+												`;
+							
+												response.forEach(function (supplier) {
+													// Format and append each row of data
+													supplierDetailsHTML += `
+														<tr>
+															<td>${supplier.name}</td>
+															<td>${supplier.contact}</td>
+															<td><img src="${supplier.image}" alt="Supplier Image" style="max-width: 100px;"></td>
+															<!-- Add more cells for additional fields -->
+														</tr>
+													`;
+												});
+							
+												supplierDetailsHTML += `
+														</tbody>
+													</table>
+												`;
+							
+												$('#supplier-details').html(supplierDetailsHTML);
+							
+												// Activate the Supplier Details tab
+												$('#productTabs a[href="#supplier-details"]').tab('show');
+											} else {
+												// Handle case when no suppliers are associated
+												$('#supplier-details').html(`<p>No suppliers found for this product.</p>`);
+											}
+										},
+										error: function () {
+											console.error('Failed to retrieve supplier details.');
+										}
+									});
+								}
+							});
+
+
+
+							$('.stocktab').on('click', function (e) {
+								e.preventDefault();
+								const tabId = $(this).attr('href');
+								console.log(tabId);
+								if (tabId === '#stock-details') {
+									// Clear existing content
+									$('#stock-details').empty();
+							
+									// Make an AJAX request to retrieve stock details
+									$.ajax({
+										url: '/get_stock_details/',
+										method: 'GET',
+										data: { product_id: productId },
+										success: function (response) {
+											if (response.error) {
+												// Handle error if stock is not found
+												$('#stock-details').html(`<p>${response.error}</p>`);
+											} else if (Array.isArray(response) && response.length > 0) {
+												// Create a styled table to display stock details
+												let stockDetailsHTML = `
+													<table class="table table-striped">
+														<thead>
+															<tr>
+																<th>Sector</th>
+																<th>Row Start</th>
+																<th>Column Start</th>
+																<th>Column End</th>
+																<th>Remaining Quantity</th>
+																<th>Is Stored</th>
+															</tr>
+														</thead>
+														<tbody>
+												`;
+							
+												response.forEach(function (stock) {
+													// Format and append each row of data
+													stockDetailsHTML += `
+														<tr>
+															<td>${stock.sector}</td>
+															<td>${stock.row_start}</td>
+															<td>${stock.column_start}</td>
+															<td>${stock.column_end}</td>
+															<td>${stock.remaining_quantity}</td>
+															<td>${stock.is_stored}</td>
+														</tr>
+													`;
+												});
+							
+												stockDetailsHTML += `
+														</tbody>
+													</table>
+												`;
+							
+												$('#stock-details').html(stockDetailsHTML);
+							
+												// Activate the Stock Details tab
+												$('#productTabs a[href="#stock-details"]').tab('show');
+											} else {
+												// Handle case when no stock is associated
+												$('#stock-details').html(`<p>No stock found for this order.</p>`);
+											}
+										},
+										error: function () {
+											console.error('Failed to retrieve stock details.');
+										}
+									});
+								}
+							});
+							
+
+
+
+
+							// Attach a click event handler to the "Storage" tab
+							$('.storagetab').on('click', function (e) {
+								e.preventDefault();
+								const tabId = $(this).attr('href');
+								console.log(productId);
+								if (tabId === '#storage-details') {
+									// Clear existing content
+									$('#storage-details').empty();
+
+									// You can replace this with your actual URL and product ID
+									
+									// Make an AJAX request to retrieve product location details
+									$.ajax({
+										url: '/get_product_location_details/', // Replace with your URL
+										method: 'GET',
+										data: { product_id: productId },
+										success: function (response) {
+											if (response.error) {
+												// Handle error if product location is not found
+												$('#storage-details').html(`<p>${response.error}</p>`);
+											} else {
+												// Create a styled table to display product location details
+												let locationDetailsHTML = `
+													<table class="table table-striped">
+														<thead>
+															<tr>
+																<th>Storage Location</th>
+																<th>Shelf Number</th>
+																<th>Row Number</th>
+																<th>Column Number</th>
+															</tr>
+														</thead>
+														<tbody>
+												`;
+
+												// Loop through the response data (replace with your actual data structure)
+												response.forEach(function (location) {
+													// Format and append each row of data
+													locationDetailsHTML += `
+														<tr>
+															<td>${location.storage_location}</td>
+															<td>${location.shelf_number}</td>
+															<td>${location.row_number}</td>
+															<td>${location.column_number}</td>
+														</tr>
+													`;
+												});
+
+												locationDetailsHTML += `
+														</tbody>
+													</table>
+												`;
+
+												$('#storage-details').html(locationDetailsHTML);
+
+												// Activate the Storage Details tab
+												$('#productTabs a[href="#storage-details"]').tab('show');
+											}
+										},
+										error: function () {
+											console.error('Failed to retrieve product location details.');
+										}
+									});
+								}
+							});
+
+							
+
+
+							$('.orderstab').on('click', function (e) {
+								e.preventDefault();
+								const tabId = $(this).attr('href');
+								if (tabId === '#orders-details') {
+									// Clear existing content
+									$('#orders-details').empty();
+							
+									// Make an AJAX request to retrieve order details
+									$.ajax({
+										url: '/get_order_details/',
+										method: 'GET',
+										data: { product_id: productId },
+										success: function (response) {
+											if (response.error) {
+												// Handle error if no orders are found
+												$('#orders-details').html(`<p>${response.error}</p>`);
+											} else {
+												// Create and populate a table with order details
+												let ordersDetailsHTML = `
+													<table class="table table-striped">
+														<thead>
+															<tr>
+																<th>Order ID</th>
+																<th>Status</th>
+																<th>Warehouse</th>
+																<th>Quantity</th>
+																<th>Buying Price</th>
+																<th>Total Price</th>
+																<th>Is Stored</th>
+																<th>Delivered At</th>
+															</tr>
+														</thead>
+														<tbody>
+												`;
+							
+												response.forEach(function (order) {
+													// Format and append each row of data
+													ordersDetailsHTML += `
+														<tr>
+															<td>${order.order_id}</td>
+															<td>${order.order_status}</td>
+															<td>${order.warehouse}</td>
+															<td>${order.quantity}</td>
+															<td>${order.buying_price}</td>
+															<td>${order.total_price}</td>
+															<td>${order.is_stored}</td>
+															<td>${order.delivered_at}</td>
+														</tr>
+													`;
+												});
+							
+												ordersDetailsHTML += `
+														</tbody>
+													</table>
+												`;
+							
+												$('#orders-details').html(ordersDetailsHTML);
+							
+												// Activate the Orders Details tab
+												$('#productTabs a[href="#orders-details"]').tab('show');
+											}
+										},
+										error: function () {
+											console.error('Failed to retrieve order details.');
+										}
+									});
+								}
+							});
+
+
+
+							$('.salestab').on('click', function (e) {
+								e.preventDefault();
+								console.log("clickd");
+								const tabId = $(this).attr('href');
+								console.log(tabId);
+								if (tabId === '#sales-details') {
+									// Clear existing content
+									$('#sales-details').empty();
+							
+									// Make an AJAX request to retrieve sales details
+									$.ajax({
+										url: '/get_sales_details/',
+										method: 'GET',
+										data: { product_id: productId },
+										success: function (response) {
+											if (response.error) {
+												// Handle error if no sales are found
+												$('#sales-details').html(`<p>${response.error}</p>`);
+											} else {
+												// Create and populate a table with sales details
+												let salesDetailsHTML = `
+													<table class="table table-striped">
+														<thead>
+															<tr>
+																<th>Sale ID</th>
+																<th>Date</th>
+																<th>Quantity</th>
+																<th>Delivery Address</th>
+																<th>Sales Price</th>
+																<th>Status</th>
+																<th>Buyer Name</th>
+																<th>Buyer Contact Info</th>
+																<th>Total Sales Price</th>
+																<th>Total Buying Price</th>
+																<th>Profit</th>
+															</tr>
+														</thead>
+														<tbody>
+												`;
+							
+												response.forEach(function (sale) {
+													// Format and append each row of data
+													salesDetailsHTML += `
+														<tr>
+															<td>${sale.sale_id}</td>
+															<td>${sale.date}</td>
+															<td>${sale.quantity}</td>
+															<td>${sale.delivery_address}</td>
+															<td>${sale.sales_price}</td>
+															<td>${sale.status}</td>
+															<td>${sale.buyer_name}</td>
+															<td>${sale.buyer_contact_info}</td>
+															<td>${sale.total_sales_price}</td>
+															<td>${sale.total_buying_price}</td>
+															<td>${sale.profit}</td>
+														</tr>
+													`;
+												});
+							
+												salesDetailsHTML += `
+														</tbody>
+													</table>
+												`;
+							
+												$('#sales-details').html(salesDetailsHTML);
+							
+												// Activate the Sales Details tab
+												$('#productTabs a[href="#sales-details"]').tab('show');
+											}
+										},
+										error: function () {
+											console.error('Failed to retrieve sales details.');
+										}
+									});
+								}
+							});
+							
+							
+						});
+
+						
+
+
+
+
 						// Add event listeners for checkboxes
 						const checkboxes = document.querySelectorAll(".product-checkbox");
 				
@@ -810,37 +1404,7 @@
 								},
 							});
 						});
-/*
-						document.getElementById('generate-pdf-btn').addEventListener('click', function () {
-							generatePDF();
-						});
-				
-						function generatePDF() {
-							const pdf = new jsPDF();
-				
-							// Loop through each row of the table and add data to the PDF
-							const rows = document.querySelectorAll('.product-row');
-							rows.forEach((row, index) => {
-								const name = row.querySelector('.product-name').textContent;
-								const category = row.querySelectorAll('.cell')[2].textContent;
-								const subcategory = row.querySelectorAll('.cell')[3].textContent;
-				
-								// Add data to the PDF
-								pdf.text(`Row ${index + 1}`, 10, 10 + index * 10);
-								pdf.text(`Name: ${name}`, 20, 20 + index * 10);
-								pdf.text(`Category: ${category}`, 20, 30 + index * 10);
-								pdf.text(`Subcategory: ${subcategory}`, 20, 40 + index * 10);
-				
-								// Check if we need to add a new page for the next row
-								if (index < rows.length - 1) {
-									pdf.addPage();
-								}
-							});
-				
-							// Save the PDF as a file
-							pdf.save('product_report.pdf');
-						}
-				*/
+
 						function updateImagePreview(input, previewId) {
 							var preview = document.getElementById(previewId);
 							var imagePreview = document.getElementById(previewId + "Preview");

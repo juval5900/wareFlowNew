@@ -18,18 +18,44 @@ class Subcategory(models.Model):
     def __str__(self):
         return self.subcategory_name
 
+class Brand(models.Model):
+    brand_id = models.AutoField(primary_key=True)
+    subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
+    brand_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.brand_name
+    
+class ProductType(models.Model):
+    product_type_id = models.AutoField(primary_key=True)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    type_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.type_name
+    
+class Subtype(models.Model):
+    subtype_id = models.AutoField(primary_key=True)
+    producttype = models.ForeignKey(ProductType, on_delete=models.CASCADE)
+    subtype_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.subtype_name
 
 class Product(models.Model):
     product_id = models.AutoField(primary_key=True)
     product_name = models.CharField(max_length=255)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)  # Default category ID
+    subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)  # Default subcategory ID
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, default='1')  # Default brand ID
+    product_type = models.ForeignKey(ProductType, on_delete=models.CASCADE, default='1')  # Default product type ID
+    subtype = models.ForeignKey(Subtype, on_delete=models.CASCADE, default='1')
     suppliers = models.ManyToManyField('Supplier', blank=True, related_name='products')
     quantity = models.PositiveIntegerField()
     threshold_value = models.PositiveIntegerField()
-    product_image = models.ImageField(upload_to='product_images/')  # Add this field
-    is_active = models.BooleanField(default=True)  # Flag to indicate whether the product is active
-    deleted_at = models.DateTimeField(null=True, blank=True)  # Timestamp when the product was soft-deleted
+    product_image = models.ImageField(upload_to='product_images/')
+    is_active = models.BooleanField(default=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     def soft_delete(self):
         self.is_active = False
@@ -42,7 +68,7 @@ class Product(models.Model):
         self.save()
 
     def __str__(self):
-        return self.product_name  
+        return self.product_name
     
    
 class Supplier(models.Model):

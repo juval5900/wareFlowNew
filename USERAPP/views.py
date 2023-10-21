@@ -31,7 +31,7 @@ from controllerapp.models import Sales, Stock
 
 # Project-Specific Imports
 from django.db.models import Sum, Count
-from .models import Category, Product, ProductLocation, StorageLocation, Subcategory, Supplier, Orders, UserProfile, UserRole
+from .models import Brand, Category, Product, ProductLocation, ProductType, StorageLocation, Subcategory, Subtype, Supplier, Orders, UserProfile, UserRole
 from .models import Product,Orders  # Duplicate import, remove it
 from django.db.models import Sum  # Import the Sum aggregation function
 
@@ -238,18 +238,28 @@ def add_product(request):
         subcategory_id = request.POST.get('subcategory')
         category = Category.objects.get(pk=category_id)
         subcategory = Subcategory.objects.get(pk=subcategory_id)
+        brand_id = request.POST['brand']
+        product_type_id = request.POST['productType']
+        subtype_id = request.POST['subtype']
+
+        # Retrieve other form fields
         product_image = request.FILES['productImage']
         product_name = request.POST['productName']
         quantity = request.POST['quantity']
         threshold_value = request.POST['thresholdValue']
-
+        
         # Create the product instance
-        product = Product(category=category, 
-                          subcategory=subcategory,
-                          product_image=product_image, 
-                          product_name=product_name, 
-                          quantity=quantity,
-                          threshold_value=threshold_value)
+        product = Product(
+            category=category,
+            subcategory=subcategory,
+            brand_id=brand_id,
+            product_type_id=product_type_id,
+            subtype_id=subtype_id,
+            product_image=product_image,
+            product_name=product_name,
+            quantity=quantity,
+            threshold_value=threshold_value
+        )
         product.save()
 
         # Handle multiple suppliers
@@ -259,7 +269,7 @@ def add_product(request):
             product.suppliers.add(supplier)  # Associate the product with the selected suppliers
 
         # Redirect to a success page or wherever you want
-        return redirect('list_products')  # Change 'success_page' to the actual URL
+        return redirect('list_products')  # Change 'list_products' to the actual URL
 
 
 def list_products(request):
@@ -279,6 +289,24 @@ def get_subcategories(request):
     subcategory_options = [{'id': subcategory.subcategory_id, 'name': subcategory.subcategory_name} for subcategory in subcategories]
     return JsonResponse({'subcategories': subcategory_options})
 
+def get_brands(request):
+    subcategory_id = request.GET.get('subcategory_id')
+    brands = Brand.objects.filter(subcategory=subcategory_id)
+    brands_options = [{'id': brand.brand_id, 'name': brand.brand_name} for brand in brands]
+    return JsonResponse({'brands': brands_options})
+
+def get_type(request):
+    brand_id = request.GET.get('brand_id')
+    types = ProductType.objects.filter(brand=brand_id)
+    type_options = [{'id': type.product_type_id, 'name': type.type_name} for type in types]
+    return JsonResponse({'types': type_options})
+
+def get_subtype(request):
+    type_id = request.GET.get('type_id')
+    subtypes = Subtype.objects.filter(producttype=type_id)
+    subtype_options = [{'id': subtype.subtype_id, 'name': subtype.subtype_name} for subtype in subtypes]
+    print(subtype_options)
+    return JsonResponse({'subtypes': subtype_options})
 
 @csrf_exempt
 def delete_product(request, product_id):
@@ -1089,3 +1117,167 @@ def get_stock_count(request):
             return JsonResponse({'error': 'Product not found'}, status=404)
 
     return JsonResponse({'error': 'Invalid product_id'}, status=400)
+
+
+
+def get_product_details(request):
+    if request.method == 'GET':
+        product_id = request.GET.get('product_id')
+        try:
+            product = Product.objects.get(pk=product_id)
+
+            # Create a dictionary containing all the fields of the product
+            product_data = {
+                'product_image': product.product_image.url if product.product_image else '',
+                'product_id': product.product_id,
+                'product_name': product.product_name,
+                'category': product.category.category_name,  # Replace with the actual field name from Category
+                'subcategory': product.subcategory.subcategory_name,  # Replace with the actual field name from Subcategory
+                'brand': product.brand.brand_name,  # Replace with the actual field name from Brand
+                'product_type': product.product_type.type_name,  # Replace with the actual field name from ProductType
+                'subtype': product.subtype.subtype_name,  # Replace with the actual field name from Subtype
+                'quantity': product.quantity,
+                'threshold_value': product.threshold_value,
+                'is_active': product.is_active,
+            }
+
+            return JsonResponse(product_data)
+        except Product.DoesNotExist:
+            return JsonResponse({'error': 'Product not found'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
+    
+    
+    
+def get_supplier_details(request):
+    product_id = request.GET.get('product_id')
+    try:
+        product = get_object_or_404(Product, product_id=product_id)  # Use 'product_id' instead of 'id'
+        suppliers = product.suppliers.all()
+
+        supplier_data = []
+
+        for supplier in suppliers:
+            supplier_info = {
+                'name': supplier.supplier_name,
+                'address': supplier.supplier_address,
+                'contact': supplier.contact_number,
+                'email': supplier.supplier_email,
+                'type': supplier.supplier_type,
+                'image': supplier.supplier_image.url if supplier.supplier_image else '',
+                'is_active': supplier.is_active,
+                # Add more fields as needed
+            }
+            supplier_data.append(supplier_info)
+
+        return JsonResponse(supplier_data, safe=False)
+    except Product.DoesNotExist:
+        return JsonResponse({'error': 'Product not found'})
+    
+    
+def get_stock_details(request):
+    product_id = request.GET.get('product_id')
+    try:
+        stocks = Stock.objects.filter(order__product__product_id=product_id)
+        stock_data = []
+        for stock in stocks:
+            stock_info = {
+                'sector': stock.sector,
+                'row_start': stock.row_start,
+                'column_start': stock.column_start,
+                'column_end': stock.column_end,
+                'remaining_quantity': stock.remaining_quantity,
+                'is_stored': stock.is_stored,
+                'is_active': stock.is_active,
+            }
+            stock_data.append(stock_info)
+        return JsonResponse(stock_data, safe=False)
+    except Stock.DoesNotExist:
+        return JsonResponse({'error': 'Stock not found'})
+    
+    
+def get_product_location_details(request):
+    if request.method == 'GET':
+        product_id = request.GET.get('product_id')
+
+        try:
+            # Retrieve the product location details based on the product_id
+            product_location = ProductLocation.objects.get(order__product__product_id=product_id)
+
+            # Create a dictionary with the product location details
+            product_location_data = {
+                'storage_location': product_location.storage_location.location_name,
+                'shelf_number': product_location.shelf_number,
+                'row_number': product_location.row_number,
+                'column_number': product_location.column_number,
+            }
+
+            return JsonResponse(product_location_data)
+        except ProductLocation.DoesNotExist:
+            return JsonResponse({'error': 'Product location not found'})
+        
+        
+def get_order_details(request):
+    if request.method == 'GET':
+        product_id = request.GET.get('product_id')
+
+        try:
+            # Retrieve the order details based on the product_id
+            orders = Orders.objects.filter(product__product_id=product_id)
+
+            if orders.exists():
+                # Create a list of dictionaries with order details
+                order_details = []
+                for order in orders:
+                    order_data = {
+                        'order_id': order.order_id,
+                        'order_status': order.order_status,
+                        'warehouse': order.warehouse,
+                        'quantity': order.quantity,
+                        'buying_price': str(order.buying_price),
+                        'total_price': str(order.total_price),
+                        'is_stored': order.is_stored,
+                        'delivered_at': order.delivered_at.strftime('%Y-%m-%d %H:%M:%S') if order.delivered_at else None,
+                    }
+                    order_details.append(order_data)
+
+                return JsonResponse(order_details, safe=False)
+            else:
+                return JsonResponse({'error': 'No orders found for this product'})
+        except Orders.DoesNotExist:
+            return JsonResponse({'error': 'Product not found'})
+        
+        
+        
+def get_sales_details(request):
+    if request.method == 'GET':
+        product_id = request.GET.get('product_id')
+
+        try:
+            # Retrieve the sales details based on the product_id
+            sales = Sales.objects.filter(product__product_id=product_id)
+
+            if sales.exists():
+                # Create a list of dictionaries with sales details
+                sales_details = []
+                for sale in sales:
+                    sale_data = {
+                        'sale_id': sale.id,
+                        'date': sale.date_field.strftime('%Y-%m-%d %H:%M:%S'),
+                        'quantity': sale.quantity,
+                        'delivery_address': sale.delivery_address,
+                        'sales_price': str(sale.sales_price),
+                        'status': sale.status,
+                        'buyer_name': sale.buyer_name,
+                        'buyer_contact_info': sale.buyer_contact_info,
+                        'total_sales_price': str(sale.total_sales_price),
+                        'total_buying_price': str(sale.total_buying_price),
+                        'profit': str(sale.profit),
+                    }
+                    sales_details.append(sale_data)
+
+                return JsonResponse(sales_details, safe=False)
+            else:
+                return JsonResponse({'error': 'No sales found for this product'})
+        except Sales.DoesNotExist:
+            return JsonResponse({'error': 'Product not found'})

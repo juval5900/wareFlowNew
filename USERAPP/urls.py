@@ -68,7 +68,16 @@ urlpatterns = [
     path('generate_otp', views.generate_otp, name='generate_otp'),
     path('forgot', views.forgot, name='forgot'),
     path('reset_password/', views.reset_password, name='reset_password'),
-     path('get_stock_count/', views.get_stock_count, name='get_stock_count'),
+    path('get_stock_count/', views.get_stock_count, name='get_stock_count'),
+    path('get_brands/', views.get_brands, name='get_brands'),
+    path('get_type/', views.get_type, name='get_type'),
+    path('get_subtype/', views.get_subtype, name='get_subtype'),
+    path('get_product_details/', views.get_product_details, name='get_product_details'),
+    path('get_supplier_details/', views.get_supplier_details, name='get_supplier_details'),
+    path('get_stock_details/', views.get_stock_details, name='get_stock_details'),
+    path('get_product_location_details/', views.get_product_location_details, name='get_product_location_details'),
+    path('get_order_details/', views.get_order_details, name='get_order_details'),
+    path('get_sales_details/', views.get_sales_details, name='get_sales_details'),
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

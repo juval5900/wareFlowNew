@@ -10,12 +10,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
 
 
 chrome_options = Options()
 chrome_options.add_experimental_option("prefs", {
-    "download.default_directory": "C:\\Users\\juval\\Downloads\\",  # Replace with your download folder path
+    "download.default_directory": "C:\\Users\\juval\\Downloads\\",
     "download.prompt_for_download": False,
     "download.directory_upgrade": True,
     "safebrowsing.enabled": True
@@ -45,54 +48,50 @@ class Hosttest(TestCase):
         submit=driver.find_element(By.CSS_SELECTOR,"button.login100-form-btn")
         submit.click()
         time.sleep(2)
-        inventory=driver.find_element(By.CSS_SELECTOR,"a.nav-link.inventory")
-        inventory.click()
-        add_product=driver.find_element(By.CSS_SELECTOR,"a.btn.btn-info")
-        add_product.click()
+        supplier=driver.find_element(By.CSS_SELECTOR,"span.nav-link-text.supplier")
+        supplier.click()
+        add_supplier=driver.find_element(By.CSS_SELECTOR,"a#showFormButton")
+        add_supplier.click()
         file_path = "C:\\Users\\juval\\Downloads\\Person_icon_BLACK-01.svg.png"
-        image_input = driver.find_element(By.CSS_SELECTOR, "input#productImage")
+        image_input = driver.find_element(By.CSS_SELECTOR, "input#supplierImage")
         image_input.send_keys(file_path)
         time.sleep(1)
-        category=driver.find_element(By.CSS_SELECTOR,"select#category")
-        category.click()
-        categoryselect=driver.find_element(By.CSS_SELECTOR,"option[value='1']")
-        categoryselect.click()
+        suppliername=driver.find_element(By.CSS_SELECTOR,"input#supplierName")
+        suppliername.send_keys("Jomey Joseph")
         time.sleep(1)
-        subcategory=driver.find_element(By.ID,"subcategory")
-        subcategory.click()
-        subcategoryselect=driver.find_element(By.CSS_SELECTOR,"option[value='1']")
-        subcategoryselect.click()
+        address=driver.find_element(By.CSS_SELECTOR,"input#supplierAddress")
+        address.send_keys("kottayam")
         time.sleep(1)
-        productname=driver.find_element(By.CSS_SELECTOR,"input#productName")
-        productname.send_keys("Iphone 14")
+        contact=driver.find_element(By.CSS_SELECTOR,"input#contactNumber")
+        contact.send_keys("8734734440")
         time.sleep(1)
-        quantity=driver.find_element(By.CSS_SELECTOR,"input#quantity")
-        quantity.send_keys("870")
+        contact=driver.find_element(By.CSS_SELECTOR,"input#supplieremail")
+        contact.send_keys("jomeyjoseph@gmail.com")
         time.sleep(1)
-        suppliers=driver.find_element(By.CSS_SELECTOR,"button.btn.btn-secondary.dropdown-toggle")
-        suppliers.click()
-        checkbox = driver.find_element(By.CSS_SELECTOR,"input#supplier_1")
-        # Create an ActionChains object
-        actions = ActionChains(driver)
-        # Perform a click action on the checkbox
-        actions.click(checkbox).perform()
+        type=driver.find_element(By.CSS_SELECTOR,"select#supplierType")
+        type.click()
+        typeselect=driver.find_element(By.CSS_SELECTOR,"option[value='Taking returns']")
+        typeselect.click()
         time.sleep(1)
-        thresholdvalue=driver.find_element(By.CSS_SELECTOR,"input#thresholdValue")
-        thresholdvalue.send_keys("100")
-        time.sleep(1)
-        add_button = driver.find_element(By.CSS_SELECTOR, "input[type='submit'].btn.btn-primary")
+        
+        add_button = driver.find_element(By.CSS_SELECTOR, "button.btn.btn-primary.mb-3")
         add_button.click()
         time.sleep(1)
-        pdf=driver.find_element(By.CSS_SELECTOR,"a#generate-pdf-btn.btn.btn-secondary.generate-pdf")
+        pdf=driver.find_element(By.CSS_SELECTOR,"a#generate-pdf-btn.btn.btn-secondary")
         pdf.click()
-        downloaded_file_path = "C:\\Users\\juval\\Downloads\\product_list.pdf"  # Replace with the expected file path
+        time.sleep(3)
+        downloaded_file_path = "C:\\Users\\juval\\Downloads\\supplier_list.pdf"  # Replace with the expected file path
         if os.path.exists(downloaded_file_path):
             print("PDF file has been downloaded successfully.")
         else:
             print("PDF file download failed or not found.")
         time.sleep(5)
-        
-
+        profile=driver.find_element(By.CSS_SELECTOR,"img[alt='user profile']")
+        profile.click()
+        time.sleep(2)
+        logout=driver.find_element(By.CSS_SELECTOR,"a.dropdown-item[href='/loggout']")
+        logout.click()
+        time.sleep(2)
     # Add more test methods as needed
 
 if __name__ == '__main__':
