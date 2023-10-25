@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <!-- Add Bootstrap CSS link here -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Add your custom CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .branding {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: rgb(228, 228, 228);
+            height: 50px;
+        }
+
+        .branding h3 {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2f2f2f; /* Change the color to your preference */
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            align-items: center;
+            padding-top: 10px;
+        }
+
+        .receipt {
+            border: 1px solid #000;
+            padding: 20px;
+            width: 100%; /* Set width to 100% to match the A4 sheet size */
+            margin: 0 auto;
+            box-sizing: border-box; /* Ensure the border size is included in the width */
+        }
+
+        .header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .info {
+            margin-top: 20px;
+        }
+
+        .info p {
+            margin: 5px 0;
+        }
+
+        .table-container {
+            margin-top: 20px;
+        }
+
+        h4 {
+            text-decoration: underline;
+        }
+
+        /* Apply styles for printing */
+        @media print {
+            .branding {
+                background-color: rgb(0, 79, 170);
+                color: #ffffff;
+            }
+
+            h4 {
+                text-decoration: underline;
+            }
+
+            /* Hide the print button when printing */
+            .print-button {
+                display: none;
+            }
+
+            /* Set page size to A4 for printing */
+            @page {
+                size: A4;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container receipt">
+        <div class="print-button">
+            <a href="javascript:void(0);" onclick="window.print()" class="btn btn-primary">Print report</a>
+        </div><br>
+        <div class="branding">
+            <h3>WAREFLOW</h3>
+        </div>
+        <h4 class="text-center">Order Report</h4>
+        <!-- Company Address -->
+        <div class="company-address">
+            <p><strong>Company Address:</strong></p>
+            <p>Warelow India</p>
+            <p>123 Main Street,</p>
+            <p>Mumbai, India</p>
+        </div>
+        <!-- End of Company Address -->
+        <!-- GST Bill Number -->
+        <div class="gst-bill">
+            <p><strong>GST Bill No:</strong> GST154864343848738488</p>
+        </div>
+        <!-- End of GST Bill Number -->
+        
+        <div class="tab-content" id="orders-table-tab-content">
+            <div class="tab-pane fade show active" id="orders-all" role="tabpanel" aria-labelledby="orders-all-tab">
+                <div class="app-card app-card-orders-table shadow-sm mb-5">
+                    <div class="app-card-body">
+                        <div class="table-responsive">
+                            <table class="table app-table-hover mb-0 text-left">
+                                <thead>
+                                    <tr>
+                                        <th class="cell"></th> <!-- Add an empty header cell for checkboxes -->
+                                        <th class="cell">Product</th>
+                                        <th class="cell">Supplier</th>
+                                        <th class="cell">Warehouse</th>
+                                        <th class="cell">Date</th>
+                                        <th class="cell">Quantity</th>
+                                        <th class="cell">Buying Price</th> <!-- Added Buying Price column -->
+                                        <th class="cell">Total Price</th> <!-- Added Total Price column -->
+                                        <th class="cell">Status</th>
+                                        <th class="cell"></th>
+                                        <th class="cell"></th>
+                                        <th class="cell"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in page %}
+                                        <tr class="order-row">
+                                            <td class="cell">
+                                                <input type="checkbox" class="order-checkbox" data-order-id="{{ order.order_id }}">
+                                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                            </td>
+                                            <td class="cell order-name"><span class="truncate">{{ order.product }}</span></td>
+                                            <td class="cell">{{ order.supplier }}</td>
+                                            <td class="cell">{{ order.warehouse }}</td>
+                                            <td class="cell">{{ order.order_datetime }}</td>
+                                            <td class="cell">{{ order.quantity }}</td>
+                                            <td class="cell">{{ order.buying_price }}</td> <!-- Display Buying Price -->
+                                            <td class="cell">{{ order.total_price }}</td> <!-- Calculate and Display Total Price -->
+                                            <td class="cell">{{ order.order_status }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <!-- Add a "Delete All" button that starts as disabled -->
+                        </div><!--//table-responsive-->
+                    </div><!--//app-card-body-->
+                </div><!--//app-card-->
+            </div>
+        </div>
+        
+      
+        {% comment %} <p>Invoice not found.</p>
+        {% endif %} {% endcomment %}
+        <br>
+        <br>
+        <br>
+        <br>
+        <footer class="bg-dark text-center text-white mt-5">
+            <div class="text-center p-3" style="background-color: rgb(215, 215, 215);">
+                <a class="text-dark" href="#">Wareflow.com</a>
+            </div>
+            <!-- Copyright -->
+        </footer>
+    </div>
+    
+    <!-- Add Bootstrap JS and jQuery scripts here (optional) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

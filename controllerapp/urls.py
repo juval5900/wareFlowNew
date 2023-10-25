@@ -23,5 +23,6 @@ urlpatterns=[
     path('get_top_selling_products/', views.get_top_selling_products, name='get_top_selling_products'),
     path('get_sales_data/', views.get_sales_data, name='get_sales_data'),
     path('view_invoice/<int:sale_id>/', views.view_invoice, name='view_invoice'),
+    path('view_order_pdf/', views.view_order_pdf, name='view_order_pdf'),
     
     ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

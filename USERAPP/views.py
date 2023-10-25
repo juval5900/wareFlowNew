@@ -18,6 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django import forms
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 # Third-Party Library Imports
 import pyotp
@@ -34,9 +35,10 @@ from django.db.models import Sum, Count
 from .models import Brand, Category, Product, ProductLocation, ProductType, StorageLocation, Subcategory, Subtype, Supplier, Orders, UserProfile, UserRole
 from .models import Product,Orders  # Duplicate import, remove it
 from django.db.models import Sum  # Import the Sum aggregation function
+from django.db import models
 
 
-
+@login_required   
 def index(request):
 
     current_datetime = timezone.now()  # Get the current date and time
@@ -100,15 +102,15 @@ def index(request):
         product_name = product['product_name']
         threshold_value = product['threshold_value']
         total_remaining_stock = Stock.objects.filter(order__product__product_name=product_name).aggregate(
-        total_remaining_stock=Sum('remaining_quantity'))['total_remaining_stock'] or 0
+            total_remaining_stock=models.Sum('remaining_quantity'))['total_remaining_stock'] or 0
 
-    # Compare total remaining stock with the threshold value
-    if total_remaining_stock <= threshold_value:
-        products_below_threshold.append({
-            'product_name': product_name,
-            'threshold_value': threshold_value,
-            'total_remaining_stock': total_remaining_stock,
-        })
+        # Compare total remaining stock with the threshold value
+        if total_remaining_stock <= threshold_value:
+            products_below_threshold.append({
+                'product_name': product_name,
+                'threshold_value': threshold_value,
+                'total_remaining_stock': total_remaining_stock,
+            })
 
     context = {
         'total_products': total_products,
@@ -125,6 +127,8 @@ def index(request):
     }
 
     return render(request, 'index.html', context)
+
+
 
 def login(request):
     if request.method == 'POST':
@@ -167,6 +171,8 @@ def login(request):
         return render(request, 'login.html')
 
 
+
+
 def register(request):
     if request.method == "POST":
         first_name = request.POST.get('name')
@@ -185,22 +191,28 @@ def register(request):
     else:
         return render(request, "register.html")
 
-
+@login_required
 def loggout(request):
     logout(request)
     if 'username' in request.session:
         del request.session['username']
     return redirect('login')
 
+
+
 def check_email(request):
     email = request.GET.get('email')
     exists = User.objects.filter(email=email).exists()
     return JsonResponse({'exists': exists})
 
+
+
 def check_username(request):
     username = request.GET.get('username')
     exists = User.objects.filter(username=username).exists()
     return JsonResponse({'exists': exists})
+
+
 
 
 def notifications(request):
@@ -221,6 +233,8 @@ def docs(request):
 def help(request):
     return render(request, 'help.html')
 
+
+@login_required
 def inventory(request):
     categories = Category.objects.all()
     suppliers = Supplier.objects.all()
@@ -228,10 +242,12 @@ def inventory(request):
     context = {'categories': categories, 'suppliers': suppliers}  # Include suppliers in the context dictionary
     return render(request, 'inventory.html', context)
 
+
+@login_required
 def settingshtml(request):
     return render(request, 'settings.html')
 
-
+@login_required
 def add_product(request):
     if request.method == 'POST':
         category_id = request.POST['category']
@@ -272,6 +288,8 @@ def add_product(request):
         return redirect('list_products')  # Change 'list_products' to the actual URL
 
 
+
+@login_required
 def list_products(request):
 
     active_products = Product.objects.filter(is_active=True).order_by('product_id')
@@ -280,27 +298,35 @@ def list_products(request):
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     categories = Category.objects.all()
-    suppliers = Supplier.objects.all()
+    suppliers = Supplier.objects.filter(is_active=True)
     return render(request, 'inventory.html', {'page': page, 'categories': categories, 'suppliers': suppliers})
 
+
+@login_required
 def get_subcategories(request):
     category_id = request.GET.get('category_id')
     subcategories = Subcategory.objects.filter(category=category_id)
     subcategory_options = [{'id': subcategory.subcategory_id, 'name': subcategory.subcategory_name} for subcategory in subcategories]
     return JsonResponse({'subcategories': subcategory_options})
 
+
+@login_required
 def get_brands(request):
     subcategory_id = request.GET.get('subcategory_id')
     brands = Brand.objects.filter(subcategory=subcategory_id)
     brands_options = [{'id': brand.brand_id, 'name': brand.brand_name} for brand in brands]
     return JsonResponse({'brands': brands_options})
 
+
+@login_required
 def get_type(request):
     brand_id = request.GET.get('brand_id')
     types = ProductType.objects.filter(brand=brand_id)
     type_options = [{'id': type.product_type_id, 'name': type.type_name} for type in types]
     return JsonResponse({'types': type_options})
 
+
+@login_required
 def get_subtype(request):
     type_id = request.GET.get('type_id')
     subtypes = Subtype.objects.filter(producttype=type_id)
@@ -309,6 +335,7 @@ def get_subtype(request):
     return JsonResponse({'subtypes': subtype_options})
 
 @csrf_exempt
+@login_required
 def delete_product(request, product_id):
     try:
         product = Product.objects.get(pk=product_id)
@@ -318,6 +345,8 @@ def delete_product(request, product_id):
         return JsonResponse({'error': 'Product not found'}, status=404)
     
     
+    
+@login_required
 def update_product(request, product_id):
     if request.method == 'POST':
         # Get the product instance based on the product ID
@@ -348,32 +377,46 @@ def update_product(request, product_id):
     return JsonResponse({'message': 'Invalid request method'}, status=400)
 
 
-def get_product_details(request, product_id):
+
+@login_required
+def get_product_detailsupdate(request, product_id):
     # Retrieve the product based on the product_id or return a 404 if not found
     product = get_object_or_404(Product, product_id=product_id)  # Use the correct field name for the primary key
 
     image_url = product.product_image.url if product.product_image else ''
     existing_image_name = product.product_image.name if product.product_image else ''
     # Convert the product data into a dictionary
+    
+    category_name = product.category.category_name
+    subcategory_name = product.subcategory.subcategory_name
+    brand_name = product.brand.brand_name
+    type = product.product_type.type_name
+    subtype = product.subtype.subtype_name
+    supplier_names = [supplier.supplier_name for supplier in product.suppliers.all()]
+
+
+
     product_data = {
         'product_id': product.product_id,
-        'category_id': product.category_id,
-        'subcategory_id': product.subcategory_id,
+        'category_id': category_name,
+        'subcategory_id': subcategory_name,
         'product_name': product.product_name,
-        #'buying_price': product.buying_price,
+        'brand':brand_name,
+        'producttype':type,
+        'subtype': subtype,
         'quantity': product.quantity,
-        #'unit': product.unit,
-       # 'expiry_date': product.expiry_date.strftime('%Y-%m-%d'),  # Format date as string
         'threshold_value': product.threshold_value,
         'product_image_url': image_url,  # Send the image URL
         'product_image_name': existing_image_name, 
-        # Add other product fields as needed
+        'suppliers': supplier_names,  # Include supplier names
     }
 
     # Return the product data as JSON response
     return JsonResponse(product_data)
 
 
+
+@login_required
 def delete_multiple_products(request):
     if request.method == 'POST':
         # Get the list of product IDs to deactivate from the POST data
@@ -393,7 +436,7 @@ def delete_multiple_products(request):
         return redirect('list_products')
 
 
-
+@login_required
 def add_suppliers(request):
     if request.method == 'POST':
         supplier_name = request.POST['supplierName']
@@ -411,7 +454,7 @@ def add_suppliers(request):
         # Redirect to a success page or wherever you want
         return redirect('list_suppliers')  # Change 'success_page' to the actual URL
     
-    
+@login_required
 def list_suppliers(request):
     active_suppliers = Supplier.objects.filter(is_active=True).order_by('supplier_id')
     suppliers_per_page = 12
@@ -422,6 +465,7 @@ def list_suppliers(request):
 
 
 @csrf_exempt
+@login_required
 def delete_suppliers(request, supplier_id):
     try:
         supplier = Supplier.objects.get(pk=supplier_id)
@@ -431,6 +475,8 @@ def delete_suppliers(request, supplier_id):
         return JsonResponse({'error': 'Supplier not found'}, status=404)
     
     
+    
+@login_required
 def update_supplier(request, supplier_id):
     if request.method == 'POST':
         # Get the product instance based on the product ID
@@ -457,7 +503,9 @@ def update_supplier(request, supplier_id):
     return JsonResponse({'message': 'Invalid request method'}, status=400)
 
 
-def get_supplier_details(request, supplier_id):
+
+@login_required
+def get_supplier_details2(request, supplier_id):
     # Retrieve the supplier based on the supplier_id or return a 404 if not found
     supplier = get_object_or_404(Supplier, supplier_id=supplier_id)  # Use the correct field name for the primary key
 
@@ -481,6 +529,8 @@ def get_supplier_details(request, supplier_id):
     return JsonResponse(supplier_data)
 
 
+
+@login_required
 def delete_multiple_suppliers(request):
     if request.method == 'POST':
         # Get the list of supplier IDs to deactivate from the POST data
@@ -500,11 +550,15 @@ def delete_multiple_suppliers(request):
         return redirect('list_suppliers')
 
 
+
+@login_required
 def check_supplieremail(request):
     email = request.GET.get('email')
     exists = Supplier.objects.filter(supplier_email=email).exists()
     return JsonResponse({'exists': exists})
 
+
+@login_required
 def check_suppliercontact(request):
     username = request.GET.get('username')
     exists = Supplier.objects.filter(contact_number=username).exists()
@@ -515,6 +569,8 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Orders, Product, Supplier
 
+
+@login_required
 def add_orders(request):
     if request.method == 'POST':
         product_id = request.POST['product']
@@ -547,7 +603,8 @@ def add_orders(request):
         # Redirect to a success page or wherever you want
         return redirect('list_orders')
     
-    
+
+@login_required
 def list_orders(request):
     active_orders = Orders.objects.filter(is_active=True).order_by('order_id')
     orders_per_page = 12
@@ -561,6 +618,7 @@ def list_orders(request):
 
 
 @csrf_exempt
+@login_required
 def cancel_order(request, order_id):
     try:
         order = Orders.objects.get(pk=order_id)
@@ -573,6 +631,8 @@ def cancel_order(request, order_id):
         return JsonResponse({'error': 'Order not found'}, status=404)
     
 
+
+@login_required
 def deliver_order(request, order_id):
     try:
         order = Orders.objects.get(pk=order_id)
@@ -590,7 +650,9 @@ def deliver_order(request, order_id):
         return JsonResponse({'message': 'Order has been delivered successfully'})
     except Orders.DoesNotExist:
         return JsonResponse({'error': 'Order not found'}, status=404)
-    
+  
+   
+@login_required 
 def update_order(request, order_id):
     if request.method == 'POST':
         # Get the product instance based on the product ID
@@ -612,7 +674,8 @@ def update_order(request, order_id):
     return JsonResponse({'message': 'Invalid request method'}, status=400)
 
 
-def get_order_details(request, order_id):
+@login_required
+def get_order_details2(request, order_id):
     # Retrieve the order based on the order_id or return a 404 if not found
     order = get_object_or_404(Orders, order_id=order_id)  # Use the correct field name for the primary key
     # Convert the order data into a dictionary
@@ -626,7 +689,7 @@ def get_order_details(request, order_id):
     # Return the order data as JSON response
     return JsonResponse(order_data)
 
-
+@login_required
 def cancel_multiple_orders(request):
     if request.method == 'POST':
         # Get the list of order IDs to deactivate from the POST data
@@ -647,6 +710,8 @@ def cancel_multiple_orders(request):
         return redirect('list_orders')
     
     
+    
+@login_required
 def return_order(request, order_id):
     try:
         order = Orders.objects.get(pk=order_id)
@@ -667,6 +732,8 @@ def return_order(request, order_id):
         return JsonResponse({'error': 'Order not found'}, status=404)
     
     
+    
+@login_required
 def returned_order(request, order_id):
     try:
         order = Orders.objects.get(pk=order_id)
@@ -684,6 +751,8 @@ def returned_order(request, order_id):
     except Orders.DoesNotExist:
         return JsonResponse({'error': 'Order not found'}, status=404)
 
+
+@login_required
 def isactiveinv(request):
     value='chat'
     return render(request, 'base.html', {'value': value})
@@ -694,6 +763,7 @@ class ProfilePictureForm(forms.ModelForm):
         model = UserProfile
         fields = ['profile_picture']
 
+@login_required
 def profile_view(request):
     user = request.user
 
@@ -763,6 +833,7 @@ def profile_view(request):
 
 
 
+@login_required
 def list_storage(request):
     delivered_orders = Orders.objects.filter(order_status="Delivered", is_stored=False).order_by('order_id')
     orders_per_page = 12
@@ -773,6 +844,8 @@ def list_storage(request):
     return render(request, 'help.html', {'page': page, 'storagelocations': storagelocations})
 
 
+
+@login_required
 def add_storage(request):
     if request.method == 'POST':
         # Get data from the POST request
@@ -798,6 +871,8 @@ def add_storage(request):
     else:
         return render(request, 'help.html')
     
+    
+@login_required
 def allocate_storages(request, order_id):
     if request.method == 'POST':
         storage_location_id = request.POST.get('storagelocation')
@@ -825,7 +900,6 @@ def allocate_storages(request, order_id):
         return redirect('list_storage')  # Replace 'success_page' with your desired URL
 
     return HttpResponse("This view only accepts POST requests.")
-
 
 class ExportPDF(View):
     def get(self, request):
@@ -958,7 +1032,7 @@ class ExportSupplierPDF(View):
 
         return response
     
-    
+
 class ExportOrdersPDF(View):
     def get(self, request):
         # Get the data you want to export (in this case, Orders)
@@ -1025,14 +1099,15 @@ class ExportOrdersPDF(View):
 
         return response
     
-    
+
+@login_required
 def forgot(request):
     return render(request, 'forgot.html')
     
 User = get_user_model()
 
 
-
+@login_required
 def generate_otp(request):
     if request.method == 'POST':
         user_email = request.POST.get('username')  # Get user's email from the request (change 'user_email' to match your form field name)
@@ -1059,7 +1134,7 @@ def generate_otp(request):
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
-
+@login_required
 def reset_password(request):
     if request.method == 'POST':
         user_email = request.POST.get('user_email')  # Get user's email from the request
@@ -1092,6 +1167,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt  # Remove this line in production for proper CSRF handling
+@login_required
 def get_stock_count(request):
     product_id = request.GET.get('product_id')
 
@@ -1119,7 +1195,7 @@ def get_stock_count(request):
     return JsonResponse({'error': 'Invalid product_id'}, status=400)
 
 
-
+@login_required
 def get_product_details(request):
     if request.method == 'GET':
         product_id = request.GET.get('product_id')
@@ -1148,7 +1224,7 @@ def get_product_details(request):
         return JsonResponse({'error': 'Invalid request method'})
     
     
-    
+@login_required
 def get_supplier_details(request):
     product_id = request.GET.get('product_id')
     try:
@@ -1175,6 +1251,8 @@ def get_supplier_details(request):
         return JsonResponse({'error': 'Product not found'})
     
     
+    
+@login_required
 def get_stock_details(request):
     product_id = request.GET.get('product_id')
     try:
@@ -1196,6 +1274,7 @@ def get_stock_details(request):
         return JsonResponse({'error': 'Stock not found'})
     
     
+@login_required
 def get_product_location_details(request):
     if request.method == 'GET':
         product_id = request.GET.get('product_id')
@@ -1216,7 +1295,8 @@ def get_product_location_details(request):
         except ProductLocation.DoesNotExist:
             return JsonResponse({'error': 'Product location not found'})
         
-        
+
+@login_required     
 def get_order_details(request):
     if request.method == 'GET':
         product_id = request.GET.get('product_id')
@@ -1248,7 +1328,7 @@ def get_order_details(request):
             return JsonResponse({'error': 'Product not found'})
         
         
-        
+@login_required
 def get_sales_details(request):
     if request.method == 'GET':
         product_id = request.GET.get('product_id')
@@ -1281,3 +1361,14 @@ def get_sales_details(request):
                 return JsonResponse({'error': 'No sales found for this product'})
         except Sales.DoesNotExist:
             return JsonResponse({'error': 'Product not found'})
+        
+@login_required     
+def view_products_pdf(request):
+    active_products = Product.objects.filter(is_active=True).order_by('product_id')
+    products_per_page = 12
+    paginator = Paginator(active_products, products_per_page)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    categories = Category.objects.all()
+    suppliers = Supplier.objects.filter(is_active=True)
+    return render(request, 'productspdf.html', {'page': page, 'categories': categories, 'suppliers': suppliers})

@@ -282,16 +282,16 @@
 					                    <div class="col-auto">
 					                        <input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
 					                    </div>
-					                    <div class="col-auto">
+					                    {% comment %} <div class="col-auto">
 											<select class="form-select w-auto" >
 												<option selected value="option-1">All</option>
 												<option value="option-2">This week</option>
 												<option value="option-3">This month</option>
 												<option value="option-4">Last 3 months</option>
 												
-										  </select>
+										  </select> {% endcomment %}
 					                        
-					                    </div>
+					                    {% comment %} </div> {% endcomment %}
 					                </form>
 					                
 							    </div><!--//col-->
@@ -309,7 +309,7 @@
 									<button id="deleteAllButton" class="btn text-white btn-danger" disabled>Cancel All</button>
 								</div>
 								<div class="col-auto">						  
-									<a id="generate-pdf-btn" class="btn btn-secondary" href="{% url 'export_orders_pdf' %}">Generate PDF</a>
+									<a id="generate-pdf-btn" class="btn btn-secondary" href="{% url 'view_order_pdf' %}">Generate PDF</a>
 								</div>
 						    </div><!--//row-->
 					    </div><!--//table-utilities-->
@@ -327,10 +327,11 @@
 					<form method="post" enctype="multipart/form-data" id="add-order-form">
 						{% csrf_token %}
 				
-						<input type="hidden" id="order-id" name="order-id">
+						<input type="hidden" id="order-id" name="order-id" required>
+						
 						<div class="form-group">
 							<label for="product">Product:</label>
-							<select id="product" name="product" class="form-control">
+							<select id="product" name="product" class="form-control" required>
 								<option value="" disabled selected>Select</option>
 								{% for Product in products %}
 								<option value="{{ Product.product_id }}">{{ Product.product_name }}</option>
@@ -338,9 +339,10 @@
 							</select>
 							<span id="product-error" class="error text-danger"></span> <!-- Error message for Product -->
 						</div>
+						
 						<div class="form-group">
 							<label for="supplier">Supplier:</label>
-							<select id="supplier" name="supplier" class="form-control">
+							<select id="supplier" name="supplier" class="form-control" required>
 								<option value="" disabled selected>Select</option>
 								{% for Supplier in suppliers %}
 								<option value="{{ Supplier.supplier_id }}">{{ Supplier.supplier_name }}</option>
@@ -348,29 +350,35 @@
 							</select>
 							<span id="supplier-error" class="error text-danger"></span> <!-- Error message for Supplier -->
 						</div>
+				
 						<!-- Replace orderstatus field with a hidden input -->
-						<input type="hidden" name="orderstatus" value="Order Placed">
+						<input type="hidden" name="orderstatus" value="Order Placed" required>
+						
 						<div class="form-group">
 							<label for="warehouse">Warehouse:</label>
-							<input type="text" id="warehouse" name="warehouse" class="form-control">
+							<input type="text" id="warehouse" name="warehouse" class="form-control" required>
 							<span id="warehouse-error" class="error text-danger"></span> <!-- Error message for Warehouse -->
 						</div>
+						
 						<div class="form-group">
 							<label for="quantity">Quantity:</label>
-							<input type="number" id="quantity" name="quantity" class="form-control">
+							<input type="number" id="quantity" name="quantity" class="form-control" required>
 							<span id="available-stock" class="error text-danger"></span> <!-- Error message for Warehouse -->
 							<span id="quantity-error" class="error text-danger"></span> <!-- Error message for Quantity -->
 							<span id="available_quantity-error" class="error text-danger"></span> <!-- Error message for Warehouse -->
 						</div>
+						
 						<div class="form-group">
 							<label for="buying_price">Buying Price:</label>
-							<input type="text" id="buying_price" name="buying_price" class="form-control">
+							<input type="text" id="buying_price" name="buying_price" class="form-control" required>
 							<span id="buying_price-error" class="error text-danger"></span> <!-- Error message for Buying Price -->
 						</div>
+						
 						<input type="submit" value="Add" class="btn btn-primary">
 						<button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
 					</form>
 				</div>
+				
 				
 				  
                 

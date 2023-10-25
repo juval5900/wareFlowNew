@@ -24,6 +24,8 @@ from django.db.models.functions import TruncMonth
 from .models import Sales, Orders  # Import your Sales and Orders models
 from django.db.models import F, ExpressionWrapper, fields
 
+
+@login_required
 def controllerindex(request):
     user = request.user  # Get the current logged-in user
 
@@ -149,6 +151,7 @@ def controllerindex(request):
 
     return render(request, 'Controller/controllerindex.html', context)
 
+@login_required
 def list_orders2(request):
     active_orders = Orders.objects.filter(is_active=True).order_by('order_id')
     orders_per_page = 12
@@ -161,7 +164,7 @@ def list_orders2(request):
     return render(request, 'Controller/orders2.html', {'page': page, 'products': products, 'suppliers':suppliers})
 
 
-
+@login_required
 def stock_list(request):
     stocks = Stock.objects.filter(is_active=True)  # Filter stocks where is_stored is True (active)
     storage_locations = StorageLocation.objects.all()  # Retrieve all storage locations
@@ -172,6 +175,7 @@ def stock_list(request):
     return render(request, 'Controller/stock.html', context)
 
 
+@login_required
 def update_stock(request, stock_id):
     if request.method == 'POST':
         try:
@@ -198,6 +202,7 @@ def update_stock(request, stock_id):
     # Handle other HTTP methods or form submission errors
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+@login_required
 def get_stock_details(request, stock_id):
     try:
         stock = Stock.objects.get(pk=stock_id)
@@ -215,7 +220,7 @@ def get_stock_details(request, stock_id):
     
     
 
-
+@login_required
 def get_stock_for_product(request, product_id):
     try:
         # Retrieve the stock data for the selected product with remaining quantity greater than 0
@@ -237,6 +242,7 @@ def get_stock_for_product(request, product_id):
             stock_data = {
                 'id': stock['id'],
                 'stock_name': f"{stock['order__product__product_name']} - Delivered At: {stock['order__delivered_at']} - Remaining Quantity: {remaining_quantity}",
+                'remaining_quantity': remaining_quantity
             }
             stock_list.append(stock_data)
 
@@ -247,7 +253,7 @@ def get_stock_for_product(request, product_id):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-
+@login_required
 def sales(request):
     # Retrieve all Sales objects from the database
     sales = Sales.objects.all()
@@ -256,16 +262,20 @@ def sales(request):
     stocks = Stock.objects.filter(is_active=True)
     orders = Orders.objects.filter(is_active=True)
     products = Product.objects.all()
+    active_products=Product.objects.filter(is_active=True)
 
     context = {
         'sales': sales,  # Pass the sales data to the template
         'stocks': stocks,  # Pass the stock data to the template
         'orders': orders,  # Pass the orders data to the template
         'products': products,  # Pass the product data to the template
+        'active_products':active_products,
     }
 
     return render(request, 'Controller/sales.html', context)
 
+
+@login_required
 def add_sales(request):
     if request.method == 'POST':
         # Get data from the form
@@ -324,6 +334,8 @@ def delete_multiple_sales(request):
 
     return JsonResponse({"error": "Bad request"}, status=400)
 
+
+@login_required
 def cancel_sale(request, sale_id):
     try:
         # Get the sale to cancel
@@ -340,6 +352,8 @@ def cancel_sale(request, sale_id):
         return JsonResponse({'error': 'Sale not found'}, status=404)
     
     
+    
+@login_required
 def deliver_sale(request, sale_id):
     if request.method == 'POST':
         # Fetch the sale object
@@ -355,6 +369,8 @@ def deliver_sale(request, sale_id):
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
 
+
+@login_required
 def get_buying_price_for_stock(request, stock_id):
     try:
         stock = Stock.objects.get(pk=stock_id)
@@ -368,11 +384,15 @@ def get_buying_price_for_stock(request, stock_id):
     
     
     
+    
+@login_required
 def controllercharts(request):
     user = request.user  # Get the current logged-in user
     return render(request, 'Controller/charts.html')
 
 
+
+@login_required
 def get_profit_data(request):
     # Query your Sales model and calculate profit data by month
     profit_data = (
@@ -415,7 +435,7 @@ def get_profit_data(request):
 
 
 
-
+@login_required
 def get_stock_and_sales_data(request):
     # Query total stocks and total sales per month
     stock_data = (
@@ -455,7 +475,7 @@ def get_stock_and_sales_data(request):
 
 
 
-
+@login_required
 def get_order_status_data(request):
     # Get the current month and year
     today = datetime.now()
@@ -481,6 +501,7 @@ def get_order_status_data(request):
 
 
 @csrf_exempt  # Only for development, remove in production or implement proper CSRF handling
+@login_required
 def get_top_selling_products(request):
     # Query the top 5 selling products based on quantity
     top_selling_products = (
@@ -502,7 +523,7 @@ def get_top_selling_products(request):
     return JsonResponse(data)
 
 
-
+@login_required
 def get_monthly_sales_data(request):
     selected_month = request.GET.get('selected_month')
 
@@ -530,7 +551,7 @@ def get_monthly_sales_data(request):
 
 
 
-
+@login_required
 def fetch_data_view(request):
     # Ensure this view is only accessible via AJAX
     if not request.headers.get('x-requested-with') == 'XMLHttpRequest' or not request.method == 'GET':
@@ -560,6 +581,8 @@ def fetch_data_view(request):
     return JsonResponse({'html_data': escaped_html_data})
 
 
+
+@login_required
 def get_sales_data(request):
     selected_month = request.GET.get('selected_month')
 
@@ -648,6 +671,7 @@ def get_sales_data(request):
 
 
 
+@login_required
 def view_invoice(request, sale_id):
     # Retrieve the sale object or data as per your application
     # Replace this with your actual logic to retrieve sale data
@@ -673,3 +697,17 @@ def view_invoice(request, sale_id):
         return render(request, 'Controller/invoice.html', context)
     else:
         return render(request, 'Controller/invoice.html', {'sale': None})
+    
+    
+    
+@login_required
+def view_order_pdf(request):
+    active_orders = Orders.objects.filter(is_active=True).order_by('order_id')
+    orders_per_page = 12
+    paginator = Paginator(active_orders, orders_per_page)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    products = Product.objects.filter(is_active=True)
+    suppliers= Supplier.objects.filter(is_active=True)
+
+    return render(request, 'Controller/pdforder.html', {'page': page, 'products': products, 'suppliers':suppliers})

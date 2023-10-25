@@ -331,7 +331,7 @@
 					                    <div class="col-auto">
 					                        <input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
 					                    </div>
-					                    <div class="col-auto">
+					                    {% comment %} <div class="col-auto">
 											<select class="form-select w-auto" >
 												<option selected value="option-1">All</option>
 												<option value="option-2">This week</option>
@@ -340,7 +340,7 @@
 												
 										  </select>
 					                        
-					                    </div>
+					                    </div> {% endcomment %}
 					                </form>
 					                
 							    </div><!--//col-->
@@ -358,7 +358,7 @@
 									<button id="deleteAllButton" class="btn text-white btn-danger" disabled>Delete All</button>
 								</div>
 								<div class="col-auto">						  
-									<a id="generate-pdf-btn" class="btn btn-secondary generate-pdf" href="{% url 'export_pdf' %}">Generate PDF</a>
+									<a id="generate-pdf-btn" class="btn btn-secondary generate-pdf" href="{% url 'view_products_pdf' %}">Generate PDF</a>
 								</div>
 						    </div><!--//row-->
 					    </div><!--//table-utilities-->
@@ -392,6 +392,7 @@
 									<option value="{{ Category.category_id }}">{{ Category.category_name }}</option>
 								{% endfor %}
 							</select>
+							<span id="categorySpan" style="display: none;"></span>
 							<span id="categoryError" class="text-danger"></span> <!-- Error message for Category -->
 						</div>
 				
@@ -401,6 +402,7 @@
 							<select id="subcategory" name="subcategory" class="form-control">
 								<option value="">Select a category first</option>
 							</select>
+							<span id="subcategorySpan" style="display: none;"></span>
 							<span id="subcategoryError" class="text-danger"></span> <!-- Error message for Subcategory -->
 						</div>
 				
@@ -413,6 +415,7 @@
 									<option value="{{ Brand.brand_id }}">{{ Brand.brand_name }}</option>
 								{% endfor %}
 							</select>
+							<span id="brandSpan" style="display: none;"></span>
 							<span id="brandError" class="text-danger"></span> <!-- Error message for Brand -->
 						</div>
 				
@@ -425,6 +428,7 @@
 									<option value="{{ ProductType.product_type_id }}">{{ ProductType.type_name }}</option>
 								{% endfor %}
 							</select>
+							<span id="typeSpan" style="display: none;"></span>
 							<span id="productTypeError" class="text-danger"></span> <!-- Error message for Product Type -->
 						</div>
 				
@@ -437,6 +441,7 @@
 									<option value="{{ Subtype.subtype_id }}">{{ Subtype.subtype_name }}</option>
 								{% endfor %}
 							</select>
+							<span id="subtypeSpan" style="display: none;"></span>
 							<span id="subtypeError" class="text-danger"></span> <!-- Error message for Subtype -->
 						</div>
 				
@@ -473,6 +478,7 @@
 									{% endfor %}
 								</div>
 							</div>
+							<span id="supplierSpan" style="display: none;"></span>
 							<span id="suppliersError" class="text-danger"></span>
 						</div>
 				
@@ -903,7 +909,6 @@
 							});
 
 
-
 							$('.stocktab').on('click', function (e) {
 								e.preventDefault();
 								const tabId = $(this).attr('href');
@@ -974,9 +979,6 @@
 							});
 							
 
-
-
-
 							// Attach a click event handler to the "Storage" tab
 							$('.storagetab').on('click', function (e) {
 								e.preventDefault();
@@ -1042,8 +1044,6 @@
 									});
 								}
 							});
-
-							
 
 
 							$('.orderstab').on('click', function (e) {
@@ -1197,11 +1197,6 @@
 							
 						});
 
-						
-
-
-
-
 						// Add event listeners for checkboxes
 						const checkboxes = document.querySelectorAll(".product-checkbox");
 				
@@ -1273,23 +1268,59 @@
 						
 						function fetchProductData(productId) {
 							$.ajax({
-								url: `/get-product-details/${productId}/`,
+								url: `/get-product-detailsupdate/${productId}/`,
 								method: "GET",
 								dataType: "json", // Specify the expected data type as JSON
 								success: function (productData) {
-									// Populate the form fields with the retrieved data
-									document.getElementById("category").value = productData.category_id;
-									document.getElementById("subcategory").value = productData.subcategory_id;
+									
 									document.getElementById("productName").value = productData.product_name;
 									document.getElementById("quantity").value = productData.quantity;
 									document.getElementById("thresholdValue").value = productData.threshold_value;
-				
+									
+
+									var categorySpan = document.getElementById("categorySpan");
+									categorySpan.innerText = "category: " + productData.category_id ;
+									categorySpan.style.display = "block"; // Show the span
+
+									var subcategorySpan = document.getElementById("subcategorySpan");
+									subcategorySpan.innerText = "Sub Category: " + productData.subcategory_id ;
+									subcategorySpan.style.display = "block"; // Show the span
+									
+
+									var brandSpan = document.getElementById("brandSpan");
+									brandSpan.innerText = "Brand: " + productData.brand ;
+									brandSpan.style.display = "block"; // Show the span
+
+									var typeSpan = document.getElementById("typeSpan");
+									typeSpan.innerText = "ProductType: " + productData.producttype ;
+									typeSpan.style.display = "block"; // Show the span
+
+									var subtypeSpan = document.getElementById("subtypeSpan");
+									subtypeSpan.innerText = "Subtype: " + productData.subtype ;
+									subtypeSpan.style.display = "block"; // Show the span
+
+									var supplierSpan = document.getElementById("supplierSpan");
+
+										// Check if supplier names exist in the product data
+										if (productData.suppliers && productData.suppliers.length > 0) {
+											// Format the list of supplier names
+											var supplierNames = "Suppliers: " + productData.suppliers.join(', ');
+
+											// Set the formatted supplier names in the span
+											supplierSpan.innerText = supplierNames;
+											supplierSpan.style.display = "block"; // Show the span
+										} else {
+											// Handle the case where there are no suppliers
+											supplierSpan.innerText = "No Suppliers";
+											supplierSpan.style.display = "block"; // Show the span
+										}
+
+								
 									var previewImage = document.getElementById("previewImage");
 									previewImage.src = productData.product_image_url;
 									previewImage.style.display = "block"; // Show the image
 				
 									// Optionally, you can add logging to verify the data
-									console.log("Product Data:", productData);
 								},
 								error: function () {
 									// Handle error if the AJAX request fails

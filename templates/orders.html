@@ -319,7 +319,7 @@
 					                    <div class="col-auto">
 					                        <input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
 					                    </div>
-					                    <div class="col-auto">
+					                    {% comment %} <div class="col-auto">
 											<select class="form-select w-auto" >
 												<option selected value="option-1">All</option>
 												<option value="option-2">This week</option>
@@ -328,7 +328,7 @@
 												
 										  </select>
 					                        
-					                    </div>
+					                    </div> {% endcomment %}
 					                </form>
 					                
 							    </div><!--//col-->
@@ -346,7 +346,7 @@
 									<button id="deleteAllButton" class="btn text-white btn-danger" disabled>Cancel All</button>
 								</div>
 								<div class="col-auto">						  
-									<a id="generate-pdf-btn" class="btn btn-secondary" href="{% url 'export_orders_pdf' %}">Generate PDF</a>
+									<a id="generate-pdf-btn" class="btn btn-secondary" href="{% url 'view_order_pdf' %}">Generate PDF</a>
 								</div>
 						    </div><!--//row-->
 					    </div><!--//table-utilities-->
@@ -1090,7 +1090,7 @@
 
 		function fetchorderData(orderId) {
 			$.ajax({
-				url: `/get-order-details/${orderId}/`,
+				url: `/get-order-details2/${orderId}/`,
 				method: "GET",
 				dataType: "json", // Specify the expected data type as JSON
 				success: function (orderData) {

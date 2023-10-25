@@ -282,7 +282,7 @@
 					                    <div class="col-auto">
 					                        <input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
 					                    </div>
-					                    <div class="col-auto">
+					                    {% comment %} <div class="col-auto">
 											<select class="form-select w-auto" >
 												<option selected value="option-1">All</option>
 												<option value="option-2">This week</option>
@@ -291,7 +291,7 @@
 												
 										  </select>
 					                        
-					                    </div>
+					                    </div> {% endcomment %}
 					                </form>
 					                
 							    </div><!--//col-->
@@ -320,69 +320,69 @@
 
 
 				<div id="orderFormPopup" class="popup">
-					<h2>Add Sales</h2>
-					<form method="post" enctype="multipart/form-data" id="add-sales-form" action="{% url 'add_sales' %}">
-						{% csrf_token %}
-				
-						<input type="hidden" id="sales-id" name="sales-id">
-				
-						<div class="form-group">
-							<label for="product">Product:</label>
-							<select id="productfield" name="product" class="form-control">
-								<option value="" disabled selected>Select</option>
-								{% for Product in products %}
-								<option value="{{ Product.product_id }}">{{ Product.product_name }}</option>
-								{% endfor %}
-							</select>
-							<span id="product-error" class="error text-danger"></span> <!-- Error message for Product -->
-						</div>
-				
-						<div class="form-group">
-							<label for="stock">Stock:</label>
-							<select id="stockfield" name="stock" class="form-control">
-								<option value="" disabled selected>Select</option>
-								<!-- The options will be populated by the AJAX function -->
-							</select>
-							<span id="stock-error" class="error text-danger"></span> <!-- Error message for Stock -->
-						</div>
-				
-						<span id="buying-price-span" style="display: none;"></span>
-        
-						<div class="form-group">
-							<label for="quantity">Quantity:</label>
-							<input type="number" id="quantity" name="quantity" class="form-control">
-							<span id="quantity-error" class="error text-danger"></span> <!-- Error message for Quantity -->
-						</div>
-				
-						<div class="form-group">
-							<label for="delivery_address">Delivery Address:</label>
-							<textarea id="delivery_address" name="delivery_address" class="form-control"></textarea>
-							<span id="delivery_address-error" class="error text-danger"></span> <!-- Error message for Delivery Address -->
-						</div>
-				
-						<div class="form-group">
-							<label for="sales_price">Sales Price:</label>
-							<input type="number" id="sales_price" name="sales_price" class="form-control">
-							<span id="sales_price-error" class="error text-danger"></span> <!-- Error message for Sales Price -->
-						</div>
-				
-				
-						<div class="form-group">
-							<label for="buyer_name">Buyer Name:</label>
-							<input type="text" id="buyer_name" name="buyer_name" class="form-control">
-							<span id="buyer_name-error" class="error text-danger"></span> <!-- Error message for Buyer Name -->
-						</div>
-				
-						<div class="form-group">
-							<label for="buyer_contact_info">Buyer Contact Info:</label>
-							<input type="text" id="buyer_contact_info" name="buyer_contact_info" class="form-control">
-							<span id="buyer_contact_info-error" class="error text-danger"></span> <!-- Error message for Buyer Contact Info -->
-						</div>
-				
-						<input type="submit" value="Add" class="btn btn-primary">
-						<button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
-					</form>
-				</div>
+				<h2>Add Sales</h2>
+				<form method="post" enctype="multipart/form-data" id="add-sales-form" action="{% url 'add_sales' %}">
+					{% csrf_token %}
+
+					<input type="hidden" id="sales-id" name="sales-id" required>
+
+					<div class="form-group">
+						<label for="product">Product:</label>
+						<select id="product" name="product" class="form-control" required>
+							<option value="" disabled selected>Select</option>
+							{% for Product in products %}
+							<option value="{{ Product.product_id }}">{{ Product.product_name }}</option>
+							{% endfor %}
+						</select>
+						<span id="product-error" class="error text-danger"></span> <!-- Error message for Product -->
+					</div>
+
+					<div class="form-group">
+						<label for="stock">Stock:</label>
+						<select id="stock" name="stock" class="form-control" required>
+							<option value="" disabled selected>Select</option>
+							<!-- The options will be populated by the AJAX function -->
+						</select>
+						<span id="stock-error" class="error text-danger"></span> <!-- Error message for Stock -->
+					</div>
+
+					<span id="buying-price-span" style="display: none;"></span>
+
+					<div class="form-group">
+						<label for="quantity">Quantity:</label>
+						<input type="number" id="quantity" name="quantity" class="form-control" required>
+						<span id="quantity-error" class="error text-danger"></span> <!-- Error message for Quantity -->
+					</div>
+
+					<div class="form-group">
+						<label for="delivery_address">Delivery Address:</label>
+						<textarea id="delivery_address" name="delivery_address" class="form-control" required></textarea>
+						<span id="delivery_address-error" class="error text-danger"></span> <!-- Error message for Delivery Address -->
+					</div>
+
+					<div class="form-group">
+						<label for="sales_price">Sales Price:</label>
+						<input type="number" id="sales_price" name="sales_price" class="form-control" required>
+						<span id="sales_price-error" class an="error text-danger"></span> <!-- Error message for Sales Price -->
+					</div>
+
+					<div class="form-group">
+						<label for="buyer_name">Buyer Name:</label>
+						<input type="text" id="buyer_name" name="buyer_name" class="form-control" required>
+						<span id="buyer_name-error" class="error text-danger"></span> <!-- Error message for Buyer Name -->
+					</div>
+
+					<div class="form-group">
+						<label for="buyer_contact_info">Buyer Contact Info:</label>
+						<input type="text" id="buyer_contact_info" name="buyer_contact_info" class="form-control" required>
+						<span id="buyer_contact_info-error" class="error text-danger"></span> <!-- Error message for Buyer Contact Info -->
+					</div>
+
+					<input type="submit" id="add_sale_button" value="Add" class="btn btn-primary">
+					<button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
+				</form>
+			</div>
+
 				
 				
 				  
@@ -485,8 +485,8 @@
 <script>
     $(document).ready(function () {
 
-		const productSelectq = $("#productfield");
-		const stockSelect = $("#stockfield");
+		const productSelectq = $("#product");
+		const stockSelect = $("#stock");
 		const buyingPriceSpan = $("#buying-price-span");
 		// Add an event listener to the product select element
 		productSelectq.on("change", function () {
@@ -719,6 +719,134 @@
 			});
 		}
 
+
+
+		const form = document.getElementById("add-sales-form");
+		const BuyerName = document.getElementById("buyer_name");
+		const Address = document.getElementById("address");
+		const product = document.getElementById("product");
+		const stock = document.getElementById("stock");
+		const quantity = document.getElementById("quantity");
+		const sales_price = document.getElementById("sales_price");
+		const contact = document.getElementById("buyer_contact_info");
+		const submitbutton = document.getElementById("add_sale_button");
+
+		// Regular expressions for validation
+		const nameRegex = /^[A-Za-z\s]+$/;
+		const addressRegex = /^[A-Za-z0-9\s]+$/;
+		const numberRegex = /^\d+$/;
+		const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+		// Error message elements
+		const BuyerNameError = document.getElementById("buyer_name-error");
+		const AddressError = document.getElementById("address-error");
+		const productError = document.getElementById("product-error");
+		const stockError = document.getElementById("stock-error");
+		const quantityError = document.getElementById("quantity-error");
+		const priceError = document.getElementById("sales_price-error");
+		const contactError = document.getElementById("buyer_contact_info-error");
+
+		// Add input event listeners for real-time validation
+		BuyerName.addEventListener("input", validateName);
+		Address.addEventListener("input", validateName2);
+		sales_price.addEventListener("input", validateEmail);
+		quantity.addEventListener("input", validateQuantity);
+		product.addEventListener("change", validateSelect);
+		stock.addEventListener("change", validateSelect);
+		contact.addEventListener("input", validateContactInfo);
+
+		form.addEventListener("submit", function (e) {
+			// Prevent form submission if any field is empty or validation fails
+			if (!validateName() || !validateName2() || !validateEmail() || !validateQuantity() || !validateSelect() || !validateContactInfo()) {
+				e.preventDefault(); // Prevent form submission if there are errors
+				submitbutton.disabled = true; // Disable the submit button
+			} else {
+				submitbutton.disabled = false; // Enable the submit button if all fields are valid
+			}
+		});
+
+		function validateName() {
+			const value = BuyerName.value;
+			if (!value || !nameRegex.test(value)) {
+				BuyerNameError.textContent = "Invalid or empty Buyer name (letters and spaces only)";
+				return false;
+			} else {
+				BuyerNameError.textContent = "";
+				submitbutton.disabled = false;
+				return true;
+			}
+		}
+
+		function validateName2() {
+			const value = Address.value;
+			if (!value || !addressRegex.test(value)) {
+				AddressError.textContent = "Invalid or empty Address (letters, spaces, and numbers only)";
+				return false;
+			} else {
+				AddressError.textContent = "";
+				submitbutton.disabled = false;
+				return true;
+			}
+		}
+
+		function validateEmail() {
+			const value = sales_price.value;
+			if (!value || !numberRegex.test(value)) {
+				priceError.textContent = "Invalid or empty price";
+				return false;
+			} else {
+				priceError.textContent = "";
+				submitbutton.disabled = false;
+				return true;
+			}
+		}
+
+		function validateQuantity() {
+		const value = quantity.value;
+		console.log("xcscfd")
+		if (!value || !numberRegex.test(value)) {
+			quantityError.textContent = "Invalid or empty quantity";
+			return false;
+		} else if (parseFloat(value) > parseFloat(stock_data.remaining_quantity)) {
+			quantityError.textContent = "Quantity cannot be greater than remaining quantity";
+			return false;
+		} else {
+			quantityError.textContent = "";
+			return true;
+		}
+	}
+
+
+		function validateContactInfo() {
+			const value = contact.value;
+			console.log("xcscfd")
+			if (!value || !numberRegex.test(value)) {
+				contactError.textContent = "Invalid or empty contact";
+				return false;
+			} else {
+				contactError.textContent = "";
+				return true;
+			}
+		}
+
+		function validateSelect() {
+			const productValue = product.value;
+			const stockValue = stock.value;
+			if (!productValue) {
+				productError.textContent = "Please select a product";
+			} else {
+				productError.textContent = "";
+			}
+			if (!stockValue) {
+				stockError.textContent = "Please select a stock";
+			} else {
+				stockError.textContent = "";
+			}
+			return !!productValue && !!stockValue; // Return true if both fields are selected
+		}
+
+
+				
 
 		
    

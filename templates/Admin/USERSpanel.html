@@ -18,6 +18,7 @@
     <!-- App CSS -->  
     <link id="theme-style" rel="stylesheet" href="{% static 'assets/css/portal.css' %}">
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 	<script src="{% static 'assets/js/jspdf.umd.min.js' %}"></script>
 
 
@@ -281,40 +282,39 @@
 					<h2 class="mb-4">Add USERS</h2>
 					<form method="post" enctype="multipart/form-data" id="add-user-form">
 						{% csrf_token %}
-						
-						<input type="hidden" id="user-id" name="user-id" class="form-control">
-
+				
+						<input type="hidden" id="user-id" name="user-id" class="form-control" required>
+				
 						<div class="form-group">
 							<div id="imagePreview" class="mt-3 text-center">
 								<img id="previewImage" src="" alt="Image Preview" class="rounded-circle" style="max-width: 150px; max-height: 150px;">
 							</div>
 							<label for="userImage">user Image:</label>
-							<input type="file" id="userImage" name="userImage" class="form-control-file">
+							<input type="file" id="userImage" name="userImage" class="form-control-file" required>
 							<span id="userImageError" class="text-danger"></span>
 						</div>
 				
 						<!-- email -->
 						<div class="form-group">
 							<label for="email">email:</label>
-							<input type="text" id="email" name="email" class="form-control">
-							<span id="emailError" class="text-danger"></span> <!-- Error message for email -->
+							<input type="text" id="email" name="email" class="form-control" required>
+							<span id="userEmailError" class="text-danger"></span> <!-- Error message for email -->
 						</div>
 				
 						<!-- Threshold Value -->
 						<div class="form-group">
 							<label for="FirstName">First Name: </label>
-							<input type="text" id="FirstName" name="FirstName" class="form-control">
+							<input type="text" id="FirstName" name="FirstName" class="form-control" required>
 							<span id="FirstNameError" class="text-danger"></span> <!-- Error message for Threshold Value -->
 						</div>
-
+				
 						<!-- Threshold Value -->
 						<div class="form-group">
 							<label for="LastName">Last Name: </label>
-							<input type="text" id="LastName" name="LastName" class="form-control">
+							<input type="text" id="LastName" name="LastName" class="form-control" required>
 							<span id="LastNameError" class="text-danger"></span> <!-- Error message for Threshold Value -->
 						</div>
-
-
+				
 						<div class="form-group">
 							<label for="userrole">Role:</label>
 							<select class="form-control" id="userrole" name="userrole" required>
@@ -331,6 +331,7 @@
 						</div>
 					</form>
 				</div>
+				
 				
 				
 				<script>
@@ -428,7 +429,7 @@
 											},
 											success: function (data) {
 												// Handle success (e.g., remove the row from the table)
-												link.closest("tr").remove();
+												$(link).closest("tr").remove();
 												window.location.href = "/userspanel/";
 											},
 											error: function (error) {
@@ -439,8 +440,7 @@
 								}
 							});
 						});
-
-
+				
 						const activeLinks = document.querySelectorAll(".activate-user");
 				
 						activeLinks.forEach(link => {
@@ -452,16 +452,16 @@
 									const confirmation = window.confirm("Are you sure you want to Activate this user?");
 				
 									if (confirmation) {
-										// Send an AJAX request to the Django view to delete the user
+										// Send an AJAX request to the Django view to activate the user
 										$.ajax({
-											url: `/activate_user/${userId}/`, // Replace with your delete view URL
+											url: `/activate_user/${userId}/`, // Replace with your activate view URL
 											method: "POST", // or "GET" depending on your view
 											data: {
 												csrfmiddlewaretoken: '{{ csrf_token }}', // Include CSRF token
 											},
 											success: function (data) {
 												// Handle success (e.g., remove the row from the table)
-												link.closest("tr").remove();
+												$(link).closest("tr").remove();
 												window.location.href = "/userspanel/";
 											},
 											error: function (error) {
@@ -474,56 +474,19 @@
 						});
 				
 						// Add event listeners for checkboxes
-
-
 				
-						function fetchuserData(userId) {
-							$.ajax({
-								url: `/get_user_details/${userId}/`,
-								method: "GET",
-								dataType: "json", // Specify the expected data type as JSON
-								success: function (userData) {
-									// Populate the form fields with the retrieved data
-									document.getElementById("userName").value = userData.username;
-									document.getElementById("email").value = userData.email;
-									document.getElementById("FirstName").value = userData.first_name;
-									document.getElementById("LastName").value = userData.last_name;
-									document.getElementById("Password").value = userData.password;
-				
-									var previewImage = document.getElementById("previewImage");
-									previewImage.src = userData.user_image_url;
-									previewImage.style.display = "block"; // Show the image
-				
-									// Optionally, you can add logging to verify the data
-									console.log("user Data:", userData);
-								},
-								error: function () {
-									// Handle error if the AJAX request fails
-									console.error("Failed to fetch user data.");
-								},
-							});
-						}
+		
 				
 						// Add an event listener for the update form
-						const updateButtons = document.querySelectorAll('.update-user');
+						
 						const userFormPopup = document.getElementById('usersFormPopup');
 						const cancelButton = document.getElementById('cancelButton');
 				
-						updateButtons.forEach(button => {
-							button.addEventListener('click', () => {
-								userFormPopup.style.display = 'block';
-								const userId = button.getAttribute('data-user-id');
-								document.getElementById('user-id').value = userId;
-								fetchuserData(userId);
-							});
-						});
-				
 						cancelButton.addEventListener('click', () => {
 							userFormPopup.style.display = 'none';
-							window.location.href = "/userspanel/"; 
+							window.location.href = "/userspanel/";
 						});
 				
-
 						$('#search-orders').on('input', function () {
 							var searchText = $(this).val().toLowerCase();
 							searchusers(searchText);
@@ -546,24 +509,19 @@
 						}
 				
 						const updateuserForm = document.getElementById("add-user-form");
-
+				
 						updateuserForm.addEventListener("submit", function (e) {
 							e.preventDefault();
-
+				
 							// Collect the updated data from the form
 							const formData = new FormData(updateuserForm);
-
+				
 							// Extract the user_id from the form or data attributes
 							const userId = document.getElementById("user-id").value;
-
+				
 							// Define the base URL for the AJAX request
-							let baseUrl =  `/add_user/`;
-
-							if (userId) {
-								// If userId is not null, append it to the base URL
-								baseUrl =  `/update_user/${userId}/`;
-							}
-
+							let baseUrl = `/add_user/`;
+				
 							// Send an AJAX request to the dynamically determined URL
 							$.ajax({
 								url: baseUrl,
@@ -574,8 +532,8 @@
 								success: function (data) {
 									// Handle success (e.g., show a success message)
 									console.log(data.message);
-										// Redirect to the "add_user" URL if userId is null
-										window.location.href = "/userspanel/"; // Replace with the correct URL
+									// Redirect to the "add_user" URL if userId is null
+									window.location.href = "/userspanel/"; // Replace with the correct URL
 								},
 								error: function (error) {
 									// Handle errors (e.g., display an error message)
@@ -583,36 +541,7 @@
 								},
 							});
 						});
-
-						document.getElementById('generate-pdf-btn').addEventListener('click', function () {
-							generatePDF();
-						});
 				
-						function generatePDF() {
-							const pdf = new jsPDF();
-				
-							// Loop through each row of the table and add data to the PDF
-							const rows = document.querySelectorAll('.user-row');
-							rows.forEach((row, index) => {
-								const name = row.querySelector('.user-name').textContent;
-								const category = row.querySelectorAll('.cell')[2].textContent;
-								const subcategory = row.querySelectorAll('.cell')[3].textContent;
-				
-								// Add data to the PDF
-								pdf.text(`Row ${index + 1}`, 10, 10 + index * 10);
-								pdf.text(`Name: ${name}`, 20, 20 + index * 10);
-								pdf.text(`Category: ${category}`, 20, 30 + index * 10);
-								pdf.text(`Subcategory: ${subcategory}`, 20, 40 + index * 10);
-				
-								// Check if we need to add a new page for the next row
-								if (index < rows.length - 1) {
-									pdf.addPage();
-								}
-							});
-				
-							// Save the PDF as a file
-							pdf.save('user_report.pdf');
-						}
 				
 						function updateImagePreview(input, previewId) {
 							var preview = document.getElementById(previewId);
@@ -633,151 +562,148 @@
 							}
 						}
 				
-						// Add an event listener to the file input field for the "Add user" form
-						var userImageInput = document.getElementById('userImage');
-						userImageInput.addEventListener('change', function () {
-							updateImagePreview(this, 'previewImage');
-						});
-				
-						// Add an event listener to the file input field for the "Update user" form
-				
-						/*const userName = document.querySelector("#userName");
-						const email = document.querySelector("#email");
-						const FirstName = document.querySelector("#FirstName");
-						const category = document.querySelector("#category");
-						const subcategory = document.querySelector("#subcategory");
-				
-						const userNameError = document.querySelector("#userNameError");
-						const emailError = document.querySelector("#emailError");
-						const FirstNameError = document.querySelector("#FirstNameError");
-						const categoryError = document.querySelector("#categoryError");
-						const subcategoryError = document.querySelector("#subcategoryError");
+						const form = document.getElementById("add-user-form");
+						const FirstName = document.getElementById("FirstName");
+						const LastName = document.getElementById("LastName");
+						const userEmail = document.getElementById("email");
+						const userImage = document.getElementById("userImage");
+						const userrole = document.getElementById("userrole");
 				
 						// Regular expressions for validation
-						const nameRegex = /^[a-zA-Z0-9\s]+$/;
-
-						const numberRegex = /^[0-9]+$/;
+						const nameRegex = /^[A-Za-z\s]+$/;
+						const addressRegex = /^[A-Za-z0-9\s]+$/;
+						const numberRegex = /^\d+$/;
+						const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+						const imageFormats = ["jpg", "jpeg", "png", "gif"]; // Add more valid image formats if needed
 				
-						userName.addEventListener("input", function () {
-							if (!nameRegex.test(userName.value)) {
-								userNameError.textContent = "Please enter a valid user name (letters, numbers and spaces only).";
-							} else {
-								userNameError.textContent = "";
-							}
-						});
+						// Error message elements
+						const FirstNameError = document.getElementById("FirstNameError");
+						const LastNameError = document.getElementById("LastNameError");
+						const userEmailError = document.getElementById("userEmailError");
+						const userImageError = document.getElementById("userImageError");
+						const roleError = document.getElementById("roleError");
 				
-						email.addEventListener("input", function () {
-							if (!numberRegex.test(email.value)) {
-								emailError.textContent = "email must be numeric.";
-							} else {
-								emailError.textContent = "";
-							}
-						});
+						// Add input event listeners for real-time validation
+						FirstName.addEventListener("input", validateName);
+						LastName.addEventListener("input", validateName2);
+						userEmail.addEventListener("input", validateEmail);
+						userImage.addEventListener("change", validateImage); // Change event for file input
+						userrole.addEventListener("change", validateType); // Change event for select
 				
-						FirstName.addEventListener("input", function () {
-							if (!numberRegex.test(FirstName.value)) {
-								FirstNameError.textContent = "Threshold Value must be numeric.";
-							} else {
-								FirstNameError.textContent = "";
-							}
-						});
-				
-						category.addEventListener("input", function () {
-							if (category.value === "") {
-								categoryError.textContent = "Please select a category.";
-							} else {
-								categoryError.textContent = "";
-							}
-						});
-				
-						subcategory.addEventListener("input", function () {
-							if (subcategory.value === "") {
-								subcategoryError.textContent = "Please select a subcategory.";
-							} else {
-								subcategoryError.textContent = "";
-							}
-						});
-				
-						const form = document.querySelector("form");
 						form.addEventListener("submit", function (event) {
+							// Prevent form submission if any validation fails
 							if (
-								!nameRegex.test(userName.value) ||
-								!numberRegex.test(email.value) ||
-								!numberRegex.test(FirstName.value) ||
-								category.value === "" ||
-								subcategory.value === ""
+								!validateName() ||
+								!validateName2() ||
+								!validateEmail() ||
+								!validateImage() ||
+								!validateType()
 							) {
 								event.preventDefault();
 							}
 						});
 				
-						function validateImageFormat(input) {
-							const userImageError = document.querySelector("#userImageError");
-							const imageExtensions = ["jpg", "jpeg", "png", "gif"];
-							const selectedFile = input.files[0];
-				
-							if (selectedFile) {
-								const imageExtension = selectedFile.name.split(".").pop().toLowerCase();
-								if (!imageExtensions.includes(imageExtension)) {
-									userImageError.textContent = "Invalid image format. Supported formats: JPG, JPEG, PNG, GIF";
-									input.value = ""; // Clear the file input
-								} else {
-									userImageError.textContent = "";
-								}
+						function validateName() {
+							const value = FirstName.value;
+							if (!nameRegex.test(value)) {
+								FirstNameError.textContent = "Invalid supplier name (letters and spaces only)";
+								return false;
+							} else {
+								FirstNameError.textContent = "";
+								return true;
 							}
 						}
 				
-						// Event listener for the user image input
-						const userImage = document.querySelector("#userImage");
-						userImage.addEventListener("input", function () {
-							validateImageFormat(this);
-						});*/
-
-
-
-
-						
+						function validateName2() {
+							const value = LastName.value;
+							if (!nameRegex.test(value)) {
+								LastNameError.textContent = "Invalid supplier name (letters and spaces only)";
+								return false;
+							} else {
+								LastNameError.textContent = "";
+								return true;
+							}
+						}
+				
+						function validateEmail() {
+							const value = userEmail.value;
+							if (!emailRegex.test(value)) {
+								userEmailError.textContent = "Invalid email address";
+								return false;
+							} else {
+								userEmailError.textContent = "";
+								return true;
+							}
+						}
+				
+						function validateImage() {
+							const value = userImage.value;
+							if (value) {
+								const extension = value.split(".").pop().toLowerCase();
+								if (!imageFormats.includes(extension)) {
+									userImageError.textContent = "Invalid image format";
+									return false;
+								} else {
+									userImageError.textContent = "";
+									return true;
+								}
+							} else {
+								userImageError.textContent = "";
+								return true;
+							}
+						}
+				
+						function validateType() {
+							const value = userrole.value;
+							if (!value) {
+								roleError.textContent = "Please select a supplier type";
+								return false;
+							} else {
+								roleError.textContent = "";
+								return true;
+							}
+						}
 					});
 				</script>
 				
 						
-<nav class="app-pagination">
-    <ul class="pagination justify-content-center">
-        {% if page.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page=1">&laquo; first</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page.previous_page_number }}">previous</a>
-            </li>
-        {% else %}
-            <li class="page-item disabled">
-                <span class="page-link">&laquo; first</span>
-            </li>
-            <li class="page-item disabled">
-                <span class="page-link">previous</span>
-            </li>
-        {% endif %}
-        <li class="page-item active">
-            <span class="page-link">{{ page.number }}</span>
-        </li>
-        {% if page.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page.next_page_number }}">next</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page.paginator.num_pages }}">last &raquo;</a>
-            </li>
-        {% else %}
-            <li class="page-item disabled">
-                <span class="page-link">next</span>
-            </li>
-            <li class="page-item disabled">
-                <span class="page-link">last &raquo;</span>
-            </li>
-        {% endif %}
-    </ul>
-</nav><!--//app-pagination-->
+				<nav class="app-pagination">
+					<ul class="pagination justify-content-center">
+						{% if page.has_previous %}
+							<li class="page-item">
+								<a class="page-link" href="?page=1">&laquo; first</a>
+							</li>
+							<li class="page-item">
+								<a class="page-link" href="?page={{ page.previous_page_number }}">previous</a>
+							</li>
+						{% else %}
+							<li class="page-item disabled">
+								<span class="page-link">&laquo; first</span>
+							</li>
+							<li class="page-item disabled">
+								<span class="page-link">previous</span>
+							</li>
+						{% endif %}
+						<li class="page-item active">
+							<span class="page-link">{{ page.number }}</span>
+						</li>
+						{% if page.has_next %}
+							<li class="page-item">
+								<a class="page-link" href="?page={{ page.next_page_number }}">next</a>
+							</li>
+							<li class="page-item">
+								<a class="page-link" href="?page={{ page.paginator.num_pages }}">last &raquo;</a>
+							</li>
+						{% else %}
+							<li class="page-item disabled">
+								<span class="page-link">next</span>
+							</li>
+							<li class="page-item disabled">
+								<span class="page-link">last &raquo;</span>
+							</li>
+						{% endif %}
+					</ul>
+				</nav><!--//app-pagination-->
 
 						
 			        </div><!--//tab-pane-->
@@ -799,3 +725,8 @@
 	
 </body>
 </html> 
+
+
+
+
+						

@@ -35,14 +35,14 @@ urlpatterns = [
     path('get_subcategories/', views.get_subcategories, name='get_subcategories'),
     path('delete-product/<int:product_id>/', views.delete_product, name='delete_product'),
     path('update-product/<int:product_id>/', views.update_product, name='update-product'),
-    path('get-product-details/<int:product_id>/', views.get_product_details, name='get-product-details'),
+    path('get-product-detailsupdate/<int:product_id>/', views.get_product_detailsupdate, name='get-product-detailsupdate'),
     path('delete-multiple-products/', views.delete_multiple_products, name='delete_multiple_products'),
     
     path('add_suppliers/', views.add_suppliers, name='add_suppliers'),
     path('list_suppliers/', views.list_suppliers, name='list_suppliers'),
     path('delete-suppliers/<int:supplier_id>/', views.delete_suppliers, name='delete_suppliers'),
     path('update-supplier/<int:supplier_id>/', views.update_supplier, name='update-supplier'),
-    path('get-supplier-details/<int:supplier_id>/', views.get_supplier_details, name='get-supplier-details'),
+    path('get-supplier-details2/<int:supplier_id>/', views.get_supplier_details2, name='get-supplier-details2'),
     path('delete-multiple-suppliers/', views.delete_multiple_suppliers, name='delete_multiple_suppliers'),
     path('check_suppliercontact/', views.check_suppliercontact, name='check_suppliercontact'),
     path('check_supplieremail/', views.check_supplieremail, name='check_supplieremail'),
@@ -53,7 +53,7 @@ urlpatterns = [
     path('cancel_order/<int:order_id>/', views.cancel_order, name='cancel_order'),
     path('deliver_order/<int:order_id>/', views.deliver_order, name='deliver_order'),
     path('update_order/<int:order_id>/', views.update_order, name='update_order'),
-    path('get-order-details/<int:order_id>/', views.get_order_details, name='get-order-details'),
+    path('get-order-details2/<int:order_id>/', views.get_order_details2, name='get-order-details2'),
     path('cancel-multiple-orders/', views.cancel_multiple_orders, name='cancel_multiple_orders'),
     path('return_order/<int:order_id>/', views.return_order, name='return_order'),
     path('returned_order/<int:order_id>/', views.returned_order, name='returned_order'),
@@ -78,6 +78,7 @@ urlpatterns = [
     path('get_product_location_details/', views.get_product_location_details, name='get_product_location_details'),
     path('get_order_details/', views.get_order_details, name='get_order_details'),
     path('get_sales_details/', views.get_sales_details, name='get_sales_details'),
+    path('view_products_pdf/', views.view_products_pdf, name='view_products_pdf'),
 
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

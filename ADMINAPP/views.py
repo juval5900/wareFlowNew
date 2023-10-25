@@ -8,7 +8,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 import pyotp
 from .models import Warehouse, UserRole
+from django.contrib.auth.decorators import login_required
 
+
+@login_required
 def adminindex(request):
     # Get the total number of users
     total_users = User.objects.count()
@@ -51,11 +54,18 @@ def adminindex(request):
 
     return render(request, 'Admin/adminindex.html', context)
 
+
+
+
+@login_required
 def userspanel(request):
     users_with_roles = User.objects.select_related('userrole').all()
     context = {'users_with_roles': users_with_roles}
     return render(request, 'Admin/USERSpanel.html', context)
 
+
+
+@login_required
 def add_user(request):
     if request.method == 'POST':
         # Retrieve form data
@@ -102,6 +112,8 @@ def add_user(request):
     return redirect('userspanel')
 
 
+
+@login_required
 def get_user_details(request, user_id):
     try:
         user = User.objects.get(id=user_id)
@@ -123,7 +135,7 @@ def get_user_details(request, user_id):
     
     
 
-
+@login_required
 def delete_user(request, user_id):
     try:
         user = User.objects.get(id=user_id)
@@ -147,6 +159,10 @@ def delete_user(request, user_id):
     except User.DoesNotExist:
         return JsonResponse({'error': 'User not found'}, status=404)
 
+
+
+
+@login_required
 def activate_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
     
@@ -171,6 +187,8 @@ def activate_user(request, user_id):
 
     
     
+    
+@login_required
 def warehousepanel(request):
     # Query all warehouse objects
     warehouses = Warehouse.objects.all()
@@ -190,6 +208,8 @@ def warehousepanel(request):
 
 
 
+
+@login_required
 def add_warehouse(request):
     if request.method == 'POST':
         # Get data from the POST request
