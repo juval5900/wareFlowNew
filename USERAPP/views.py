@@ -470,6 +470,14 @@ def delete_suppliers(request, supplier_id):
     try:
         supplier = Supplier.objects.get(pk=supplier_id)
         supplier.soft_delete()
+        
+        # Send a deactivation email to the user
+        subject = 'Your account has been deactivated'
+        message = 'Your account has been deactivated for violating user terms contact admin for more info.'
+        from_email = settings.EMAIL_HOST_USER  # Your sender email address
+        recipient_list = [supplier.supplier_email]
+
+        send_mail(subject, message, from_email, recipient_list)
         return JsonResponse({'message': 'Supplier deleted successfully'})
     except Product.DoesNotExist:
         return JsonResponse({'error': 'Supplier not found'}, status=404)

@@ -279,7 +279,7 @@
 					        </a><!--//nav-link-->
 					    </li><!--//nav-item-->
 					    
-					    <li class="nav-item">
+					    {% comment %} <li class="nav-item">
 							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
 							<a class="nav-link" href={% url 'list_storage' %}>
 								<span class="nav-icon">
@@ -294,7 +294,7 @@
 								</span>
 								<span class="nav-link-text">Storage Locations</span>
 							</a><!--//nav-link-->
-						</li><!--//nav-item-->
+						</li><!--//nav-item--> {% endcomment %}
 				    </ul><!--//app-menu-->
 			    </nav><!--//app-nav-->
 			    <div class="app-sidepanel-footer">
@@ -331,16 +331,19 @@
 					                    <div class="col-auto">
 					                        <input type="text" id="search-orders" name="searchorders" class="form-control search-orders" placeholder="Search">
 					                    </div>
-					                    {% comment %} <div class="col-auto">
-											<select class="form-select w-auto" >
-												<option selected value="option-1">All</option>
-												<option value="option-2">This week</option>
-												<option value="option-3">This month</option>
-												<option value="option-4">Last 3 months</option>
-												
-										  </select>
+					                    <div class="col-auto">
+											<div class="filter-container">
+											<label for="category-filter">Filter by Category:</label>
+											<select id="category-filter">
+												<option value="all">All Categories</option>
+												{% for category in categories %}
+													<option value="{{ category.category_name }}">{{ category.category_name }}</option>
+												{% endfor %}
+											</select>
+										</div>
 					                        
-					                    </div> {% endcomment %}
+
+					                    </div> 
 					                </form>
 					                
 							    </div><!--//col-->
@@ -670,9 +673,9 @@
 							<li class="nav-item">
 								<a class="nav-link stocktab" id="stock-details-tab" data-toggle="tab" href="#stock-details" role="tab" aria-controls="stock-details" aria-selected="false">Stock Details</a>
 							</li>
-							<li class="nav-item">
+							{% comment %} <li class="nav-item">
 								<a class="nav-link storagetab" id="storage-details-tab" data-toggle="tab" href="#storage-details" role="tab" aria-controls="storage-details" aria-selected="false">Storage Details</a>
-							</li>
+							</li> {% endcomment %}
 							<li class="nav-item">
 								<a class="nav-link orderstab" id="orders-details-tab" data-toggle="tab" href="#orders-details" role="tab" aria-controls="orders-details" aria-selected="false">Orders Details</a>
 							</li>
@@ -742,7 +745,7 @@
 													{{ product.brand }} {{ product.product_type }} {{ product.subtype }} {{ product.product_name }}
 													</a>
 												  </td>
-												<td class="cell">{{ product.category }}</td>
+												<td class="cell categoryfilt">{{ product.category }}</td>
 												<td class="cell">{{ product.subcategory }}</td>
 												<td class="cell">{{ product.quantity }}</td>
 												<td class="cell">{{ product.threshold_value }}</td>
@@ -980,70 +983,70 @@
 							
 
 							// Attach a click event handler to the "Storage" tab
-							$('.storagetab').on('click', function (e) {
-								e.preventDefault();
-								const tabId = $(this).attr('href');
-								console.log(productId);
-								if (tabId === '#storage-details') {
-									// Clear existing content
-									$('#storage-details').empty();
-
+							//$('.storagetab').on('click', function (e) {
+							//	e.preventDefault();
+							//	const tabId = $(this).attr('href');
+							//	console.log(productId);
+							//	if (tabId === '#storage-details') {
+							//		// Clear existing content
+							//		$('#storage-details').empty();
+//
 									// You can replace this with your actual URL and product ID
 									
 									// Make an AJAX request to retrieve product location details
-									$.ajax({
-										url: '/get_product_location_details/', // Replace with your URL
-										method: 'GET',
-										data: { product_id: productId },
-										success: function (response) {
-											if (response.error) {
-												// Handle error if product location is not found
-												$('#storage-details').html(`<p>${response.error}</p>`);
-											} else {
-												// Create a styled table to display product location details
-												let locationDetailsHTML = `
-													<table class="table table-striped">
-														<thead>
-															<tr>
-																<th>Storage Location</th>
-																<th>Shelf Number</th>
-																<th>Row Number</th>
-																<th>Column Number</th>
-															</tr>
-														</thead>
-														<tbody>
-												`;
+							//		$.ajax({
+							//			url: '/get_product_location_details/', // Replace with your URL
+							//			method: 'GET',
+							//			data: { product_id: productId },
+							//			success: function (response) {
+							//				if (response.error) {
+							//					// Handle error if product location is not found
+							//					$('#storage-details').html(`<p>${response.error}</p>`);
+							//				} else {
+							//					// Create a styled table to display product location details
+							//					let locationDetailsHTML = `
+							//						<table class="table table-striped">
+							//							<thead>
+							//								<tr>
+							//									<th>Storage Location</th>
+							//									<th>Shelf Number</th>
+							//									<th>Row Number</th>
+							//									<th>Column Number</th>
+							//								</tr>
+							//							</thead>
+							//							<tbody>
+							//				
 
 												// Loop through the response data (replace with your actual data structure)
-												response.forEach(function (location) {
-													// Format and append each row of data
-													locationDetailsHTML += `
-														<tr>
-															<td>${location.storage_location}</td>
-															<td>${location.shelf_number}</td>
-															<td>${location.row_number}</td>
-															<td>${location.column_number}</td>
-														</tr>
-													`;
-												});
+							//					response.forEach(function (location) {
+							//						// Format and append each row of data
+							//						locationDetailsHTML += `
+							//							<tr>
+							//								<td>${location.storage_location}</td>
+							//								<td>${location.shelf_number}</td>
+							//								<td>${location.row_number}</td>
+							//								<td>${location.column_number}</td>
+							//							</tr>
+							//						`;
+							//					});
 
-												locationDetailsHTML += `
-														</tbody>
-													</table>
-												`;
-
-												$('#storage-details').html(locationDetailsHTML);
-
-												// Activate the Storage Details tab
-												$('#productTabs a[href="#storage-details"]').tab('show');
-											}
-										},
-										error: function () {
-											console.error('Failed to retrieve product location details.');
-										}
-									});
-								}
-							});
+							//					locationDetailsHTML += `
+							//							</tbody>
+							//						</table>
+							//					`;
+//
+//												$('#storage-details').html(locationDetailsHTML);
+//
+				//								// Activate the Storage Details tab
+				//								$('#productTabs a[href="#storage-details"]').tab('show');
+				//							}
+				//						},
+				//						error: function () {
+///////											console.error('Failed to retrieve product location details.');
+//										}
+//									});
+//								}
+//							});
 
 
 							$('.orderstab').on('click', function (e) {
@@ -1397,6 +1400,27 @@
 							});
 						}
 				
+
+
+						$("#category-filter").change(function () {
+							var selectedCategory = $(this).val();
+							console.log("Selected Category:", selectedCategory);
+						
+							// Loop through each table row
+							$(".product-row").each(function () {
+								var category = $(this).find(".cell.categoryfilt").text();
+								console.log("Row Category:", category);
+						
+								if (selectedCategory === "all" || selectedCategory === category) {
+									$(this).show();
+								} else {
+									$(this).hide();
+								}
+							});
+						});
+						
+						
+						
 						const updateProductForm = document.getElementById("add-product-form");
 
 						updateProductForm.addEventListener("submit", function (e) {

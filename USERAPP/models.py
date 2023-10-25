@@ -28,7 +28,7 @@ class Brand(models.Model):
     
 class ProductType(models.Model):
     product_type_id = models.AutoField(primary_key=True)
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE,default=2)
     type_name = models.CharField(max_length=100)
 
     def __str__(self):
