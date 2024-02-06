@@ -26,9 +26,10 @@ urlpatterns = [
     path('charts',views.charts,name='charts'),
     path('docs',views.docs,name='docs'),
     path('help',views.help,name='help'),
-    path('inventory',views.inventory,name='inventory'),
+    path('inventory',views.inventory,name='inventory'), 
     path('settingshtml',views.settingshtml,name='settingshtml'),
     
+   
     path('add_product/', views.add_product, name='add_product'),
     path('list_products/', views.list_products, name='list_products'),
     path('accounts/', include('allauth.urls')),
@@ -73,7 +74,7 @@ urlpatterns = [
     path('get_type/', views.get_type, name='get_type'),
     path('get_subtype/', views.get_subtype, name='get_subtype'),
     path('get_product_details/', views.get_product_details, name='get_product_details'),
-    path('get_supplier_details/', views.get_supplier_details, name='get_supplier_details'),
+    path('get_supplier_details/', views.get_supplier_details, name='get_supplier_details'), 
     path('get_stock_details/', views.get_stock_details, name='get_stock_details'),
     path('get_product_location_details/', views.get_product_location_details, name='get_product_location_details'),
     path('get_order_details/', views.get_order_details, name='get_order_details'),

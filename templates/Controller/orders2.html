@@ -901,7 +901,7 @@
 						success: function (data) {
 							// Handle success (e.g., remove the row from the table)
 							link.closest("tr").remove();
-							window.location.href = "/list_orders/";
+							window.location.href = "/list_orders2/";
 						},
 						error: function (error) {
 							console.error("Error cancelling order:", error);
@@ -934,7 +934,7 @@
 						success: function (data) {
 							// Handle success (e.g., remove the row from the table)
 							link.closest("tr").remove();
-							window.location.href = "/list_orders/";
+							window.location.href = "/list_orders2/";
 						},
 						error: function (error) {
 							console.error("Error delivering order:", error);
@@ -968,7 +968,7 @@
 						success: function (data) {
 							// Handle success (e.g., remove the row from the table)
 							link.closest("tr").remove();
-							window.location.href = "/list_orders/";
+							window.location.href = "/list_orders2/";
 						},
 						error: function (error) {
 							console.error("Error returning order:", error);
@@ -1001,7 +1001,7 @@
 						success: function (data) {
 							// Handle success (e.g., remove the row from the table)
 							link.closest("tr").remove();
-							window.location.href = "/list_orders/";
+							window.location.href = "/list_orders2/";
 						},
 						error: function (error) {
 							console.error("Error returning order:", error);
@@ -1070,7 +1070,7 @@
 						deleteAllButton.disabled = true;
 						
 						// Redirect to the order list page
-						window.location.href = "/list_orders/";
+						window.location.href = "/list_orders2/";
 					},
 					error: function (error) {
 						console.error("Error deleting orders:", error);
@@ -1129,7 +1129,7 @@
 
         cancelButton.addEventListener('click', () => {
             orderFormPopup.style.display = 'none';
-			window.location.href = "/list_orders/";
+			window.location.href = "/list_orders2/";
         });
 
 
@@ -1186,7 +1186,7 @@
                 success: function (data) {
                     // Handle success (e.g., show a success message)
                     console.log(data.message);
-					window.location.href = "/list_orders/"; // Replace with the correct URL
+					window.location.href = "/list_orders2/"; // Replace with the correct URL
                 },
                 error: function (error) {
                     // Handle errors (e.g., display an error message)

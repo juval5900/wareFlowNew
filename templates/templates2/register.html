@@ -1,0 +1,205 @@
+{% load static %}
+<html>
+<head>
+    <link rel="stylesheet" href="{% static 'static2/css/register.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+       
+     <title>Register</title>
+</head>
+<body>
+    <nav class="Logo">
+        <div class="container">
+            <img id="logoimg" src="{% static 'static2/images/logoecohive.png' %}">
+        </div>
+    </nav>
+        <div class="signup">
+                <div id="signuptext">
+                    <p id="signuptext1">SIGN UP</p>
+                 
+                    <h2 id="signuptext3">Naturally You</h2>
+                </div>
+                <form class="signup-form" method="POST">
+                    {% csrf_token %}
+                    <input type="text" class="signupelement" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" placeholder="User Name" required><br>
+                    <span id="nameError" style="font-size: small;" class="element"></span><br>
+                    <input type="email" class="signupelement" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" placeholder="Email" required><br>
+                    <span id="emailError" style="font-size: small;" class="element"></span><br>
+                    <input type="password" class="signupelement" name="{{ form.password1.name }}" id="{{ form.password1.id_for_label }}" placeholder="Password" required><br>
+                    <span id="passwordError" style="font-size: small;" class="element"></span><br>
+                    <input type="password" class="signupelement" name="{{ form.password2.name }}" id="{{ form.password2.id_for_label }}" placeholder="Confirm Password" required><br>
+                    <span id="cpasswordError" style="font-size: small;" class="element"></span><br><br>
+                    {% comment %} <input type="checkbox"  name="{{ form.is_customer.name }}" id="{{ form.is_customer.id_for_label }}" {{ form.is_customer.checked }}><span class="caption">Customer</span><br><br>
+                    <input type="checkbox"  name="{{ form.is_seller.name }}" id="{{ form.is_seller.id_for_label }}" {{ form.is_seller.checked }}><span class="caption">Seller</span><br><br> {% endcomment %}
+                    <input type="radio" name="{{ form.is_customer.name }}" id="{{ form.is_customer.id_for_label }}" value="customer" {{ form.is_customer.checked }}>
+                    <label for="{{ form.is_customer.id_for_label }}" class="caption">Customer</label><br><br>
+                    <input type="radio" name="{{ form.is_seller.name }}" id="{{ form.is_seller.id_for_label }}" value="seller" {{ form.is_seller.checked }}>
+                    <label for="{{ form.is_seller.id_for_label }}" class="caption">Seller</label><br><br>
+                    <span id="radio-validation" style="color: red;"></span>
+                    <span class="text-error">{{ form.errors }}</span>
+                    
+                    <div class="icon-container">
+                        <a href="#"><span id="icon" class="fab fa-google" style="color: red"></span></a>
+                        <a href="#"><span id="icon" class="fab fa-facebook" style="color: blue"></span></a>
+                        <a href="#"><span id="icon" class="fab fa-twitter" style="color: #1DA1F2"></span></a>
+                    </div>
+                    <button id="submitButton" class="signupbtn" type="submit">Register</button>
+                   
+                    <p id="signupelement2">Already have an account? <a href="login.html" style="color: #27350F; text-decoration: none">Sign in</a></p>
+                </form>
+                <div class="signupimg">
+                    <img id="img1" src="{% static 'static2/images/background1.png' %}">
+                </div>               
+        </div>
+        <script>
+            $(document).ready(function() {
+                // Select the form fields by their IDs
+                // Select the form fields by their IDs
+                var emailInput = $('#{{ form.email.id_for_label }}');
+                var usernameInput = $('#{{ form.username.id_for_label }}');
+                var passwordInput = $('#{{ form.password1.id_for_label }}');
+                var confirmPasswordInput = $('#{{ form.password2.id_for_label }}');
+                
+                // Select the error elements
+                var emailError = $('#emailError');
+                var usernameError = $('#nameError');
+                var passwordError = $('#passwordError');
+                var confirmPasswordError = $('#cpasswordError');
+                
+                // Select the radio buttons and error message span
+                const customerRadio = document.getElementById("{{ form.is_customer.id_for_label }}");
+                const sellerRadio = document.getElementById("{{ form.is_seller.id_for_label }}");
+                const radioValidation = document.getElementById("radio-validation");
+                
+                // Attach input event handlers to each field for real-time validation
+                emailInput.on('input', function() {
+                    validateField(emailInput, emailError, validateEmail);
+                });
+        
+                usernameInput.on('input', function() {
+                    validateField(usernameInput, usernameError, validateName);
+                });
+        
+                passwordInput.on('input', function() {
+                    validateField(passwordInput, passwordError, validatePassword);
+                    validateField(confirmPasswordInput, confirmPasswordError, validateConfirmPassword);
+                });
+        
+                confirmPasswordInput.on('input', function() {
+                    validateField(confirmPasswordInput, confirmPasswordError, validateConfirmPassword);
+                });
+        
+                // Validation functions
+                function validateField(input, errorElement, validationFunction) {
+                    var errorMessage = validationFunction(input.val());
+                    errorElement.text(errorMessage);
+                }
+        
+                function validateEmail(email) {
+                    var pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                    if (!pattern.test(email)) {
+                        return "Invalid email";
+                    }
+                    return "";
+                }
+        
+                function validateName(name) {
+                    var pattern = /^[A-Za-z0-9]+$/; // Only letters and numbers are allowed
+                    if (!pattern.test(name)) {
+                        return "Invalid name: Please use only letters and numbers.";
+                    }
+                    return "";
+                }
+        
+                function validatePassword(password) {
+                    var pattern = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{8,}$/;
+                    if (!pattern.test(password)) {
+                        if (password.length < 8) {
+                            return "At least 8 characters";
+                        }
+                        if (!/[0-9]/.test(password)) {
+                            return "At least 1 number";
+                        }
+                        if (!/[!@#$%^&*]/.test(password)) {
+                            return "At least 1 symbol (!@#$%^&*)";
+                        }
+                        if (!/[A-Z]/.test(password)) {
+                            return "At least 1 capital letter";
+                        }
+                        return "Invalid password";
+                    }
+                    return "";
+                }
+        
+                function validateConfirmPassword(confirmPassword) {
+                    var password = $('#{{ form.password1.id_for_label }}').val(); // Get the password from the password field
+                    if (confirmPassword !== password) {
+                        return "Passwords do not match";
+                    }
+                    return "";
+                }
+                customerRadio.addEventListener("change", function () {
+                    sellerRadio.checked = !customerRadio.checked;
+                    radioValidation.textContent = "";
+                });
+            
+                sellerRadio.addEventListener("change", function () {
+                    customerRadio.checked = !sellerRadio.checked;
+                    radioValidation.textContent = "";
+                });
+            
+                document.querySelector("form").addEventListener("submit", function (event) {
+                    if (!customerRadio.checked && !sellerRadio.checked) {
+                        radioValidation.textContent = "Please select either Customer or Seller.";
+                        event.preventDefault(); // Prevent form submission
+                    }
+                });
+                // Prevent form submission if any field has an error
+                $('form').on('submit', function(event) {
+                    var errorMessages = [
+                        emailError.text(),
+                        usernameError.text(),
+                        passwordError.text(),
+                        confirmPasswordError.text(),
+                        
+                    ];
+                    
+                    if (errorMessages.some(message => message.trim() !== "")) {
+                        event.preventDefault(); // Prevent form submission
+                    }
+                });
+        
+                $(document).ready(function() {
+                    const emailInput = $('#{{ form.email.id_for_label }}');
+                    const usernameInput = $('#{{ form.username.id_for_label }}');
+                    const emailError = $('#emailError');
+                    const usernameError = $('#nameError');
+                    
+                    emailInput.on('input', function() {
+                        const enteredEmail = $(this).val();
+                        $.get('/check_email/', { email: enteredEmail }, function(data) {
+                            if (enteredEmail && data.exists) {
+                                emailError.text('Email already taken');
+                            } else {
+                                validateField(emailInput, emailError, validateEmail);
+                            }
+                        });
+                    });
+                    
+                    usernameInput.on('input', function() {
+                        const enteredUsername = $(this).val();
+                        $.get('/check_username/', { username: enteredUsername }, function(data) {
+                            if (enteredUsername && data.exists) {
+                                usernameError.text('Username already taken');
+                            } else {
+                                validateField(usernameInput, usernameError, validateName);
+                            }
+                        });
+                    });
+                });
+            });
+        </script>        
+</body>
+</html>

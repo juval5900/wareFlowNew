@@ -1,0 +1,344 @@
+{% extends 'admindash/base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/css/bootstrap.min.css">
+<!-- Add Bootstrap JavaScript (CDN) and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.5.2/dist/css/bootstrap.min.css">
+        <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Include Bootstrap JS (Popper.js is required for some Bootstrap functionality) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title fw-semibold mb-4">Registered Users</h5>
+      <label for="role-filter" class="filter-label">Filter by Role:</label>
+      <select id="role-filter" class="filter-select">
+          <option value="all">All</option>
+          <option value="admin">Superuser</option>
+          <option value="seller">Seller</option>
+          <option value="legaladvisor">Legal Advisor</option>
+          <option value="customer">Customer</option>
+      </select>
+      <br>
+      <br>
+      <!-- Search form -->
+      <form id="user-search-form" class="search-form">
+        <label for="username" class="search-label">Search by Username:</label>
+        <input type="text" id="username" name="username" class="search-input">
+        <button type="submit" class="search-button">Search</button>
+      </form>
+      <br>
+      <br>
+      <p id="no-user-message" style="display: none;">No such user</p>
+      <div class="table-responsive">
+        <table class="table table-striped user-list custom-table">
+          <thead>
+              <tr>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Action</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for user in users %}
+              {% if not user.is_superuser %}
+                  <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                      {% if user.is_seller %}
+                      Seller
+                      {% elif user.is_legaladvisor %}
+                        Legal Advisor
+                      {% else %}
+                        Customer
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if user.is_active %}
+                          <span class="badge bg-success">Active</span>
+                      {% else %}
+                          <span class="badge bg-danger">Inactive</span>
+                      {% endif %}
+                  </td>
+                        <form method="post" action="{% url 'user_status_toggle' user.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
+                            <td>
+                              <form method="post" action="{% url 'user_status_toggle' user.id %}">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="action" value="{% if user.is_active %}deactivate{% else %}activate{% endif %}">
+                                  <button type="submit" class="btn {% if user.is_active %}btn-danger{% else %}btn-success{% endif %}">
+                                      {% if user.is_active %}
+                                      Inactive
+                                      {% else %}
+                                          Activate
+                                      {% endif %}
+                                  </button>
+                              </form>     
+                        </form>
+                    </td>
+                  </tr>
+                  {% endif %}
+              {% endfor %}
+          </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  /* Customize styles here */
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f8f8;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .card {
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .filter-label {
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 10px;
+    color: #333; /* Text color */
+  }
+
+  .filter-select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #f7f7f7;
+    color: #333; /* Text color */
+  }
+
+  .filter-select::after {
+    content: "\25BC";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    pointer-events: none;
+  }
+
+  .filter-select:hover {
+    border-color: #007bff;
+  }
+
+  .filter-select:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+
+  .search-label {
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 10px;
+    color: #333; /* Text color */
+  }
+
+  .search-input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #f7f7f7;
+    color: #333; /* Text color */
+    width: 200px;
+  }
+
+  .search-button {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .search-button:hover {
+    background-color: #0056b3;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+
+/* Custom table styles with a new color */
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #f5f5f5; /* Change the background color to your preferred color */
+}
+
+.custom-table th,
+.custom-table td {
+  padding: 12px 15px;
+  text-align: left;
+  color: #333; /* Text color */
+}
+
+.custom-table th {
+  background-color: blue; /* Change this color for the header */
+  color: #fff;
+}
+
+.custom-table tr:nth-child(even) {
+  background-color: #fff; /* Alternate row background color */
+}
+
+.custom-table tr:hover {
+  background-color: #ddd;
+}
+
+.custom-table .btn-primary {
+  background-color: #FF5733; /* Change this color for buttons */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-table .btn-primary:hover {
+  background-color: #FFA07A; /* Change this color on hover for buttons */
+}
+/* Style for the modal backdrop */
+.modal-backdrop {
+  opacity: 0.7 !important; /* Adjust the opacity as needed */
+}
+
+/* Style for the modal content */
+.modal-content {
+  border-radius: 10px;
+}
+
+/* Style for the modal header */
+.modal-header {
+  background-color: #007bff; /* Header background color */
+  color: #fff; /* Header text color */
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+/* Style for the modal title */
+.modal-title {
+  font-size: 24px;
+}
+
+.close:hover {
+  opacity: 0.8; /* Reduce opacity on hover */
+}
+
+/* Style for the modal body */
+.modal-body {
+  padding: 20px;
+}
+
+/* Style for the form elements */
+.form-group label {
+  font-weight: bold;
+}
+
+/* Style for the role select input */
+#role {
+  width: 100%;
+}
+
+/* Style for the status radio buttons */
+.form-check-label {
+  margin-left: 10px;
+}
+
+/* Style for the save button */
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+.close {
+  color: #007bff; /* Close button color */
+  font-size: 24px;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close:hover {
+  color: #0056b3; /* Darker shade on hover */
+}
+    /* Style for the "activate" text when the user is active (green) */
+    .activate {
+      color: green;
+  }
+
+  /* Style for the "deactivate" text when the user is not active (red) */
+  .deactivate {
+      color: red;
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.querySelector('#username');
+    const roleFilter = document.querySelector('#role-filter');
+    const rows = document.querySelectorAll('.user-list tbody tr');
+    const noUserMessage = document.querySelector('#no-user-message');
+
+    input.addEventListener('input', filterUsers);
+    roleFilter.addEventListener('change', filterUsers);
+
+    function filterUsers() {
+        const searchTerm = input.value.toLowerCase();
+        const selectedRole = roleFilter.value;
+        let found = false; // Flag to track if a matching user is found
+
+        rows.forEach(function (row) {
+            const username = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const role = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+
+            // Check if the user matches the selected role (or if all roles are selected)
+            if ((selectedRole === 'all' || role.includes(selectedRole)) &&
+                (searchTerm.length === 0 || username.includes(searchTerm))) {
+                row.style.display = 'table-row';
+                found = true; // Matching user found
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Show/hide "No such user" message
+        if (found) {
+            noUserMessage.style.display = 'none';
+        } else {
+            noUserMessage.style.display = 'block';
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -9,4 +9,5 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('', include('ADMINAPP.urls')),
     path('', include('controllerapp.urls')),
+    path('', include('ecohiveapp.urls')),
 ]

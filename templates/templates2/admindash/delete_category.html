@@ -1,0 +1,68 @@
+{% extends 'admindash/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-body">
+        <h5 class="fw-semibold">Delete Category</h5>
+        <style>
+            /* Customize styles here */
+            body {
+                font-family: Arial, sans-serif;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            .btn-danger {
+                margin-right: 10px;
+            }
+            .product-list {
+                list-style: none;
+                padding: 0;
+            }
+            .product-list li {
+                margin-bottom: 10px;
+                font-size: 16px; /* Adjust font size */
+                font-weight: bold; /* Add font weight */
+                color: #333; /* Change text color */
+            }
+            .confirmation-message {
+                font-size: 14px; /* Adjust font size */
+                color: #777; /* Change text color */
+            }
+        </style>
+        <div class="container mt-4">
+            <h5 class="fw-bold">Confirm Category Deletion</h5>
+            <p>Are you sure you want to delete the category "{{ category.category_name }}"?</p>
+            {% if associated_products %}
+                <p class="confirmation-message">The following products are associated with this category:</p>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Seller Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in associated_products %}
+                            <tr>
+                                <td>{{ product.product_name }}</td>
+                                <td>{{ product.seller.user.username }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <p class="confirmation-message">Deleting this category will also delete these associated products. Proceed with caution.</p>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                <a href="{% url 'viewcategory' %}" class="btn btn-primary btn-sm">Cancel</a>
+            </form>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

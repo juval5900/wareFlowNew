@@ -13,6 +13,7 @@
 		<script defer src="{% static 'assets/plugins/fontawesome/js/all.min.js' %}"></script>
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 		<!-- App CSS -->
 		<link id="theme-style" rel="stylesheet"
 			href="{% static 'assets/css/portal.css' %}">
@@ -446,6 +447,8 @@
 						<nav class="app-nav app-nav-footer">
 							<ul class="app-menu footer-menu list-unstyled">
 							
+
+								<div class="alan-btn"></div>
 								<li class="nav-item">
 									<a class="nav-link" href={% url 'loggout' %}>
 										<span class="nav-icon">
@@ -683,6 +686,19 @@
 			</div><!--//app-content-->
 		</div><!--//app-wrapper-->
 
+		<script type="text/javascript"
+ src="https://studio.alan.app/web/lib/alan_lib.min.js"></script>
+<script>
+  var alanBtnInstance = alanBtn({
+    key: "5cd0bde7ee931969e5c99c3db1f81e102e956eca572e1d8b807a3e2338fdd0dc/stage",
+    onCommand: function (commandData) {
+      if (commandData.command === "go:back") {
+        //call client code that will react on the received command
+      }
+    },
+    rootEl: document.getElementById("alan-btn"),
+  });
+</script>
 
 		<script>
 			$(document).ready(function () {

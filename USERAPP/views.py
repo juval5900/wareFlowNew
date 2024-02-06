@@ -214,22 +214,27 @@ def check_username(request):
 
 
 
-
+@login_required
 def notifications(request):
     return render(request, 'notifications.html')
 
+@login_required
 def error(request):
     return render(request, '404.html')
 
+@login_required
 def account(request):
     return render(request, 'account.html')
 
+@login_required
 def charts(request):
     return render(request, 'charts.html')
 
+@login_required
 def docs(request):
     return render(request, 'docs.html')
 
+@login_required
 def help(request):
     return render(request, 'help.html')
 

@@ -42,6 +42,9 @@ class Subtype(models.Model):
     def __str__(self):
         return self.subtype_name
 
+from django.db import models
+from django.utils import timezone
+
 class Product(models.Model):
     product_id = models.AutoField(primary_key=True)
     product_name = models.CharField(max_length=255)
@@ -54,6 +57,7 @@ class Product(models.Model):
     quantity = models.PositiveIntegerField()
     threshold_value = models.PositiveIntegerField()
     product_image = models.ImageField(upload_to='product_images/')
+    product_price = models.DecimalField(default=499, max_digits=10, decimal_places=2)  # Default product price
     is_active = models.BooleanField(default=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
 
@@ -69,6 +73,7 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_name
+
     
    
 class Supplier(models.Model):
@@ -129,7 +134,7 @@ class Orders(models.Model):
         return str(self.order_id)
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True, related_name='user_profile')
     country = models.CharField(max_length=15, blank=True, null=True)
     district = models.CharField(max_length=15, blank=True, null=True)
     addressline1 = models.CharField(max_length=15, blank=True, null=True)

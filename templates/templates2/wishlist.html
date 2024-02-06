@@ -1,0 +1,79 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block content%}
+    <!-- END nav -->
+
+    <div class="hero-wrap hero-bread" style="background-image: url('images/bg_1.jpg');">
+      <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center">
+          <div class="col-md-9 ftco-animate text-center">
+          	<p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home</a></span> <span>Wishlist</span></p>
+            <h1 class="mb-0 bread">My Wishlist</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="ftco-section ftco-cart">
+			<div class="container">
+				<div class="row">
+    			<div class="col-md-12 ftco-animate">
+    				<div class="cart-list">
+	    				<table class="table">
+						    <thead class="thead-primary">
+								<tr class="text-center">
+									<th>Product</th>
+									<th>Scientific Name</th>
+									<th>Category</th>
+									<th>Remove from Wishlist</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for wishlist_item in wishlist_items %}
+								<tr class="cards text-center">
+									<td href="{% url 'product_single' wishlist_item.product.id %}">
+									<div class="product-info">
+									   <a href="{% url 'product_single' wishlist_item.product.id %}"> <img src="{{ wishlist_item.product.product_image.url }}" alt="{{ wishlist_item.product.product_name }}" class="img-fluid" style="height:100px;"></a>  
+										<p>{{ wishlist_item.product.product_name }}<p>
+									</div>
+									</td>
+									<td>
+										<div class="product-info">
+											<p>{{ wishlist_item.product.product_sci_name }}<p>
+										</div>
+									</td>
+									<td>
+										{% if wishlist_item.product.total_stock > 0 %}
+										<div class="product-info">
+											<p>{{ wishlist_item.product.total_stock }}<p>
+										</div>
+										{% else %}
+										<div class="product-info">
+											<p style="color:red;">OUT OF STOCK<p>
+										</div>
+										{% endif %}
+										
+									</td>
+									<td class="remove-from-wishlist">
+										<form action="{% url 'remove_from_wishlist' wishlist_item.id %}" method="post">
+											{% csrf_token %}
+											<button class="remove-button btn btn-dark rounded-pill py-2 px-4 m-2"  type="submit"><i class="fas fa-trash-alt" style="margin-right:10px;"></i>Remove</button>
+											
+										</form>
+									</td>
+								</tr><!-- END TR-->
+								{% endfor %}
+								<!-- Repeat this row for each item in the cart -->
+							</tbody>
+						  </table>
+						  <div class="cart-summary">
+							<p>Items in wishlist : <span style="color:green;">{{ total_items }}</span></p>
+							<a class="remove-button btn btn-dark rounded-pill py-2 px-4 m-2" href="{% url 'remove_all_from_wishlist' %}"><i class="fas fa-trash-alt" style="margin-right:10px;"></i>Remove all</a>
+						</div>
+					  </div>
+    			</div>
+    		</div>
+			</div>
+		</section>
+
+		{%endblock%}

@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    'ecohiveapp.apps.EcohiveappConfig',
     'django.contrib.sites', # must
     'allauth',
     'allauth.account',

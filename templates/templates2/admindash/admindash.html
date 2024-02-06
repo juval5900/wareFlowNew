@@ -1,0 +1,108 @@
+{% extends 'admindash/base.html' %}
+{% load static %}
+{%block content%}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+      <div class="container-fluid">
+        <!--  Row 1 -->
+        <div class="row">
+          <div class="col-lg-8 d-flex align-items-strech">
+            <div class="card w-100">
+              <div class="mt-4">
+                <canvas id="orderChart"></canvas>
+            </div>
+            <script>
+                var ctx = document.getElementById('orderChart').getContext('2d');
+                var order_labels = {{ order_labels|safe }};
+                var order_data = {{ order_data|safe }};
+      
+                var orderChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: order_labels,
+                        datasets: [{
+                            label: 'Total Orders',
+                            data: order_data,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stepSize: 1
+                            }
+                        }
+                    }
+                });
+            </script>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="row">
+              <div class="col-lg-12">
+                <!-- Yearly Breakup -->
+                <div class="card overflow-hidden">
+                  <div class="card-body p-4">
+                    <h5 class="card-title mb-9 fw-semibold">Yearly Breakup</h5>
+                    <div class="row align-items-center">
+                      <div class="col-8">
+                        <h4 class="fw-semibold mb-3">$36,358</h4>
+                        <div class="d-flex align-items-center mb-3">
+                          <span
+                            class="me-1 rounded-circle bg-light-success round-20 d-flex align-items-center justify-content-center">
+                            <i class="ti ti-arrow-up-left text-success"></i>
+                          </span>
+                          <p class="text-dark me-1 fs-3 mb-0">+9%</p>
+                          <p class="fs-3 mb-0">last year</p>
+                        </div>
+                        <div class="d-flex align-items-center">
+                          <div class="me-4">
+                            <span class="round-8 bg-primary rounded-circle me-2 d-inline-block"></span>
+                            <span class="fs-2">2023</span>
+                          </div>
+                          <div>
+                            <span class="round-8 bg-light-primary rounded-circle me-2 d-inline-block"></span>
+                            <span class="fs-2">2023</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="d-flex justify-content-center">
+                          <div id="breakup"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-body">
+                  <div class="row align-items-start">
+                    <div class="col-8">
+                      <h5 class="card-title mb-4 fw-semibold">Website Summary</h5>
+
+                      </div>
+                      <!-- Display the total number of users, products, and certified users -->
+                      <div class="mt-4">
+                        <p>Total Number of Users: {{ total_users }}</p>
+                        <p>Total Number of Products Added: {{ total_products }}</p>
+                        <p>Total Number of Certified Users: {{ total_certified_users }}</p>
+                        <p>Total Number of Orders: {{ total_orders }}</p> <!-- Add this line -->
+                      </div>
+                    </div>
+                  </div>
+                    <div class="col-4">
+                    </div>
+                  </div>
+                </div>
+              </div>              
+            </div>
+          </div>
+        </div>
+      </div>
+{%endblock%}
+    

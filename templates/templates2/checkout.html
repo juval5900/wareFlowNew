@@ -1,0 +1,230 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block content%}
+    <!-- END nav -->
+<style>
+    .error{
+        color:red;
+    }
+</style>
+    <div class="hero-wrap hero-bread" style="background-image:url({% static 'static2/images/bg_1.jpg' %});">
+      <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center">
+          <div class="col-md-9 ftco-animate text-center">
+          	<p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home</a></span> <span>Order Details</span></p>
+            <h1 class="mb-0 bread">Checkout</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+	<!-- Add this code to display cart details in checkout.html -->
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 ftco-animate">
+                  <form method="post" class="billing-form" onsubmit="return validateForm()">
+                    {% csrf_token %}
+                    <h3 class="mb-4 billing-heading">Billing Details</h3>
+                    <div class="row align-items-end">
+                        <!-- First Name -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="firstname">First Name</label>
+                                <input type="text" id="firstname" name="firstname" placeholder="First Name" class="form-control" value="{{ billing_details.first_name }}">
+                                <span id="firstnameError" class="error"></span>
+                            </div>
+                        </div>
+                        <!-- Last Name -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="lastname">Last Name</label>
+                                <input type="text" id="lastname" name="lastname" placeholder="Last Name" class="form-control" value="{{ billing_details.last_name }}">
+                                <span id="lastnameError" class="error"></span>
+                            </div>
+                        </div>
+                        <!-- State -->
+                        <div class="w-100"></div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="state">State</label>
+                                <div class="select-wrap">
+                                    <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                                    <select id="state" name="state" value="{{ billing_details.state }}" class="form-control">
+                                      <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                                      <option value="Kochi">Kochi</option>
+                                      <option value="Kozhikode">Kozhikode</option>
+                                      <option value="Thrissur">Thrissur</option>
+                                      <option value="Kollam">Kollam</option>
+                                      <option value="Alappuzha">Alappuzha</option>
+                                      <option value="Palakkad">Palakkad</option>
+                                      <option value="Kannur">Kannur</option>
+                                      <option value="Kottayam">Kottayam</option>
+                                      <option value="Malappuram">Malappuram</option>
+                                      <option value="Pathanamthitta">Pathanamthitta</option>
+                                      <option value="Idukki">Idukki</option>
+                                      <option value="Wayanad">Wayanad</option>
+                                        <!-- Add more options for other cities/states -->
+                                    </select>
+                                </div>
+                                <span id="stateError" class="error"></span>
+                            </div>
+                        </div>
+                        <!-- Street Address -->
+                        <div class="w-100"></div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="streetaddress">Street Address</label>
+                                <input type="text" id="streetaddress" name="streetaddress" class="form-control" placeholder="House number and street name" value="{{ billing_details.street_address }}">
+                                <span id="streetaddressError" class="error"></span>
+                            </div>
+                        </div>
+                        <!-- Apartment, Suite, Unit (optional) -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="apartmentsuiteunit">Apartment, Suite, Unit (optional)</label>
+                                <input type="text" id="apartmentsuiteunit" name="apartmentsuiteunit" class="form-control" placeholder="Apartment, suite, unit, etc. (optional)" value="{{ billing_details.apartment_suite_unit }}">
+                            </div>
+                        </div>
+                        <!-- Town / City -->
+                        <div class="w-100"></div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="towncity">Town / City</label>
+                                <input type="text" id="towncity" name="towncity" class="form-control" placeholder="Town or City" value="{{ billing_details.town_city }}">
+                                <span id="towncityError" class="error"></span>
+                            </div>
+                        </div>
+                        <!-- Postcode / ZIP -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="postcodezip">Postcode / ZIP *</label>
+                                <input type="text" id="postcodezip" name="postcodezip" class="form-control" placeholder="Postcode or ZIP" value="{{ billing_details.postcode_zip }}">
+                                <span id="postcodezipError" class="error"></span>
+
+                            </div>
+                        </div>
+                        <!-- Phone -->
+                        <div class="w-100"></div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="text" id="phone" name="phone" class="form-control" placeholder="Phone" value="{{ billing_details.phone }}">
+                                <span id="phoneError" class="error"></span>
+
+                            </div>
+                        </div>
+                        <!-- Email Address -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="emailaddress">Email Address</label>
+                                <input type="text" id="emailaddress" name="emailaddress" class="form-control" placeholder="Email Address" value="{{ billing_details.email }}">
+                                <span id="emailaddressError" class="error"></span>
+                            </div>
+                        </div>
+                        <div class="w-100"></div>
+                    </div>
+                    <p><button type="submit" class="btn btn-primary py-3 px-4" name="place_order">Proceed to Payment</button></p>
+                </form>
+                <script>
+                    function validateForm() {
+                        var valid = true;
+                        var firstname = document.getElementById('firstname').value;
+                        var lastname = document.getElementById('lastname').value;
+                        var state = document.getElementById('state').value;
+                        var streetaddress = document.getElementById('streetaddress').value;
+                        var towncity = document.getElementById('towncity').value;
+                        var postcodezip = document.getElementById('postcodezip').value;
+                        var phone = document.getElementById('phone').value;
+                        var emailaddress = document.getElementById('emailaddress').value;
+                        
+                        var nameRegex = /^[A-Za-z\s]+$/;
+                        var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+                
+                        if (!nameRegex.test(firstname)) {
+                            valid = false;
+                            document.getElementById('firstnameError').textContent = "Please enter a valid first name.";
+                        } else {
+                            document.getElementById('firstnameError').textContent = "";
+                        }
+                
+                        if (!nameRegex.test(lastname)) {
+                            valid = false;
+                            document.getElementById('lastnameError').textContent = "Please enter a valid last name.";
+                        } else {
+                            document.getElementById('lastnameError').textContent = "";
+                        }
+                
+                        if (state === "") {
+                            valid = false;
+                            document.getElementById('stateError').textContent = "Please select a state.";
+                        } else {
+                            document.getElementById('stateError').textContent = "";
+                        }
+                
+                        if (streetaddress === "") {
+                            valid = false;
+                            document.getElementById('streetaddressError').textContent = "Please enter a street address.";
+                        } else {
+                            document.getElementById('streetaddressError').textContent = "";
+                        }
+                        if (postcodezip === "") {
+                            valid = false;
+                            document.getElementById('postcodezipError').textContent = "Please enter a Postal Code.";
+                        } else {
+                            document.getElementById('postcodezipError').textContent = "";
+                        }
+                        if (phone === "") {
+                            valid = false;
+                            document.getElementById('phoneError').textContent = "Please enter a Phone Number.";
+                        } else {
+                            document.getElementById('phoneError').textContent = "";
+                        }
+                        // Add similar validation for other fields
+                
+                        if (!emailRegex.test(emailaddress)) {
+                            valid = false;
+                            document.getElementById('emailaddressError').textContent = "Please enter a valid email address.";
+                        } else {
+                            document.getElementById('emailaddressError').textContent = "";
+                        }
+                
+                        return valid;
+                    }
+                </script>
+                    <!-- END -->
+                </div>
+                <div class="col-xl-5">
+                    <div class="row mt-5 pt-3">
+                        <div class="col-md-12 d-flex mb-5">
+                            <div class="cart-detail cart-total p-3 p-md-4">
+                                <h3 class="billing-heading mb-4">Cart Total</h3>
+                                <p class="d-flex">
+                                    <span>Subtotal</span>
+                                    <!-- Use the correct variable name 'total_price' to render the total amount -->
+                                    <span>RS {{ total_price|floatformat:2 }}</span>
+                                </p>
+                                <p class="d-flex">
+                                    <span>Delivery</span>
+                                    <span>RS 0.00</span> <!-- Replace with your delivery amount if applicable -->
+                                </p>
+                                <p class="d-flex">
+                                    <span>Discount</span>
+                                    <span>RS 0.00</span> <!-- Replace with your discount amount if applicable -->
+                                </p>
+                                <hr>
+                                <p class="d-flex total-price">
+                                    <span>Total</span>
+                                    <!-- Use the correct variable name 'total_price' to render the total amount -->
+                                    <span>RS {{ total_price|floatformat:2 }}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <!-- Payment Method Section (No changes needed) -->
+                        </div>
+                    </div>
+                </div> <!-- .col-md-8 -->
+            </div>
+        </div>
+    </section> <!-- .section -->
+    {%endblock%}

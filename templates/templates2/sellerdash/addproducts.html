@@ -1,0 +1,154 @@
+{%extends 'sellerdash/base.html'%}
+{% load static %}
+{%block content%}
+      <div class="container-fluid">
+        <div class="card swing">
+          <div class="card-body">
+            {% if error_message %}
+            <div class="alert alert-danger">
+                {{ error_message }}
+            </div>
+            {% endif %}
+            <h5 class="card-title fw-semibold mb-4">Add Products</h5>
+            {% if certification_status == 'approved' %}
+            
+            <form method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <div class="form-group mb-3" style="margin-top: 30px;">
+                    <label for="product_name">Product Name:</label>
+                    <input type="text" id="product_name" name="product_name" class="form-control" oninput="validateProductName()" >
+                    <span id="product_name_error" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3" style="margin-top: 10px;">
+                    <label for="product_description">Product Description:</label>
+                    <textarea id="product_description" name="product_description" class="form-control" rows="4" oninput="validateProductDescription()"></textarea>
+                    <span id="product_description_error" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3" style="margin-top: 10px;">
+                    <label for="product_price">Product Price:</label>     
+                    <input type="text" id="product_price" name="product_price" class="form-control" oninput="validateProductPrice()">
+                    <span id="product_price_error" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3" style="margin-top: 10px;">
+                    <label for="product_stock">Enter Stock(in KG):</label>     
+                    <input type="text" id="product_stock" name="product_stock" class="form-control" oninput="validateProductstock()">
+                    <span id="product_stock_error" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3" style="margin-top: 10px;">
+                    <label for="select_category">Select Category:</label>
+                    <select id="select_category" name="select_category" class="form-control" required>
+                        <option value="">Select Category</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.category_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <span id="select_category_error" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3" style="margin-top: 10px;">
+                    <label for="product_image">Category Image:</label>
+                    <input type="file" accept=".img,.jpg,.png/*" id="product_image" name="product_image" accept="image/*" oninput="validateProductImage()">
+                    <span id="product_image_error" class="text-danger"></span>
+                </div>
+                <input type="hidden" name="product_form" value="1">
+                <button type="submit" style="margin-top: 30px;" class="btn btn-primary pulse" id="add-product-button">Add Product</button>
+            </form>    
+          {% elif certification_status == 'pending' %}
+          <p class="certification-message">You need an approved certification to add products.</p>
+          {% elif certification_status == 'rejected' %}
+              <p class="certification-message">Your certification application has been rejected.</p>
+          {% else %}
+          <p><a href="{% url 'addproducts' %}" class="btn btn-danger">Go Back</a></p>
+          {% endif %}
+           
+          </div>
+        </div>
+      </div>
+      <script>
+        function validateProductName() {
+            const productNameInput = document.getElementById('product_name');
+            const productNameError = document.getElementById('product_name_error');
+            const productNameValue = productNameInput.value.trim(); // Removes leading and trailing spaces
+        
+            // Remove spaces from the input value
+            const productNameWithoutSpaces = productNameValue.replace(/\s+/g, '');
+        
+            if (!/^[A-Za-z]+$/.test(productNameWithoutSpaces)) {
+                productNameError.textContent = 'Product Name should contain only alphabetic characters.';
+            } else {
+                productNameError.textContent = '';
+            } 
+        
+            // Set the input field value to the one without spaces
+            productNameInput.value = productNameWithoutSpaces;
+        }
+        
+    
+        function validateProductDescription() {
+            const productDescriptionInput = document.getElementById('product_description');
+            const productDescriptionError = document.getElementById('product_description_error');
+            const productDescriptionValue = productDescriptionInput.value.trim();
+    
+            if (productDescriptionValue === '') {
+                productDescriptionError.textContent = 'Product Description is required.';
+            } else {
+                productDescriptionError.textContent = '';
+            }
+        }
+    
+        function validateProductPrice() {
+            const productPriceInput = document.getElementById('product_price');
+            const productPriceError = document.getElementById('product_price_error');
+            const productPriceValue = productPriceInput.value.trim();
+    
+            if (isNaN(productPriceValue)) {
+                productPriceError.textContent = 'Product Price should be a numeric value.';
+            } else {
+                productPriceError.textContent = '';
+            }
+        }
+    
+        function validateProductStock() {
+            const productStockInput = document.getElementById('product_stock');
+            const productStockError = document.getElementById('product_stock_error');
+            const productStockValue = productStockInput.value.trim();
+            
+            if (isNaN(productStockValue)) {
+                productStockError.textContent = 'Stock (in KG) should be a numeric value.';
+            } else if (parseFloat(productStockValue) < 1) {
+                productStockError.textContent = 'Stock must be atleast 1 KG';
+            } else {
+                productStockError.textContent = '';
+            }
+        }
+        
+        function validateProductImage() {
+            const productImageInput = document.getElementById('product_image');
+            const productImageError = document.getElementById('product_image_error');
+            const productImageValue = productImageInput.value.trim();
+    
+            if (productImageValue === '') {
+                productImageError.textContent = 'Product Image is required.';
+            } else {
+                productImageError.textContent = '';
+            }
+        }
+    
+        function validateForm() {
+            validateProductName();
+            validateProductDescription();
+            validateProductPrice();
+            validateProductStock();
+            validateProductImage();
+    
+            // Check if there are any validation errors
+            const errorElements = document.querySelectorAll('.text-danger');
+            for (const errorElement of errorElements) {
+                if (errorElement.textContent !== '') {
+                    return false; // Prevent form submission if there are validation errors
+                }
+            }
+    
+            return true; // Submit the form if there are no validation errors
+        }
+    </script>
+      {%endblock%}

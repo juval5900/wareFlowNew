@@ -1,286 +1,455 @@
-{% load static  %}
-
+{% load static %}
 <!DOCTYPE html>
-<html lang="en"> 
-<head>
+<html lang="en">
+  <head>
     <title>WAREFLOW</title>
-    
-    <!-- Meta -->
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
-    <!-- FontAwesome JS-->
-	<script defer src="{% static 'assets/plugins/fontawesome/js/all.min.js' %}"></script>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,400i,700,700i&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Amatic+SC:400,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'static2/css/open-iconic-bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'static2/css/animate.css' %}">
+    
+    <link rel="stylesheet" href="{% static 'static2/css/owl.carousel.min.css' %}">
+    <link rel="stylesheet" href="{% static 'static2/css/owl.theme.default.min.css' %}">
+    <link rel="stylesheet" href="{% static 'static2/css/magnific-popup.css' %}">
+
+    <link rel="stylesheet" href="{% static 'static2/css/aos.css' %}">
+
+    <link rel="stylesheet" href="{% static 'static2/css/ionicons.min.css' %}">
+
+    <link rel="stylesheet" href="{% static 'static2/css/bootstrap-datepicker.css' %}">
+    <link rel="stylesheet" href="css/jquery.timepicker.css">
 
     
-    <!-- App CSS -->  
-    <link id="theme-style" rel="stylesheet" href="{% static 'assets/css/portal.css' %}">
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="{% static 'assets/js/jspdf.umd.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'static2/css/flaticon.css' %}">
+    <link rel="stylesheet" href="{% static 'static2/css/icomoon.css' %}">
+    <link rel="stylesheet" href="{% static 'static2/css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  </head>
+  <style>
+    .product {
+        width: 100%;
+        height: auto;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+        position: relative;
+    }
 
+    /* Style for the product image container */
+    .img-container {
+        position: relative;
+        width: 100%;
+        padding-bottom: 100%;
+        overflow: hidden;
+    }
 
-	<style>
-        /* Add your CSS styling here */
-        /* This is just a basic example */
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-			z-index: 9999;
+    /* Style for the product image */
+    .img-container img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Style for the status overlay */
+    .status {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: green;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+
+    .out-of-stock {
+      opacity: 0.6; /* Reduce opacity for a faded look */
+      pointer-events: none; /* Disable pointer events for this element */
+  }
+  .table {
+    width: 100%; /* Set the table width to 100% of its container */
+  }
+
+  .text-center {
+    text-align: center; /* Center-align text within table cells */
+  }
+
+  .product-thumbnail img {
+    max-width: 100px; /* Limit the width of product thumbnail images */
+    height: auto; /* Automatically adjust the height to maintain aspect ratio */
+  }
+
+  .product-name h3 {
+    font-size: 1.2rem; /* Adjust font size for product names */
+  }
+  .btn-update-quantity {
+    background-color: white; /* Blue background color */
+    color: #fff; /* White text color */
+    cursor: pointer; /* Show a pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+}
+
+/* Style for the "Remove From Cart" button */
+.btn-remove-from-cart {
+    background-color: white; /* Red background color */
+    color: #fff; /* White text color */
+    cursor: pointer; /* Show a pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+}
+    /* Style for the quantity input field */
+    .quantity-input {
+      width: 40px; /* Adjust the width as needed */
+      margin-right: 5px; /* Add spacing between input and button */
+  }
+
+  /* Optional: Align the button and input vertically */
+  .button-container {
+      display: flex;
+      align-items: center;
+  }
+      /* Add your custom CSS styles here */
+      body {
+        background-color: #f7f7f7;
+        font-family: Arial, sans-serif;
+    }
+    h2 {
+        color: #333;
+    }
+    table {
+        width: 150%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        padding: 10px;
+        text-align: center;
+    }
+    th {
+        background-color: #333;
+        color: #fff;
+    }
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    .status-pending {
+        color: #FF5733; /* Red for Pending status */
+    }
+    .status-successful {
+        color: #4CAF50; /* Green for Successful status */
+    }
+    .status-failed {
+        color: #FFC300; /* Yellow for Failed status */
+    }
+    .cart-total {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .cart-total h6 {
+        color: #333;
+    }
+    /* Target the container within the .ftco-section.ftco-cart */
+.ftco-section.ftco-cart .container {
+    max-width: 1200px; /* Set your desired maximum width */
+    margin: 0 auto; /* Center the container */
+}
+#star-rating ul {
+  display: flex;
+  gap: 15px;
+  list-style-type: none;
+  unicode-bidi: bidi-override;
+  direction: rtl;
+}
+
+li {
+  font-size: 50px;
+  cursor: pointer;
+  color: #34495e;
+  transition: all 0.5s ease;
+}
+
+li:hover, li.active {
+  color: #f1c40f;
+  transform: scale(1.2);
+}
+
+li:hover ~ li, li.active ~ li {
+  color: #f1c40f;
+}
+</style>
+  <body class="goto-here">
+		<div class="py-1 bg-primary">
+    	<div class="container">
+    		<div class="row no-gutters d-flex align-items-start align-items-center px-md-0">
+	    		<div class="col-lg-12 d-block">
+		    		<div class="row d-flex">
+		    			<div class="col-md pr-4 d-flex topper align-items-center">
+					    	<div class="icon mr-2 d-flex justify-content-center align-items-center"><span class="icon-phone2"></span></div>
+						    <span class="text">+91 8330859255</span>
+					    </div>
+					    <div class="col-md pr-4 d-flex topper align-items-center">
+					    	<div class="icon mr-2 d-flex justify-content-center align-items-center"><span class="icon-paper-plane"></span></div>
+						    <span class="text">wareflow100@gmail.com</span>
+					    </div>
+				    </div>
+			    </div>
+		    </div>
+		  </div>
+    </div>
+	<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+		<div class="container">
+		  <a class="navbar-brand" href="{% url 'index' %}">WAREFLOW</a>
+		  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="oi oi-menu"></span> Menu
+		  </button>
+      <form class="element1" id="search-form">
+        <div class="input-group">
+            <input type="text" class="form-control" id="search-input" placeholder="Search for products">
+            <div class="input-group-append">
+                <span class="input-group-text bg-transparent text-primary">
+                    <i class="fa fa-search"></i>
+                </span>
+            </div>
+        </div>
+    </form>
+		  <div class="collapse navbar-collapse" id="ftco-nav">
+			<ul class="navbar-nav ml-auto">
+			  <li class="nav-item active"><a href="{% url 'customer_index' %}" class="nav-link">Home</a></li>
+			  <li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="{% url 'shop' %}" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">About</a>
+				<div class="dropdown-menu" aria-labelledby="dropdown04">
+          <a class="dropdown-item" href="{% url 'about' %}">About</a>
+				  <a class="dropdown-item" href="#">Contact</a>
+				  {% comment %} <a class="dropdown-item" href="{% url 'wishlist' %}">Wishlist</a> {% endcomment %}
+				  <a class="dropdown-item" href="#">Blog</a>
+
+				  {% comment %} <a class="dropdown-item" href="{% url 'checkout' %}">Checkout</a> {% endcomment %}
+				</div>
+			  </li>
+			  {% comment %} <li class="nav-item"><a href="{% url 'wishlist' %}" class="nav-link">Wishlist</a></li> {% endcomment %}
+        <li class="nav-item"><a href="{% url 'shop' %}" id="top" class="nav-link">Shop</a></li>
+        {% if user.is_authenticated %}
+			  <li class="nav-item cta cta-colored"><a href="{% url 'cart' %}" class="nav-link"><span class="icon-shopping_cart"></span>[{{ cart_item_count }}]</a></li>
+        {% else %}
+			  <li class="nav-item cta cta-colored"><a href="{% url 'cart' %}" class="nav-link"><span class="icon-shopping_cart"></span>[0]</a></li>
+        {% endif %}
+			  <!-- Added Login and Registration buttons -->
+			  {% if user.is_authenticated %}
+	<div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+            <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
+              <li class="nav-item dropdown">
+                <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false">
+					{% if user.userprofile.profile_pic %}
+					  <img src="{{ user.userprofile.profile_pic.url }}" alt="" width="35" height="35" class="rounded-circle">
+					{% else %}
+					  <img src="{% static 'admin/assets/images/profile/user-1.jpg' %}" alt="" width="35" height="35" class="rounded-circle">
+					{% endif %}
+				  </a> 
+                <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
+                  <a class="d-flex align-items-center gap-2 dropdown-item">
+                    <i class="ti ti-user fs-6"></i>
+                    <h6 class="mb-0 fs-3">{{ user.username }}</h6>
+                </a>
+                  <div class="message-body">
+                    <a href="{% url 'profile' %}" class="d-flex align-items-center gap-2 dropdown-item">
+                        <i class="ti ti-user fs-6"></i>
+                        <p class="mb-0 fs-3">My Profile</p>
+                    </a>                    
+                  <a href="{% url 'orders' %}" class="d-flex align-items-center gap-2 dropdown-item">
+                      <i class="ti ti-user fs-6"></i>
+                      <p class="mb-0 fs-3">My Orders</p>
+                  </a>
+                  <a href="{% url 'loggout' %}" class="d-flex align-items-center gap-2 dropdown-item">
+                    <i class="ti ti-user fs-6"></i>
+                    <p class="mb-0 fs-3">Logout</p>
+                </a>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+				{% else %}
+				<a href="{% url 'login' %}" class="nav-link" style="color:black; margin-top:13px;">Login</a>
+				<a href="{% url 'register' %}" class="nav-link" style="color:black;  margin-top:13px;">Register</a>
+    	{% endif %}
+			</ul>
+		  </div>
+
+		</div>
+	  </nav>
+    <div id="search-results"></div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#search-input').keyup(function () {
+                var query = $(this).val();
+                $.ajax({
+                    type: 'GET',
+                    url: '/live_search/',
+                    data: {
+                        'query': query
+                    },
+                    success: function (data) {
+                        var results = data.products;
+                        var resultsHtml = '';
+                        resultsHtml += '<div class="container">';
+                          resultsHtml += '  <div class="row">';
+                          resultsHtml += '    <div class="col-12">';
+                          resultsHtml += '      <div class="product-container" style="display: flex; flex-wrap: wrap; gap: 10px;">';
+                          
+                          if (results.length === 0) {
+                              // If there are no results, insert a default image
+                              resultsHtml += '        <div class="product-inf" style="flex-basis: calc(33.33% - 20px); text-align: center;">'; // Set width to 33.33% for each product in a row
+                              resultsHtml += '          <img style="width: 100%;" src="{% static 'img/not-found.svg' %}" alt="Default Image">';
+                              resultsHtml += '          <h3>No products found</h3>';
+                              resultsHtml += '        </div>';
+                          } else {
+                              for (var i = 0; i < results.length; i++) {
+                                  resultsHtml += '        <div style="flex-basis: calc(33.33% - 20px); display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px;">'; // Set width to 33.33% for each product in a row
+                                  resultsHtml += '          <a href="/product/' + results[i].prod_id + '/">';
+                                  resultsHtml += '            <img style="width: 40%;" src="' + results[i].img + '" alt="' + results[i].name + '">';
+                                  resultsHtml += '          </a>';
+                                  resultsHtml += '          <a href="/product/' + results[i].prod_id + '/" class="text-truncate">' + results[i].name + '</a>';
+                                  resultsHtml += '          <span class="text-truncate">' + results[i].price + '</span>';
+                                  resultsHtml += '        </div>';
+                              }
+                          }
+                          
+                          resultsHtml += '      </div>';
+                          resultsHtml += '    </div>';
+                          resultsHtml += '  </div>';
+                          resultsHtml += '</div>';
+                          
+                          
+            if (query) {
+                $('#search-results').html(resultsHtml);
+                $('#search-results').show();
+                $('#hello').hide();
+
+                
+            } else {
+                $('#search-results').hide();
+                $('#hello').show();
+                
+            }
         }
-    </style>
+                });
+            });
+        });
 
-</head> 
+    </script>
 
-<body class="app">   	
-    <header class="app-header fixed-top">	   	            
-        <div class="app-header-inner">  
-	        <div class="container-fluid py-2">
-		        <div class="app-header-content"> 
-		            <div class="row justify-content-between align-items-center">
-			        
-				    <div class="col-auto">
-					    <a id="sidepanel-toggler" class="sidepanel-toggler d-inline-block d-xl-none" href="#">
-						    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" role="img"><title>Menu</title><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg>
-					    </a>
-				    </div><!--//col-->		            
-		            <div class="app-utilities col-auto ml-auto">
-			            {% comment %} <div class="app-utility-item app-notifications-dropdown dropdown">    
-				            <a class="dropdown-toggle no-toggle-arrow" id="notifications-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" title="Notifications">
-					            <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-					            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bell icon" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2z"/>
-  <path fill-rule="evenodd" d="M8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
-</svg>
-					            <span class="icon-badge">3</span>
-					        </a><!--//dropdown-toggle-->
-					        
-					        <div class="dropdown-menu p-0 " aria-labelledby="notifications-dropdown-toggle">
-					            <div class="dropdown-menu-header p-3">
-						            <h5 class="dropdown-menu-title mb-0">Notifications</h5>
-						        </div><!--//dropdown-menu-title-->
-						        <div class="dropdown-menu-content">
-							       <div class="item p-3">
-								        <div class="row gx-2 justify-content-between align-items-center">
-									        <div class="col-auto">
-										       <img class="profile-image" src="{% static 'assets/images/profiles/profile-1.png' %}" alt="">
-									        </div><!--//col-->
-									        <div class="col">
-										        <div class="info"> 
-											        <div class="desc">Amy shared a file with you. Lorem ipsum dolor sit amet, consectetur adipiscing elit. </div>
-											        <div class="meta"> 2 hrs ago</div>
-										        </div>
-									        </div><!--//col--> 
-								        </div><!--//row-->
-								        <a class="link-mask" href={% url 'notifications' %}></a>
-							       </div><!--//item-->
-							       <div class="item p-3">
-								        <div class="row gx-2 justify-content-between align-items-center">
-									        <div class="col-auto">
-										        <div class="app-icon-holder">
-											        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-receipt" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-	  <path fill-rule="evenodd" d="M1.92.506a.5.5 0 0 1 .434.14L3 1.293l.646-.647a.5.5 0 0 1 .708 0L5 1.293l.646-.647a.5.5 0 0 1 .708 0L7 1.293l.646-.647a.5.5 0 0 1 .708 0L9 1.293l.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .801.13l.5 1A.5.5 0 0 1 15 2v12a.5.5 0 0 1-.053.224l-.5 1a.5.5 0 0 1-.8.13L13 14.707l-.646.647a.5.5 0 0 1-.708 0L11 14.707l-.646.647a.5.5 0 0 1-.708 0L9 14.707l-.646.647a.5.5 0 0 1-.708 0L7 14.707l-.646.647a.5.5 0 0 1-.708 0L5 14.707l-.646.647a.5.5 0 0 1-.708 0L3 14.707l-.646.647a.5.5 0 0 1-.801-.13l-.5-1A.5.5 0 0 1 1 14V2a.5.5 0 0 1 .053-.224l.5-1a.5.5 0 0 1 .367-.27zm.217 1.338L2 2.118v11.764l.137.274.51-.51a.5.5 0 0 1 .707 0l.646.647.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.646.646.646-.646a.5.5 0 0 1 .708 0l.509.509.137-.274V2.118l-.137-.274-.51.51a.5.5 0 0 1-.707 0L12 1.707l-.646.647a.5.5 0 0 1-.708 0L10 1.707l-.646.647a.5.5 0 0 1-.708 0L8 1.707l-.646.647a.5.5 0 0 1-.708 0L6 1.707l-.646.647a.5.5 0 0 1-.708 0L4 1.707l-.646.647a.5.5 0 0 1-.708 0l-.509-.51z"/>
-	  <path fill-rule="evenodd" d="M3 4.5a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 1 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm8-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5z"/>
-	</svg>
-										        </div>
-									        </div><!--//col-->
-									        <div class="col">
-										        <div class="info"> 
-											        <div class="desc">You have a new invoice. Proin venenatis interdum est.</div>
-											        <div class="meta"> 1 day ago</div>
-										        </div>
-									        </div><!--//col-->
-								        </div><!--//row-->
-								        <a class="link-mask" href={% url 'notifications' %}></a>
-							       </div><!--//item-->
-							       <div class="item p-3">
-								        <div class="row gx-2 justify-content-between align-items-center">
-									        <div class="col-auto">
-										        <div class="app-icon-holder icon-holder-mono">
-											        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-bar-chart-line" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path fill-rule="evenodd" d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-5 0v-3H2v3h2z"/>
-</svg>
-										        </div>
-									        </div><!--//col-->
-									        <div class="col">
-										        <div class="info"> 
-											        <div class="desc">Your report is ready. Proin venenatis interdum est.</div>
-											        <div class="meta"> 3 days ago</div>
-										        </div>
-									        </div><!--//col-->
-								        </div><!--//row-->
-								        <a class="link-mask" href={% url 'notifications' %}></a>
-							       </div><!--//item-->
-							       <div class="item p-3">
-								        <div class="row gx-2 justify-content-between align-items-center">
-									        <div class="col-auto">
-										       <img class="profile-image" src="{% static 'assets/images/profiles/profile-2.png' %}" alt="">
-									        </div><!--//col-->
-									        <div class="col">
-										        <div class="info"> 
-											        <div class="desc">James sent you a new message.</div>
-											        <div class="meta"> 7 days ago</div>
-										        </div>
-									        </div><!--//col--> 
-								        </div><!--//row-->
-								        <a class="link-mask" href={% url 'notifications' %}></a>
-							       </div><!--//item-->
-						        </div><!--//dropdown-menu-content-->
-						        
-						        <div class="dropdown-menu-footer p-2 text-center">
-							        <a href={% url 'notifications' %}>View all</a>
-						        </div>
-															
-							</div><!--//dropdown-menu-->					        
-				        </div><!--//app-utility-item--> {% endcomment %}
-			            
-			            <div class="app-utility-item app-user-dropdown dropdown">
-							<a class="dropdown-toggle" id="user-dropdown-toggle"
-								data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
-								<img src="{% if request.session.profile_picture_url %}{{ request.session.profile_picture_url }}{% else %}{% static 'assets/images/user.png' %}{% endif %}" alt="user profile">
-							</a>
-							<ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
-								<li><span class="dropdown-item">{{ request.session.name }}</span></li>
-								<li><a class="dropdown-item" href={% url 'profile_view' %}>Account</a></li>
-								<li><hr class="dropdown-divider"></li>
-								<li><a class="dropdown-item" href={% url 'loggout' %}>Log Out</a></li>
-							</ul>
-						</div><!--//app-user-dropdown-->
-		            </div><!--//app-utilities-->
-		        </div><!--//row-->
-	            </div><!--//app-header-content-->
-	        </div><!--//container-fluid-->
-        </div><!--//app-header-inner-->
-        <div id="app-sidepanel" class="app-sidepanel sidepanel-hidden"> 
-	        <div id="sidepanel-drop" class="sidepanel-drop"></div>
-	        <div class="sidepanel-inner d-flex flex-column">
-		        <a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
-		        <div class="app-branding">
-		            <a class="app-logo" href={% url 'index' %}><img class="logo-icon me-2" src="{% static 'assets/images/app-logo.svg' %}" alt="logo"><span class="logo-text">WAREFLOW</span></a>
-	
-		        </div><!--//app-branding-->  
-			    <nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
-				    <ul class="app-menu list-unstyled accordion" id="menu-accordion">
-					    <li class="nav-item">
-					        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-					        <a class="nav-link " href={% url 'index' %}>
-						        <span class="nav-icon">
-						        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-house-door" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-		  <path fill-rule="evenodd" d="M7.646 1.146a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 .146.354v7a.5.5 0 0 1-.5.5H9.5a.5.5 0 0 1-.5-.5v-4H7v4a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .146-.354l6-6zM2.5 7.707V14H6v-4a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4h3.5V7.707L8 2.207l-5.5 5.5z"/>
-		  <path fill-rule="evenodd" d="M13 2.5V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z"/>
-		</svg>
-						         </span>
-		                         <span class="nav-link-text">Dashboard</span>
-					        </a><!--//nav-link-->
-					    </li><!--//nav-item-->
-						<li class="nav-item">
-					        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-					        <a class="nav-link {% if page == 'chat' %}active{% endif %}" href="{% url 'list_products' %}">{{value}}
-									<span class="nav-icon svg-icon svg-icon-primary svg-icon-2x"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo8/dist/../src/media/svg/icons/Shopping/Cart1.svg--><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-											<rect x="0" y="0" width="24" height="24"/>
-											<path d="M18.1446364,11.84388 L17.4471627,16.0287218 C17.4463569,16.0335568 17.4455155,16.0383857 17.4446387,16.0432083 C17.345843,16.5865846 16.8252597,16.9469884 16.2818833,16.8481927 L4.91303792,14.7811299 C4.53842737,14.7130189 4.23500006,14.4380834 4.13039941,14.0719812 L2.30560137,7.68518803 C2.28007524,7.59584656 2.26712532,7.50338343 2.26712532,7.4104669 C2.26712532,6.85818215 2.71484057,6.4104669 3.26712532,6.4104669 L16.9929851,6.4104669 L17.606173,3.78251876 C17.7307772,3.24850086 18.2068633,2.87071314 18.7552257,2.87071314 L20.8200821,2.87071314 C21.4717328,2.87071314 22,3.39898039 22,4.05063106 C22,4.70228173 21.4717328,5.23054898 20.8200821,5.23054898 L19.6915238,5.23054898 L18.1446364,11.84388 Z" fill="#000000" opacity="0.3"/>
-											<path d="M6.5,21 C5.67157288,21 5,20.3284271 5,19.5 C5,18.6715729 5.67157288,18 6.5,18 C7.32842712,18 8,18.6715729 8,19.5 C8,20.3284271 7.32842712,21 6.5,21 Z M15.5,21 C14.6715729,21 14,20.3284271 14,19.5 C14,18.6715729 14.6715729,18 15.5,18 C16.3284271,18 17,18.6715729 17,19.5 C17,20.3284271 16.3284271,21 15.5,21 Z" fill="#000000"/>
-										</g>
-									</svg><!--end::Svg Icon--></span>
-		                         <span class="nav-link-text">Inventory</span>
-					        </a><!--//nav-link-->
-					    </li><!--//nav-item-->
-					    <li class="nav-item">
-							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link" href={% url 'charts' %}>
-								<span class="nav-icon">
-									<svg width="1em" height="1em" viewBox="0 0 16 16"
-										class="bi bi-bar-chart-line" fill="currentColor"
-										xmlns="http://www.w3.org/2000/svg">
-										<path fill-rule="evenodd"
-											d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-5 0v-3H2v3h2z" />
-									</svg>
-								</span>
-								<span class="nav-link-text">Charts</span>
-							</a><!--//nav-link-->
-						</li><!--//nav-item-->
-					   
-					    <li class="nav-item">
-							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-							<a class="nav-link" href={% url 'list_suppliers' %}>
-								<span class="nav-icon">
-									<svg style="color: rgb(75, 74, 73);" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16"> <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" fill="#4b4a49"></path> <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z" fill="#4b4a49"></path> </svg>
-								</span>
-								<span class="nav-link-text">Suppliers</span>
-							</a><!--//nav-link-->
-						</li><!--//nav-item-->
-						<li class="nav-item">
-					        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-					        <a class="nav-link" href={% url 'list_orders' %}>
-						        <span class="nav-icon">
-									<svg width="24" height="24" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M9.99998 15L9.99999 19C10 20.1046 9.10457 21 7.99999 21H4C2.89543 21 2 20.1046 2 19V15C2 13.8954 2.89543 13 4 13H7.99998C9.10455 13 9.99998 13.8954 9.99998 15Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> <path d="M16 4.99999L16 8.99999C16 10.1046 15.1046 11 14 11H10C8.89543 11 8 10.1046 8 9V5C8 3.89543 8.89543 3 10 3H14C15.1045 3 16 3.89543 16 4.99999Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> <path d="M22 15L22 19C22 20.1046 21.1046 21 20 21H16C14.8954 21 14 20.1046 14 19V15C14 13.8954 14.8954 13 16 13H20C21.1045 13 22 13.8954 22 15Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> <path d="M6 16V13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> <path d="M12 6V3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> <path d="M18 16V13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/> </svg>
-						         </span>
-		                         <span class="nav-link-text">Orders</span>
-					        </a><!--//nav-link-->
-					    </li><!--//nav-item-->
-					    
-					    <li class="nav-item">
-					        <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-					        <a class="nav-link" href={% url 'help' %}>
-						        <span class="nav-icon">
-						        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-question-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-  <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-  <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
-</svg>
-						         </span>
-		                         <span class="nav-link-text">Help</span>
-					        </a><!--//nav-link-->
-					    </li><!--//nav-item-->
-				    </ul><!--//app-menu-->
-			    </nav><!--//app-nav-->
-			    <div class="app-sidepanel-footer">
-				    <nav class="app-nav app-nav-footer">
-					    <ul class="app-menu footer-menu list-unstyled">
-							<li class="nav-item">
-								<a class="nav-link" href={% url 'loggout' %}>
-									<span class="nav-icon">
-										<svg style="color: rgb(93, 94, 101);" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" fill="#5d5e65"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>										</span>
-									<span class="nav-link-text">Logout</span>
-								</a>
-							</li><!--//nav-item-->
-					    </ul><!--//footer-menu-->
-				    </nav>
-			    </div><!--//app-sidepanel-footer-->
-	        </div><!--//sidepanel-inner-->
-	    </div><!--//app-sidepanel-->
-    </header><!--//app-header-->
+    {%block content%}{% endblock %}
+  </div>
+    <div id="hello">
+
+		<section class="ftco-section ftco-no-pt ftco-no-pb py-5 bg-light">
+      <div class="container py-4">
+        <div class="row d-flex justify-content-center py-5">
+          <div class="col-md-6">
+          	<h2 style="font-size: 22px;" class="mb-0">Subcribe to our Newsletter</h2>
+          	<span>Get e-mail updates about our latest shops and special offers</span>
+          </div>
+          <div class="col-md-6 d-flex align-items-center">
+            <form action="#" class="subscribe-form">
+              <div class="form-group d-flex">
+                <input type="text" class="form-control" placeholder="Enter email address">
+                <input type="submit" value="Subscribe" class="submit px-3">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer class="ftco-footer ftco-section">
+      <div class="container">
+      	<div class="row">
+      		<div class="mouse">
+						<a href="#" class="mouse-icon">
+							<div class="mouse-wheel"><span class="ion-ios-arrow-up"></span></div>
+						</a>
+					</div>
+      	</div>
+        <div class="row mb-5">
+          <div class="col-md">
+            <div class="ftco-footer-widget mb-4">
+              <h2 class="ftco-heading-2">WAREFLOW</h2>
+              <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+              <ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
+                <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
+                <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
+                <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md">
+            <div class="ftco-footer-widget mb-4 ml-md-5">
+              <h2 class="ftco-heading-2">Menu</h2>
+              <ul class="list-unstyled">
+                <li><a href="#" class="py-2 d-block">Shop</a></li>
+                <li><a href="#" class="py-2 d-block">About</a></li>
+                <li><a href="#" class="py-2 d-block">Contact Us</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-4">
+             <div class="ftco-footer-widget mb-4">
+              <h2 class="ftco-heading-2">Help</h2>
+              <div class="d-flex">
+	              <ul class="list-unstyled mr-l-5 pr-l-3 mr-4">
+	                <li><a href="#" class="py-2 d-block">Shipping Information</a></li>
+	                <li><a href="#" class="py-2 d-block">Terms &amp; Conditions</a></li>
+	                <li><a href="#" class="py-2 d-block">Privacy Policy</a></li>
+	              </ul>
+	              <ul class="list-unstyled">
+	                <li><a href="#" class="py-2 d-block">FAQs</a></li>
+	                <li><a href="#" class="py-2 d-block">Contact</a></li>
+	              </ul>
+	            </div>
+            </div>
+          </div>
+          <div class="col-md">
+            <div class="ftco-footer-widget mb-4">
+            	<h2 class="ftco-heading-2">Have a Questions?</h2>
+            	<div class="block-23 mb-3">
+	              <ul>
+	                <li><span class="icon icon-map-marker"></span><span class="text">Kanjirappilly,Kottayam,Kerela</span></li>
+	                <li><a href="#"><span class="icon icon-phone"></span><span class="text">+918330859255</span></a></li>
+	                <li><a href="#"><span class="icon icon-envelope"></span><span class="text">wareflow100@gmail.com</span></a></li>
+	              </ul>
+	            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  <!-- loader -->
+  <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
 
 
-
-
-{%block content%} {%endblock%}
-
-
-    						
-</div><!--//tab-pane-->
-</div><!--//tab-content-->		    
-</div><!--//container-fluid-->
-</div><!--//app-content-->
-
-
-</div><!--//app-wrapper-->    					
-
-
-<!-- Javascript -->          
-<script src="{% static 'assets/plugins/popper.min.js' %}"></script>
-<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.min.js' %}"></script>  
-
-
-<!-- Page Specific JS -->
-<script src="{% static 'assets/js/app.js' %}"></script> 
-
-</body>
-</html> 
+  <script src="{% static 'static2/js/jquery.min.js' %}"></script>
+  <script src="{% static 'static2/js/jquery-migrate-3.0.1.min.js' %}"></script>
+  <script src="{% static 'static2/js/popper.min.js' %}"></script>
+  <script src="{% static 'static2/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'static2/js/jquery.easing.1.3.js' %}"></script>
+  <script src="{% static 'static2/js/jquery.waypoints.min.js' %}"></script>
+  <script src="{% static 'static2/js/jquery.stellar.min.js' %}"></script>
+  <script src="{% static 'static2/js/owl.carousel.min.js' %}"></script>
+  <script src="{% static 'static2/js/jquery.magnific-popup.min.js' %}"></script>
+  <script src="{% static 'static2/js/aos.js' %}"></script>
+  <script src="{% static 'static2/js/jquery.animateNumber.min.js' %}"></script>
+  <script src="{% static 'static2/js/bootstrap-datepicker.js' %}"></script>
+  <script src="{% static 'static2/js/scrollax.min.js' %}"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&sensor=false"></script>
+  <script src="{% static 'static2/js/google-map.js' %}"></script>
+  <script src="{% static 'static2/js/main.js' %}"></script>
+  
+    
+  </body>
+</html>

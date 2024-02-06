@@ -1,0 +1,367 @@
+.sticky-top {
+    top: -150px;
+    transition: .5s;
+}
+
+.navbar .navbar-brand {
+    position: absolute;
+    padding: 0;
+    width: 170px;
+    height: 135px;
+    top: 0;
+    left: 0;
+}
+
+.navbar .navbar-nav .nav-link {
+    margin-right: 35px;
+    padding: 25px 0;
+    color: var(--dark);
+    font-weight: 600;
+    text-transform: uppercase;
+    outline: none;
+}
+
+.navbar .navbar-nav .nav-link:hover,
+.navbar .navbar-nav .nav-link.active {
+    color: green;
+}
+
+.navbar .dropdown-toggle::after {
+    border: none;
+    content: "\f107";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+form{
+    display: flex; margin-top: 1.5%; margin-left: 3%;
+}
+#budoralogo
+{
+    margin-left: 5.8%;
+    margin-top: 0.4%;
+    height: 10px; 
+        width: 58px;
+}
+
+#logoname
+{
+    font-family: sans-serif;
+                    color:#27350F;
+                    text-decoration: none;
+                    text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;
+                font-size: larger;
+}
+#homebtn
+{
+    
+    border-radius: 100px;
+    color: #27350F;
+    background-color: white;
+    margin-top: 30px;
+    margin-left: 0px;
+    border-width: 1px;
+    border-style: groove;
+    border-color: #27350F;
+    fill: #27350F;
+    transition: 0.5s;
+    width: 150px;
+    height: 40px;
+    
+}
+#homebtn:focus {
+    
+  color: white;
+  border-style: none;
+  background-color: #27350F;
+    
+  }
+  
+  #homebtn:hover {
+    
+    color: white;
+    border-style: none;
+    background-color: #27350F;
+  }
+  #homebtn:active {
+   
+    color: white;
+    border-style: none;
+    background-color: #27350F;
+  }
+
+#divout
+{
+    align-items: center; 
+        border-width: 2px;
+        padding-left: 2.8%; 
+        width: 30%;
+        
+        padding-top: 1%; 
+        padding-bottom: 3%;
+}
+#usern
+{
+    margin-left: 36%;
+    font-size: xx-large; 
+    font-weight: lighter;
+    text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;
+
+}
+#propic
+{
+    width:250px; height:250px; border-radius: 190px; margin-left: 55px; margin-top: 8%;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; 
+
+}
+#proname
+{
+    margin-left: 35%;
+    font-size: x-large; 
+    font-weight: lighter;
+    margin-top: 18%;
+    text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;
+
+}
+#divout2
+{
+                align-items: center;
+                background-color: white; 
+                border-width: 2px;
+                margin-left: 5%;
+                box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; 
+                padding-left: 4.5%; 
+                width: 50%;
+                height: 550px;
+                padding-top: 2%; 
+                padding-bottom: 4%;
+}
+#cardelement
+{
+    border-color: #27350F;
+    background-color: white;
+    border-style:solid;
+    border-width: 1px;
+    margin-top: -45px;
+    margin-left: 50%;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    width: 250px;
+    height: 40px;
+    padding: 10px;
+}
+
+#cardelement:focus {
+    border-style: hidden;
+    
+  }
+  
+  #cardelement:hover {
+    border-color: darkgreen;
+  background-color: white;
+  border-style: hidden;
+  fill: darkgreen;
+  }
+  
+#carde
+{
+    
+    color:#27350F; 
+    margin-top: 20px;
+}
+#signintext2
+{
+    color:#27350F; 
+    width: 3px;
+    height: 20px;
+    margin-top: -28px;
+    margin-left: 30%;
+    border-radius: 30%;
+}
+#signinbtn
+{
+
+    background-color: #27350F;
+    border-radius: 100px;
+    margin-top: 10px;   
+    color: white;
+    width: 100px;
+    transition: 0.5s;
+    height: 35px;
+    border-style: none;
+    margin-top: 10%;
+    margin-left: 23%;
+}
+
+
+#signinbtn:focus {
+    color: #27350F;
+    background-color: white;
+    border-width: 1px;
+    border-style: groove;
+    border-color: #27350F;
+    fill: #27350F;
+    
+}
+
+#signinbtn:hover {
+    background-color: white;
+    border-width: 1px;
+    border-style: groove;
+
+    border-color: #27350F;
+    color: #27350F;
+    fill: #27350F;
+}
+#signinbtn:not([disabled]):focus {
+    box-shadow:  0 0 0.5rem #27350F;
+  }
+  
+  #signinbtn:not([disabled]):hover {
+    box-shadow: 0 0 0.5rem #27350F;
+  }
+#signinbtn:active {
+  
+    color: #27350F;
+    border-style: groove;
+
+    background-color: white;
+    border-width: 1px;
+    border-color: #27350F;
+    fill: #27350F;
+}
+#sbtn
+{
+    color:white;
+}
+
+#sbtn:hover
+{
+    color:#27350F;
+    text-decoration: none;
+}
+#usern1
+{
+    font-size: xx-large; 
+    font-weight: lighter;
+    padding-bottom: 5%;
+    margin-top: -35px;
+}
+#usern2
+{
+    width: 155px;
+   
+    margin-left: 245px;
+    border-radius: 30%;
+}
+@media (max-width: 991.98px) {
+    .navbar .navbar-brand {
+        width: 126px;
+        height: 100px;
+
+    }
+
+    .navbar .navbar-nav .nav-link  {
+        margin-right: 0;
+        padding: 10px 0;
+    }
+
+    .navbar .navbar-nav {
+        margin-top: 75px;
+        border-top: 1px solid ;
+    }
+    #budoralogo
+    {
+        margin-top: 3px;
+        margin-left: 16%;
+        height: 10px; 
+        width: 33px;
+    }
+    #logoname
+    {
+        font-size: medium;
+    }
+    #divout
+{
+        align-items: center; 
+        border-width: 2px;
+        padding-left: 2.8%; 
+        
+        margin-left: 25%;
+        height: 30%;
+        
+        
+}
+#usern
+{
+    margin-left: 48%;
+}
+#propic
+{
+    width:200px; height:200px; border-radius: 180px; margin-left: 0px;
+}
+#proname
+{
+    margin-top:20px ;  margin-left: 50%;
+}
+#divout2
+{
+                margin-left: -220px;
+                margin-top: 80%;
+                box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; 
+                width: 80%;
+                height: 600px;
+}
+#cardelement
+{
+    margin-top: 0px;
+    margin-left: 10%;
+}
+#signintext2
+{
+    display: none;
+}
+#carde
+{
+    
+    color:#27350F; 
+    margin-top: 10px;
+    margin-left: 10%;
+}
+#usern2
+{
+    width: 65px;
+   
+    margin-left: 245px;
+    border-radius: 30%;
+}
+#signinbtn
+{
+    margin-left: 30%;
+}
+}
+
+@media (min-width: 992px) {
+    .navbar .nav-item .dropdown-menu {
+        display: block;
+        border: none;
+        margin-top: 0;
+        top: 150%;
+        opacity: 0;
+        visibility: hidden;
+        transition: .5s;
+    }
+
+    .navbar .nav-item:hover .dropdown-menu {
+        top: 100%;
+        visibility: visible;
+        transition: .5s;
+        opacity: 1;
+    }
+
+}
+
+body{
+    font-family:  sans-serif; 
+
+}

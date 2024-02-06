@@ -1,0 +1,128 @@
+{% extends 'sellerdash/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card swing">
+      <div class="card-body">
+    <h2>Edit Product</h2>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+        {% endif %}
+  <form method="POST" onsubmit="return validateForm()">
+      {% csrf_token %}
+      <div class="form-group">
+          <label for="product_name">Product Name:</label>
+          <input type="text" class="form-control" id="product_name" name="product_name" value="{{ product.product_name }}" disable>
+          <span id="product_name_error" class="text-danger"></span>
+      </div>
+      <div class="form-group">
+          <label for="product_description">Description:</label>
+          <textarea class="form-control" id="product_description" name="product_description">{{ product.product_description }}</textarea>
+          <span id="product_description_error" class="text-danger"></span>
+      </div>
+      <div class="form-group " style="margin-top: 10px;">
+          <label for="select_category">Select Category:</label>
+          <select id="select_category" name="select_category" class="form-control">
+              <option value="">Select Category</option>
+              {% for category in categories %}
+                  <option value="{{ category.id }}" {% if category.id == product.category.id %}selected{% endif %}>{{ category.category_name }}</option>
+              {% endfor %}
+          </select>
+          <span id="select_category_error" class="text-danger"></span>
+      </div>
+      <div class="form-group">
+          <label for="product_price">Price:</label>
+          <input type="text" class="form-control" id="product_price" name="product_price" value="{{ product.product_price }}">
+          <span id="product_price_error" class="text-danger"></span>
+      </div>
+      <div class="form-group">
+          <label for="product_stock">Stock (in KG):</label>
+          <input type="text" class="form-control" id="product_stock" name="product_stock" value="{{ product.product_stock }}">
+          <span id="product_stock_error" class="text-danger"></span>
+      </div>
+      <div class="form-group">
+          <label for="product_image">Product Image:</label>
+          <input type="file" class="form-control-file" id="product_image" name="product_image">
+          {% if product.product_image %}
+              <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+          {% endif %}
+          <span id="product_image_error" class="text-danger"></span>
+      </div>
+      <button type="submit" href="{% url 'viewaddproduct' %}" class="btn btn-primary">Save Changes</button>
+      <button type="submit" href="{% url 'viewaddproduct' %}" class="btn btn-danger">Go Back</button>
+  </form>
+</div>
+</div>
+</div>
+<script>
+  function validateForm() {
+      const product_nameInput = document.getElementById('product_name');
+      const product_nameError = document.getElementById('product_name_error');
+      const product_nameValue = product_nameInput.value.trim();
+
+      const product_descriptionInput = document.getElementById('product_description');
+      const product_descriptionError = document.getElementById('product_description_error');
+      const product_descriptionValue = product_descriptionInput.value.trim();
+
+      const select_categoryInput = document.getElementById('select_category');
+      const select_categoryError = document.getElementById('select_category_error');
+      const select_categoryValue = select_categoryInput.value;
+
+      const product_priceInput = document.getElementById('product_price');
+      const product_priceError = document.getElementById('product_price_error');
+      const product_priceValue = product_priceInput.value.trim();
+
+      const product_stockInput = document.getElementById('product_stock');
+      const product_stockError = document.getElementById('product_stock_error');
+      const product_stockValue = product_stockInput.value.trim();
+
+      const product_imageInput = document.getElementById('product_image');
+      const product_imageError = document.getElementById('product_image_error');
+      const product_imageValue = product_imageInput.value;
+
+      let isValid = true;
+
+      // Validate Product Name
+      if (!/^[A-Za-z]+$/.test(product_nameValue)) {
+        product_nameError.textContent = 'Product Name should contain only alphabetic characters.';
+    } else {
+        product_nameError.textContent = '';
+    }
+
+      // Validate Product Description (optional, no validation)
+
+      // Validate Select Category
+      if (select_categoryValue === '') {
+          select_categoryError.textContent = 'Please select a category.';
+          isValid = false;
+      } else {
+          select_categoryError.textContent = '';
+      }
+
+      // Validate Product Price
+      if (product_priceValue === '' || isNaN(product_priceValue)) {
+          product_priceError.textContent = 'Valid numeric Price is required.';
+          isValid = false;
+      } else {
+          product_priceError.textContent = '';
+      }
+
+      // Validate Product Stock
+      if (product_stockValue === '' || isNaN(product_stockValue)) {
+          product_stockError.textContent = 'Valid numeric Stock (in KG) is required.';
+          isValid = false;
+      } else {
+          product_stockError.textContent = '';
+      }
+
+      // Validate Product Image (optional, no validation)
+
+      return isValid;
+  }
+</script>
+{% endblock %}

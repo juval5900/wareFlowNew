@@ -1,0 +1,55 @@
+{%extends 'admindash/base.html'%}
+{% load static %}
+{%block content%}
+
+      <div class="container-fluid">
+        <div class="card">
+          <div class="card-body">
+            <div class="container mt-4">
+                <h5 class="fw-semibold">View Products</h5>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="font-weight: bold;">Product Name</th>
+                            <th style="font-weight: bold;">Product Description</th>
+                            <th style="font-weight: bold;">Category</th>
+                            <th style="font-weight: bold;">Price</th>
+                            <th style="font-weight: bold;">Stock</th>
+                            <th style="font-weight: bold;">Image</th>
+                            <th style="font-weight: bold;">Seller</th> <!-- Add a new column for the seller -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in all_products %}
+                            <tr>
+                                <td>{{ product.product_name }}</td>
+                                <td>{{ product.product_description }}</td>
+                                <td>{{ product.category.category_name }}</td>
+                                <td>RS {{ product.product_price }}</td>
+                                <td>{{ product.product_stock }} KG</td>
+                                <td>
+                                    {% if product.product_image %}
+                                        <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" width="100">
+                                    {% else %}
+                                        No image available
+                                    {% endif %}
+                                </td>
+                                <td>{{ product.seller.user.username }}</td> <!-- Display the seller's username or appropriate field -->
+                                <td>
+                                    <a href="{% url 'delete_product' product.id %}" class="btn btn-sm btn-danger">Delete</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6">No products available.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                    
+            </div>
+            
+          </div>
+        </div>
+      </div>
+{%endblock%}   

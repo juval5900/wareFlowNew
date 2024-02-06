@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select User Type</title>
+</head>
+<body>
+    <h2>Select User Type</h2>
+    <form method="post" action="{% url 'google_login' %}">
+        {% csrf_token %}
+        <label>
+            <input type="radio" name="user_type" value="seller"> Seller
+        </label>
+        <label>
+            <input type="radio" name="user_type" value="customer"> Customer
+        </label>
+        <button type="submit">Continue</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,144 @@
+{% load static %}
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+        <link href="{% static 'css/open-iconic-bootstrap.min.css' %}" rel="stylesheet">
+        <link href="{% static 'css/userpro.css' %}" rel="stylesheet">
+        <link href="{% static 'css/animate.min.css' %}" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- Template Stylesheet -->
+</head>
+<style>
+    .custom-toast-class {
+        background-color: rgba(0, 128, 0, 1);  color:white; /* Text color */
+      border-radius: 8px; /* Border radius */
+      max-width: 250px;
+      opacity: 1 !important;
+      
+    
+    }
+</style>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav ml-auto">
+                    <!-- Conditionally display links based on user type -->
+                    {% if user.is_authenticated %}
+                        <!-- User is logged in -->
+                        {% if user.is_seller %}
+                            <!-- User is a seller -->
+                            <li class="nav-item">
+                                <a href="{% url 'dashseller' %}" class="nav-link" style="font-weight: lighter;">Seller Dashboard</a>
+                            </li>
+                        {% endif %}
+                        {% if user.is_superuser %}
+                        <!-- User is a seller -->
+                        <li class="nav-item">
+                            <a href="{% url 'admindash' %}" class="nav-link" style="font-weight: lighter;">Admin Dashboard</a>
+                        </li>
+                         {% endif %}
+                        <li class="nav-item">
+                            <a href="{% url 'index' %}" class="nav-link" style="font-weight: lighter;">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'loggout' %}" class="nav-link" style="font-weight: lighter;">Logout</a>
+                        </li>
+                    {% else %}
+                        <!-- User is not logged in -->
+                        <li class="nav-item">
+                            <a href="{% url 'index' %}" class="nav-link" style="font-weight: lighter;">Home</a>
+                        </li>
+                    {% endif %}
+                    <!-- Add more navigation links as needed -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <form method="post" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <div id="divout" >
+        
+        {% if user.is_superuser %}
+            <h5 id="usern" class=" text animated zoomIn"> Admin </h5>
+            {% elif user.is_seller %}
+            <h5 id="usern" class=" text animated zoomIn"> Seller </h5>
+            {% else  %}
+            <h5 id="usern" class=" text animated zoomIn"> User </h5>
+            {% endif  %}
+        <!-- {{ user.profile.profile_picture.url }} -->
+        {% if user.userprofile.profile_pic %}
+      <img id="propic" src="{{user.userprofile.profile_pic.url }}" alt="profile pic" style="margin-left:100px;" class="card-img-top text animated zoomIn"/>
+      {% else %}
+    <!-- Display a default profile picture or a message if no profile picture is available -->
+      <img id="propic" src="{% static 'images/usericon.png' %}" class="card-img-top" style="margin-left:20px;" />
+      {% endif %}
+        <h5 id="proname" class="text animated zoomIn" >{{ user.userprofile.name }}</h5>
+
+        </div>
+                <div id="divout2">
+                    {% csrf_token %}
+                    <hr  class="text animated zoomIn" id="usern2">
+                    <h5  class=" text animated zoomIn" id="usern1"> USERPROFILE </h5>
+                    
+
+                    <!-- <div>
+                        <label for="profile_picture" class="form-label">Profile Picture:</label>
+                        <input type="file"  class="form-control"  id="cardelement" name="profile_picture" style="border-color: #27350F;
+                        border-style:solid;
+                        border-width: 1px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;
+                        height: 40px;
+                        padding: 10px;">
+                    </div> -->
+                    <div>
+                        <label for="name" id="carde" class="form-label text animated zoomIn">Full Name:</label>
+                        <hr class=" text animated zoomIn" id="signintext2">
+                        <input type="text" class="form-control text animated zoomIn" value="{{ user.userprofile.name }}" name="name" id="cardelement" >
+                        
+                    </div>
+                    <div>
+                        <label for="profile_pic"  id="carde"  class="form-label text animated zoomIn">Profile Picture:</label><br>
+                        <hr class=" text animated zoomIn" id="signintext2">
+                        <input type="file"  class="form-control text animated zoomIn"  id="cardelement" name="profile_pic" >
+                    </div>
+                    <div>
+                        <label for="email" id="carde" class="form-label text animated zoomIn">Email:</label>
+                        <hr class=" text animated zoomIn" id="signintext2">
+                        <input type="email"  class="form-control text animated zoomIn" id="cardelement" name="email" value="{{ user.email }}" >
+                    </div>
+                    <div>
+                        <label for="phone_number" id="carde" class="form-label text animated zoomIn" >Phone Number:</label>
+                        <hr class=" text animated zoomIn" id="signintext2">
+                        <input class="form-control text animated zoomIn" id="cardelement" name="phone_number" value="{{ user.userprofile.phone_number }}">
+                    </div>
+                    <div>
+                        <label for="address" id="carde" class="form-label text animated zoomIn">Address:</label>
+                        <hr class=" text animated zoomIn" id="signintext2">
+                        <input type="text" class="form-control text animated zoomIn"  id="cardelement" value="{{ user.userprofile.address }}" name="address">
+                    </div>
+                    <button class=" text animated zoomIn" type="submit" id="signinbtn" >Update</button>
+                    
+                </div>
+    </form>
+    {% if messages %}
+    <div class="toast">
+        <div class="toast-header">
+            <strong class="mr-auto">Message</strong>
+        </div>
+        <div class="toast-body">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %} 
+</div>
+</div>
+</body>

@@ -1,0 +1,132 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block content%}
+    <!-- END nav -->
+    <div class="hero-wrap hero-bread"style="background-image: url({% static 'static2/images/bg_1.jpg' %});">
+      <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center">
+          <div class="col-md-9 ftco-animate text-center">
+          	<p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home</a></span> <span>Cart</span></p>
+            <h1 class="mb-0 bread">My Cart</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+<!-- Your HTML structure for displaying cart items and total price -->
+<section class="ftco-section ftco-cart">
+  <div class="container">
+      <div class="row">
+          <div class="col-md-12 ftco-animate">
+              <div class="cart-list">
+                  <table class="table">
+                      <thead class="thead-primary">
+                          <tr class="text-center">
+                              <th>Product</th>
+                              <th>Product name</th>
+                              <th>Price</th>
+                              <th>Quantity</th>
+                              <th>Total</th>
+                              <th>Remove from Cart</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% if cart_items %}
+                          {% for cart_item in cart_items %}
+                          <tr class="text-center">
+                              <td class="product-thumbnail">
+                                  <img src="{{ cart_item.product.product_image.url }}" alt="{{ cart_item.product.product_name }}" class="img-fluid">
+                              </td>
+                              <td class="product-name">
+                                  <h3>{{ cart_item.product.product_name }}</h3>
+                              </td>
+                              <td class="price">RS {{ cart_item.product.product_price }}</td>
+                              <td class="quantity">
+                                  <form action="{% url 'update_cart_item' cart_item.id %}" method="post">
+                                      {% csrf_token %}
+                                      <input type="number" name="quantity" value="{{ cart_item.quantity }}" min="1" class="quantity-input">
+                                      <button type="submit" class="btn btn-update-quantity">
+                                          <i class="fas fa-sync"></i> <!-- FontAwesome refresh icon -->
+                                      </button>
+                                  </form>
+
+                              </td>
+                              {% if messages %}
+                              {% for message in messages %}
+                              <div class="alert alert-danger text-center" >{{ message }}</div>
+                              {% endfor %}						
+                              {% endif %}
+                              <td class="total">RS {{ cart_item.price }}</td>
+                              <input type="hidden" name="total_price" value="{{ total_price }}">
+                              <td class="remove-from-cart">
+                                  <form action="{% url 'remove_from_cart' cart_item.id %}" method="post">
+                                      {% csrf_token %}
+                                      <button type="submit" class="btn btn-remove-from-cart" id="deleteButton">
+                                          <i class="fas fa-trash"></i> <!-- FontAwesome trash icon -->
+                                      </button>
+                                  </form>
+                              </td>
+                          </tr><!-- END TR-->
+                          {% endfor %}
+                          {% else %}
+                          <tr>
+                              <td colspan="6" class="text-center">Your cart is empty.</td>
+                          </tr>
+                          {% endif %}
+                      </tbody>
+                  </table>
+              </div>
+              <div class="cart-total" style="align:center;">
+                  <h6>Total: RS {{ total_price|floatformat:2 }}</h6>
+              </div>
+          </div>
+      </div>
+      <div class="row justify-content-end">
+          {% if cart_items %}
+          <div class="col-lg-4 mt-5 cart-wrap ftco-animate">
+              <div class="cart-total mb-3">
+                  <h3>Cart Totals</h3>
+                  <p class="d-flex">
+                      <span>Subtotal</span>
+                      <span>RS {{ total_price|floatformat:2 }}</span>
+                  </p>
+                  <p class="d-flex">
+                      <span>Delivery</span>
+                      <span>RS 0.00</span>
+                  </p>
+                  <p class="d-flex">
+                      <span>Discount</span>
+                      <span>RS 0.00</span>
+                  </p>
+                  <hr>
+                  <p class="d-flex total-price">
+                      <span>Total</span>
+                      <span id="total-amount">RS {{ total_price|floatformat:2 }}</span>
+                  </p>
+              </div>
+              <!-- Link to proceed to checkout -->
+              <p><a href="{% url 'checkout' %}" class="btn btn-primary py-3 px-4">Proceed to Checkout</a></p>
+          </div>
+          {% endif %}
+      </div>
+  </div>
+</section>
+<script>
+  // Function to handle the delete action
+  function handleDelete() {
+    
+      // Display a confirmation dialog
+      var confirmed = window.confirm('Are you sure you want to delete?');
+      
+      // Check if the user confirmed
+      if (confirmed) {
+        
+      } else {
+        event.preventDefault();
+          // User canceled the deletion
+          alert('Deletion canceled.');
+      }
+  }
+  // Add an event listener to the button to call the function
+  document.getElementById('deleteButton').addEventListener('click', handleDelete);
+</script>
+{%endblock%}

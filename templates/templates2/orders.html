@@ -1,0 +1,262 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block content%}
+    <div class="hero-wrap hero-bread"style="background-image: url({% static 'static2/images/bg_1.jpg' %});">
+        <div class="container">
+          <div class="row no-gutters slider-text align-items-center justify-content-center">
+            <div class="col-md-9 ftco-animate text-center">
+                <p class="breadcrumbs"><span class="mr-2"><a href="{% url 'index' %}">Home</a></span> <span>Orders</span></p>
+              <h1 class="mb-0 bread">Your Orders</h1>
+            </div>
+          </div>
+        </div>
+      </div>        <!-- ... Hero section content ... -->
+    </div>
+    <!-- Add a section for displaying order details -->
+    <section class="ftco-section ftco-cart">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12 ftco-animate">
+                  <div class="cart-list">
+                    <table class="table">
+                      <thead class="thead-primary">
+                          <tr class="text-center">
+                              <th>Order ID</th>
+                              <th>Order Date</th>
+                              <th>Product Name</th>
+                              <th>Image</th>
+                              <th>Price</th>
+                              <th>Status</th>
+                              <th>Total Paid Amount</th>
+                              <th>Download Invoice</th>
+                              <th>Add Review</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for order in orders %}
+                              {% for item in order.orderitem_set.all %}
+                                  <tr class="text-center">
+                                      <td>{{ order.id }}</td>
+                                      <td>{{ order.order_date }}</td>
+                                      <td>{{ item.product.product_name }} (Quantity: {{ item.quantity }})</td>
+                                      <td><img src="{{ item.product.product_image.url }}" alt="{{ item.product.product_name }}" width="100"></td>
+                                      <td>{{ item.price }}</td>
+                                      <td>
+                                          {% if order.payment_status == 'successful' %}
+                                              <div style="color: green; font-weight: bold;">
+                                                  <span style="background-color: lightgreen; padding: 3px 5px; border-radius: 3px;">&#10004;</span> Paid
+                                              </div>
+                                          {% else %}
+                                              <div style="color: red; font-weight: bold;">
+                                                  <span style="background-color: salmon; padding: 3px 5px; border-radius: 3px;">&#10008;</span> Pending
+                                              </div>
+                                          {% endif %}
+                                      </td>
+                                      <td>{{ order.total_price }}</td>
+                                      <td>
+                                          {% if order.payment_status == 'successful' %}
+                                              <a href="{% url 'generate_pdf' order.id %}" target="_blank">
+                                                  <i class="fas fa-download"></i>
+                                              </a>
+                                          {% else %}
+                                              <!-- Disable the download button if payment status is not 'successful' -->
+                                              <button type="button" class="btn btn-disabled" disabled>
+                                                  <i class="fas fa-download"></i>
+                                              </button>
+                                          {% endif %}
+                                      </td>
+                                      <td>
+                                          <button type="button" class="btn btn-outline" onclick="showReviewModal( {{ item.product.id }})">Review product</button>
+                                      </td>
+                                  </tr>
+                              {% endfor %}
+                          {% endfor %}
+                      </tbody>
+                  </table>                  
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  <!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reviewModalLabel">Add Review</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Review Form -->
+        <form method="post" action="{% url 'submit_review' %}" class="form">
+          {% csrf_token %}
+          <!-- Hidden input to store the product ID -->
+          <input type="hidden" id="product_id" name="product_id" value="">
+      
+          <div class="form-group">
+              <label for="rating">Rating:</label>
+              <div id="star-rating">
+                  <input type="hidden" id="rating" name="rating" value="" class="form-control"> <!-- Hidden input to store the selected rating -->
+              </div>
+          </div>
+      
+          <div class="form-group">
+              <!-- Comment input (you can customize this) -->
+              <label for="comment">Comment:</label>
+              <textarea id="comment" name="comment" rows="4" class="form-control"></textarea>
+          </div>
+          
+          {% if user_has_reviewed_product %}
+          <!-- If the user has already reviewed the product, display an "Update Review" button -->
+          <div class="text-center">
+              <button type="submit" class="btn btn-primary">Update Review</button>
+          </div>
+          {% else %}
+          <!-- If the user hasn't reviewed the product, display a "Submit Review" button -->
+          <div class="text-center">
+              <button type="submit" class="btn btn-primary">Submit Review</button>
+          </div>
+          {% endif %}
+      </form>
+      
+      </div>
+    </div>
+  </div>
+</div>
+  <script>
+    // Function to show the modal and set the product ID
+    function showReviewModal(productId) {
+      // Set the product ID in a hidden input field in the modal form
+      document.getElementById("product_id").value = productId;
+      // Show the modal
+      $('#reviewModal').modal('show');
+    }
+    const starRatingNode = document.getElementById("star-rating");
+const ratingInput = document.getElementById("rating"); // Reference to the hidden input
+
+const starRatingsList = [
+    { id: "5" },
+    { id: "4" },
+    { id: "3" },
+    { id: "2" },
+    { id: "1" }
+];
+
+const ul = document.createElement("ul");
+
+const starRatingsListHtml = starRatingsList.map((starRating) => {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    li.appendChild(a);
+    a.id = starRating.id;
+    a.innerHTML = `&starf;`;
+
+    li.addEventListener("click", handleClick);
+
+    return li;
+});
+
+// Appending the star li nodes to ul
+for (const starRating of starRatingsListHtml) {
+    ul.appendChild(starRating);
+}
+
+starRatingNode.appendChild(ul);
+
+function handleClick(e) {
+  const id = e.target.id; // Use the id as a string
+  
+  // Set the selected rating value in the hidden input
+  ratingInput.value = id;
+
+  // Remove 'active' class from all li nodes
+  const liNodes = document.querySelectorAll('li');
+  for (let node of liNodes) {
+      node.classList.remove("active");
+  }
+
+  // Add 'active' class to the clicked li node
+  this.classList.add('active');
+}
+
+
+  </script>
+  <style>
+    /* Add your custom CSS styles here */
+    body {
+        background-color: #f7f7f7;
+        font-family: Arial, sans-serif;
+    }
+    h2 {
+        color: #333;
+    }
+    table {
+        width: 150%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        padding: 10px;
+        text-align: center;
+    }
+    th {
+        background-color: #333;
+        color: #fff;
+    }
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    .status-pending {
+        color: #FF5733; /* Red for Pending status */
+    }
+    .status-successful {
+        color: #4CAF50; /* Green for Successful status */
+    }
+    .status-failed {
+        color: #FFC300; /* Yellow for Failed status */
+    }
+    .cart-total {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .cart-total h6 {
+        color: #333;
+    }
+    /* Target the container within the .ftco-section.ftco-cart */
+.ftco-section.ftco-cart .container {
+    max-width: 1200px; /* Set your desired maximum width */
+    margin: 0 auto; /* Center the container */
+}
+    /* Add some spacing between form elements */
+    .form-group {
+      margin-bottom: 20px;
+  }
+  
+  #star-rating ul {
+    display: flex;
+    gap: 15px;
+    list-style-type: none;
+    unicode-bidi: bidi-override;
+    direction: rtl;
+    margin-right:50px;
+  }
+  
+  li {
+    font-size: 50px;
+    cursor: pointer;
+    color: #34495e;
+    transition: all 0.5s ease;
+  }
+  
+  li:hover, li.active {
+    color: #f1c40f;
+    transform: scale(1.2);
+  }
+  
+  li:hover ~ li, li.active ~ li {
+    color: #f1c40f;
+  }
+</style>
+{%endblock%}

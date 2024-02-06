@@ -1,0 +1,83 @@
+{% extends 'admindash/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-body">
+        <h5 class="fw-semibold">Edit Category Details</h5>
+        <!-- edit_category.html -->
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+            {% endif %}
+        <form method="post" onsubmit="return validateForm()">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="category_name">Category Name:</label>
+                <input type="text" id="category_name" name="category_name" value="{{ category.category_name }}" class="form-control">
+                <span id="category_name_error" class="text-danger"></span>
+            </div>
+        
+            <div class="form-group">
+                <label for="category_description">Category Description:</label>
+                <textarea id="category_description" name="category_description" class="form-control">{{ category.category_description }}</textarea>
+                <span id="category_description_error" class="text-danger"></span>
+            </div>
+        
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+  </div>
+</div>
+<script>
+    function validateForm() {
+        const category_nameInput = document.getElementById('category_name');
+        const category_nameError = document.getElementById('category_name_error');
+        const category_nameValue = category_nameInput.value.trim();
+
+        const category_descriptionInput = document.getElementById('category_description');
+        const category_descriptionError = document.getElementById('category_description_error');
+        const category_descriptionValue = category_descriptionInput.value.trim();
+
+        let isValid = true;
+
+        // Validate Category Name
+        if (category_nameValue === '') {
+            category_nameError.textContent = 'Category Name cannot be empty.';
+            isValid = false;
+        } else if (!/^[A-Za-z\s]+$/.test(category_nameValue)) {
+            category_nameError.textContent = 'Category Name should contain only alphabetic characters.';
+            isValid = false;
+        } else {
+            category_nameError.textContent = '';
+        }
+
+        // Validate Category Description
+        if (category_descriptionValue.trim() === '') {
+            category_descriptionError.textContent = 'Category Description cannot be empty.';
+            isValid = false;
+        } else {
+            category_descriptionError.textContent = '';
+        }
+
+        return isValid;
+    }
+</script>
+<style>
+    /* Custom CSS styles */
+    .form-group {
+        margin-bottom: 20px; /* Add space between form groups (input fields) */
+    }
+
+    .form-group .btn {
+        margin-right: 10px; /* Add space to the right of the buttons */
+        line-height: 2; /* Adjust line height for better vertical alignment */
+    }
+
+    /* You can further customize the styles as needed */
+</style>
+
+{% endblock %}

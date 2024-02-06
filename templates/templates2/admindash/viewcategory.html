@@ -1,0 +1,40 @@
+{%extends 'admindash/base.html'%}
+{% load static %}
+{%block content%}
+
+      <div class="container-fluid">
+        <div class="card">
+          <div class="card-body">
+            <div class="container mt-4">
+                <h5 class="fw-semibold">Added Categories</h5>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="font-weight: bold;">Category Name</th>
+                            <th style="font-weight: bold;">Category Description</th>
+                            <th style="font-weight: bold;">Actions</th> <!-- Add a new column for actions -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                            <tr>
+                                <td style="font-weight: bold;">{{ category.category_name }}</td>
+                                <td style="font-weight: bold;">{{ category.category_description }}</td>
+                                <td>
+                                    <a href="{% url 'edit_category' category.id %}" class="btn btn-primary btn-sm btn-action">Update</a>
+                                    <a href="{% url 'delete_category' category.id %}" class="btn btn-danger btn-sm btn-action">Delete</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3">No categories added yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+      {%endblock%}  

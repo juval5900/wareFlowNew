@@ -1,0 +1,77 @@
+{% extends 'sellerdash/base.html' %}
+{% load static %}
+{%block content%}
+<style>
+  
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    td img {
+        max-width: 100px;
+        max-height: 100px;
+    }
+</style>
+      <div class="container-fluid">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Added Products</h5>
+            <div class="container">
+              <h2>Your Products</h2>
+              <table>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Image</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in user_products %}
+                        <tr>
+                            <td>{{ product.product_name }}</td>
+                            <td>{{ product.product_description }}</td>
+                            <td>{{ product.category }}</td>
+                            <td>RS {{ product.product_price }}</td>
+                            <td>{{ product.product_stock }} KG</td>
+                            <td>
+                                {% if product.product_image %}
+                                    <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                                {% else %}
+                                    No Image
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'edit_product' product.id %}" class="btn btn-sm btn-primary">Edit</a>
+                            </td>
+                            <td>
+                                <a href="{% url 'delete_add_product' product.id %}" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+          </div>
+
+          </div>
+        </div>
+      </div>
+      {%endblock%}

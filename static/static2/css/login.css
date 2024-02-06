@@ -1,0 +1,203 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+#logoimg
+{
+    width: 250px;
+    height: 250px;
+    margin-left: 138px;
+    margin-top: -20px;
+}
+
+.signin
+{
+    width: 600px;
+    height: auto;
+    border-width: 2px;
+    margin-left: 600px;
+    margin-top: -100px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+}
+
+#signintext
+{
+    margin-top: 80px;
+    margin-left: 40px;
+    width:150px;
+    height: 80px;
+    color:#27350F; 
+    font-size: medium;
+    padding-top: 10px;
+}
+#signintext1
+{
+    margin-top: 30px;
+    margin-left: 2px;
+    color: green;
+}
+#signintext2
+{
+    width: 55px;
+    margin-top: -28px;
+    margin-left: 65px;
+    border-radius: 30%;
+}
+#signintext3
+{
+    margin-top: -6px;
+    
+}
+.signin-form
+{
+    width: 300px; 
+    margin-left: 20px;
+    margin-top: 30px;
+    height: 300px;
+    
+}
+.signinelement
+{
+    border-color: #27350F;
+    border-style:solid;
+    border-width: 1px;
+    margin-top: 20px;
+    margin-left: 20px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    width: 200px;
+    height: 40px;
+    padding: 10px;
+    font-size:small;
+}
+
+.signinelement:focus {
+    border-style: hidden;
+    
+  }
+  
+  .signinelement:hover {
+    border-color: darkgreen;
+  background-color: white;
+  border-style: hidden;
+  fill: darkgreen;
+  }
+  
+
+.signinbtn
+{
+
+    background-color: #27350F;
+    border-radius: 100px;
+    margin-top: 20px;
+    margin-left: 70px;
+    color: white;
+    width: 100px;
+    transition: 0.5s;
+    height: 35px;
+    border-style: none;
+}
+
+
+.signinbtn:focus {
+  color: #27350F;
+  background-color: white;
+  border-color: #27350F;
+  border-style: groove;
+  fill: #27350F;
+}
+
+.signinbtn:hover {
+  border-color: #27350F;
+  background-color: white;
+  border-style: groove;
+  color: #27350F;
+  fill: #27350F;
+}
+
+.signinbtn:active {
+  border-color: #27350F;
+  color: #27350F;
+  border-style: groove;
+  background-color: white;
+  fill: #27350F;
+}
+
+#signinelement2
+{
+    margin-top: 30px;
+    margin-left: 65px;
+    font-size: medium;
+    color: #27350F;
+
+}
+#signinelement3
+{
+    margin-left: 30px;
+    margin-top: 20px;
+    font-size: medium;
+    color: #27350F;
+}
+.icon-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+
+    width: 100px;
+    margin-left: 69px;
+}
+
+#icon {
+    width: 20px;
+    height: 20px;
+    margin: 0 10px;
+    transition: transform 0.3s ease-in-out;
+    margin-top: 10px;
+}
+
+#icon:hover {
+    transform: scale(1.2);
+} 
+#img1
+{
+    width: 350px;
+    margin-left: 285px;
+    margin-top: -436px;
+
+}
+
+@media screen and (max-width: 768px) {
+    .signin {
+        width: 57%;
+        margin-left: 20%;
+       
+    }
+
+    .signinimg {
+        display: none;
+    }
+
+    #img1 {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #logoname {
+        font-size: small;
+    }
+
+    .signin {
+        margin-top: 20px;
+    }
+
+    #img1 {
+        display: none;
+    }
+}
+
+

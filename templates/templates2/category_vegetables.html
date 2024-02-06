@@ -1,0 +1,76 @@
+{%extends 'base.html'%}
+{% load static %}
+{%block content%}
+    <!-- END nav -->
+
+    <div class="hero-wrap hero-bread" style="background-image: url({% static 'static2/images/bg_1.jpg' %});">
+      <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center">
+          <div class="col-md-9 ftco-animate text-center">
+          	<p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home</a></span> <span>Products</span></p>
+            <h1 class="mb-0 bread">Products</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+
+	<section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-10 mb-5 text-center">
+                    <ul class="product-category">
+                        <li><a href="{% url 'shop' %}" >All</a></li>
+                        <li><a href="{% url 'category_vegetables' %}">Vegetables</a></li>
+                        <li><a href="{% url 'category_fruits' %}">Fruits</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 ftco-animate">
+                    <div class="row">
+                        {% for product in category_products.Vegetables %}
+                        <div class="col-md-6 col-lg-3 ftco-animate">
+                            <div class="product">
+                                <a href="{% url 'product_single' product.id %}" class="img-prod">
+                                    <div class="img-container">
+                                        <img class="img-fluid" src="{{ product.product_image.url }}" alt="Product Image">
+                                    </div>
+                                    {% if product.product_stock > 0 %}
+                                    <span class="status">In Stock</span>
+                                    {% else %}
+                                    <span class="status out-of-stock">Out of Stock</span>
+                                    {% endif %}
+                                    <div class="overlay"></div>
+                                </a>
+                                <div class="text py-3 pb-4 px-3 text-center">
+                                    <h3><a href="{% url 'product_single' product.id %}">{{ product.product_name }}</a></h3>
+                                    <div class="d-flex">
+                                        <div class="pricing">
+                                            <p class="price">RS. {{ product.product_price }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="bottom-area d-flex px-3">
+                                        <div class="m-auto d-flex">
+                                            <a href="#" class="add-to-cart d-flex justify-content-center align-items-center text-center">
+                                                <span><i class="ion-ios-menu"></i></span>
+                                            </a>
+                                            <a href="#" class="buy-now d-flex justify-content-center align-items-center mx-1">
+                                                <span><i class="ion-ios-cart"></i></span>
+                                            </a>
+                                            <a href="#" class="heart d-flex justify-content-center align-items-center">
+                                                <span><i class="ion-ios-heart"></i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+    
+        </div>
+    </section>
+    
+    {%endblock%}

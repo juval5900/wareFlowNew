@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Add your custom CSS styles here */
+        body {
+            background-color: #f8f9fa;
+        }
+        .payment-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        /* Add more styles as needed */
+    </style>
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="payment-container">
+                        <h2 class="text-center">Payment Details</h2><br><br>
+                        <!-- Display the name of the current user -->
+                        <p><strong>{{ user.username }}</strong>, Your Order is Ready</p>
+                        
+                        <!-- Display the list of products and their details in a table -->
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cart_item in cart_items %}
+                                    <tr>
+                                        <td>{{ cart_item.product.product_name }}</td>
+                                        <td>{{ cart_item.quantity }}</td>
+                                        <td>RS {{ cart_item.product.product_price|floatformat:2 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <!-- Display the total amount -->
+                        <p>Total Amount: <strong>RS {{ total_price|floatformat:2 }}</strong></p><br>
+                        <button type="submit" id="pay-btn" class="btn btn-primary btn-block">Place Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var options = {
+            // Enter the Key ID generated from the Dashboard
+            key: "{{ razorpay_merchant_key }}",
+            // Amount is in currency subunits.
+            // Default currency is INR. Hence,
+            // 50000 refers to 50000 paise
+            amount: "{{ razorpay_amount }}",
+            currency: "{{ currency }}",
+            // Your/store name.
+            name: "Dj Razorpay",
+            // Pass the `id` obtained in the response of Step 1
+            order_id: "{{ razorpay_order_id }}",
+            callback_url: "{{ callback_url }}",
+        };
+        // initialise razorpay with the options.
+        var rzp1 = new Razorpay(options);
+        // add event listener to the payment button.
+        document.getElementById("pay-btn").onclick = function (e) {
+            rzp1.open();
+            e.preventDefault();
+        };
+    </script>
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

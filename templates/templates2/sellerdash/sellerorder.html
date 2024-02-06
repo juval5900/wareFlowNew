@@ -1,0 +1,50 @@
+{% extends 'sellerdash/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card swing">
+        <div class="card-body">
+            <h2>Orders for {{ seller.username }}</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>User</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total Price</th>
+                        <th>Order Date</th>
+                        <th>Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order_item in seller_orders %}
+                        <tr>
+                            <td>{{ order_item.order.id }}</td>
+                            <td>{{ order_item.order.user.username }}</td>
+                            <td>{{ order_item.product.product_name }}</td>
+                            <td>{{ order_item.quantity }}</td>
+                            <td>RS {{ order_item.price }}</td>
+                            <td>RS {{ order_item.total_price }}</td>
+                            <td>{{ order_item.order.order_date }}</td>
+                            <td>
+                                {% if order_item.order.payment_status == 'successful' %}
+                                  <div style="color: green; font-weight: bold;">
+                                    <span style="background-color: lightgreen; padding: 3px 5px; border-radius: 3px;">&#10004;</span> Paid
+                                  </div>
+                                {% else %}
+                                  <div style="color: red; font-weight: bold;">
+                                    <span style="background-color: salmon; padding: 3px 5px; border-radius: 3px;">&#10008;</span> Pending
+                                  </div>
+                                {% endif %}
+                              </td>                         
+                            </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

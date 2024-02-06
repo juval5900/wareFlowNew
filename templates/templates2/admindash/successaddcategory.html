@@ -1,0 +1,83 @@
+{% extends 'admindash/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-body">
+      <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <!-- Session info and logout link -->
+          <div>
+            {% if messages %}
+              {% for message in messages %}
+                {% if message.tags == 'success' %}
+                  <p class="session-info">New Category Added</p>
+                {% elif message.tags == 'error' %}
+                  <p class="session-info">Category with that name already exists</p>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>   
+        <div class="text-center mt-3">
+          <a href="{% url 'viewcategory' %}" class="btn btn-primary btn-action">View Category</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  /* Customize styles here */
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f8f8;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .card {
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .session-info {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 20px;
+  }
+
+  .btn-action {
+    margin-top: 20px;
+  }
+
+  /* You can further customize the styles as needed */
+
+  /* Add responsive styles for smaller screens */
+  @media (max-width: 768px) {
+    .container {
+      padding: 10px;
+    }
+
+    .session-info {
+      font-size: 16px;
+    }
+
+    .page-title {
+      font-size: 24px;
+    }
+  }
+</style>
+
+{% endblock %}

@@ -1,0 +1,241 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Administrator Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      /* Custom CSS styles */
+      body {
+        background-color: #f8f8f8;
+        font-family: Arial, sans-serif;
+      }
+  
+      .container {
+        max-width: 1200px;
+        margin: 20px auto;
+      }
+  
+      .filter-label, .search-label {
+        font-weight: bold;
+      }
+  
+      .filter-select, .search-input {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        background-color: #f7f7f7;
+        color: #333;
+        width: 100%;
+      }
+  
+      .search-button {
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+  
+      .search-button:hover {
+        background-color: #0056b3;
+      }
+  
+      .application-list th, .application-list td {
+        vertical-align: middle;
+      }
+  
+      .approval-status {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+  
+      .approval-message {
+        margin-top: 10px;
+      }
+  
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+  
+      .table th, .table td {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ccc;
+      }
+  
+      .table th {
+        background-color: #007bff;
+        color: #fff;
+      }
+  
+      .table tbody tr:nth-child(even) {
+        background-color: #f7f7f7;
+      }
+  
+      .table tbody tr:hover {
+        background-color: #e0e0e0;
+      }
+  
+      .file-link {
+        text-decoration: none;
+        color: #007bff;
+      }
+  
+      .file-link:hover {
+        text-decoration: underline;
+      }
+  
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <p>Welcome, {{ request.user.username }}</p>
+      </div>
+      <div>
+        <p><a href="{% url 'loggout' %}" class="btn btn-danger">Logout</a></p>
+      </div>
+    </div>
+    <div id="indiv">
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="status-filter" class="filter-label">Filter by status:</label>
+          <select id="status-filter" class="filter-select">
+            <option value="all">All</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <form class="search-form" id="searchform">
+            <div class="input-group">
+              <label for="name" class="search-label">Search by name:</label>
+              <input type="text" id="name" name="name" class="form-control search-input">
+              <div class="input-group-append">
+                <button type="submit" class="btn btn-primary search-button">Search</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <h2>Legal Administrator Dashboard</h2>
+<p id="no-application-message" style="display: none;">No matching applications</p>
+<table class="table application-list">
+  <thead>
+    <tr>
+      <th>Application ID</th>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Expiry Date</th>
+
+      <th>Certification Authority</th>
+      <th>Phone Number</th>
+      <th>Certification Number</th>
+      <th>File</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for application in seller_applications %}
+    <tr>
+      <td>{{ application.id }}</td>
+      <td>{{ application.first_name }}</td>
+      <td>{{ application.last_name }}</td>
+      <td>{{ application.expiry_date_from }}</td>
+
+      <td>{{ application.certification_authority }}</td>
+      <td>{{ application.phone_number }}</td>
+      <td>{{ application.certification_number }}</td>
+      <td>
+        {% if application.certification_image %}
+        <a href="{{ application.certification_image.url }}" target="_blank" class="btn btn-primary">View File</a>
+        {% else %}
+          No File Available
+        {% endif %}
+      </td>
+      <td id="status-cell-{{ application.id }}">
+        <div class="approval-status">
+          {% if application.is_approved == 'pending' %}
+          <form method="post" action="{% url 'approve_certification' application.id %}">
+            {% csrf_token %}
+            <button class="btn btn-success approve-btn" type="submit">Approve</button>
+          </form>
+          <form method="post" action="{% url 'reject_certification' application.id %}">
+            {% csrf_token %}
+            <button class="btn btn-danger reject-btn" type="submit">Reject</button>
+          </form>
+          {% elif application.is_approved == 'approved' %}
+            <span class="text-success">Approved</span>
+            <form method="post" action="{% url 'reject_certification' application.id %}">
+              {% csrf_token %}
+              <button class="btn btn-danger reject-btn" type="submit">Reject</button>
+            </form>
+          {% elif application.is_approved == 'rejected' %}
+            <span class="text-danger">Rejected</span>
+            <form method="post" action="{% url 'approve_certification' application.id %}">
+              {% csrf_token %}
+              <button class="btn btn-success approve-btn" type="submit">Approve</button>
+            </form>
+          {% else %}
+            <p>Not working</p>
+          {% endif %}
+          <div class="approval-message"></div>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+    </form>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const input = document.querySelector('#name');
+      const roleFilter = document.querySelector('#status-filter');
+      const rows = document.querySelectorAll('.application-list tbody tr');
+      const noUserMessage = document.querySelector('#no-application-message');
+
+      input.addEventListener('input', filterUsers);
+      roleFilter.addEventListener('change', filterUsers);
+
+      function filterUsers() {
+        const searchTerm = input.value.toLowerCase();
+        const selectedRole = roleFilter.value;
+        let found = false;
+
+        rows.forEach(function (row) {
+          const username = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+          const role = row.querySelector('td:nth-child(7)').textContent.toLowerCase();
+
+          if ((selectedRole === 'all' || role.includes(selectedRole)) &&
+              (searchTerm.length === 0 || username.includes(searchTerm))) {
+            row.style.display = '';
+            found = true;
+          } else {
+            row.style.display = 'none';
+          }
+        });
+
+        if (found) {
+          noUserMessage.style.display = 'none';
+        } else {
+          noUserMessage.style.display = 'block';
+        }
+      }
+    });
+  </script>
+</body>
+</html>

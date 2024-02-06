@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <!-- Include Bootstrap CSS (you may need to adjust the paths) -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Add custom styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            margin-top: 20px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .invoice-header {
+            text-align: center;
+        }
+
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+
+        .invoice-title {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .invoice-details {
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .invoice-details h3 {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .custom-table th,
+        .custom-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .custom-table th {
+            background-color: #5aff35;
+            color: #333333;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .order-image {
+            max-width: 100px;
+            max-height: 100px;
+        }
+
+        .total-amount {
+            margin-top: 20px;
+            text-align: right;
+            font-size: 24px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="invoice-header">
+            <img src="{% static 'static2/images/logoecohive.png' %}" alt="Your Logo" class="logo"> <!-- Replace 'your-logo-url.png' with your actual logo URL -->
+            <div class="invoice-title">Invoice</div>
+        </div>
+        <div class="invoice-details">
+            <h3>Payment ID: {{ order.razorpay_order_id }}</h3>
+            <h3>Order ID: {{ order.id }}</h3>
+        </div>
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.orderitem_set.all %}
+                <tr>
+                    <td>{{ item.product.product_name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="total-amount">
+            <h6>Total Paid Amount: {{ order.total_price }}</h6>
+        </div>
+    </div>
+</body>
+</html>

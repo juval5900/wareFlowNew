@@ -1,0 +1,20 @@
+{%extends 'sellerdash/base.html'%}
+{% load static %}
+{%block content%}
+<div class="container-fluid">
+  <div class="card swing">
+    <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <!-- Session info and logout link -->
+      <div>
+        <p>Certification Submission is Succeeded for {{ request.user.username }}</p>
+      </div>
+      <div>
+        <p><a href="{% url 'dashseller' %}" class="btn btn-danger">Back</a></p>
+      </div>
+    </div>
+    <h2>Your Application is Submitted</h2>
+</div>
+</div>
+</div>
+{%endblock%}

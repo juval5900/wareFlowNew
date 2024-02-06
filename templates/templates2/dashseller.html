@@ -1,0 +1,326 @@
+{% extends 'sellerdash/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-bold mb-4">Certification Approval</h5>
+            {{  existing_certification.is_approved }}
+         {% if existing_certification %}
+
+            {% if existing_certification.is_approved == 'pending' %}
+            <p class="certification-message">You have already entered your Licence details.</p>
+
+            {% elif existing_certification.is_approved == 'approved' %}
+            <p class="certification-message">Your Application is approved.</p>
+            {% elif existing_certification.is_approved == 'rejected' %}
+            <p class="certification-message">Your Application is rejected.</p>
+            {% else %}
+              <p> Not working </p>                
+            {% endif %}
+          {% else %}
+            <!-- Display the certification form -->
+            <form method="post" enctype="multipart/form-data" class="certification-form" id="certification-form">
+                {% csrf_token %}
+            
+                <div class="form-group">
+                    <!-- Display the 'first_name' field -->
+                    <label for="{{ form.first_name.id_for_label }}">First Name:</label>
+                    <input type="text" id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.name }}" class="form-control" required>
+                    <span class="text-danger" id="first-name-error"></span>
+                </div>
+            
+                <div class="form-group">
+                    <!-- Display the 'last_name' field -->
+                    <label for="{{ form.last_name.id_for_label }}">Last Name:</label>
+                    <input type="text" id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.name }}" class="form-control" required>
+                    <span class="text-danger" id="last-name-error"></span>
+                </div>
+            
+                <div class="form-group">
+                    <!-- Display the 'expiry_date_to' field -->
+                    <label for="{{ form.expiry_date.id_for_label }}">Expiry Date :</label>
+                    <input type="date" id="{{ form.expiry_date_from.id_for_label }}" name="{{ form.expiry_date_from.name }}" class="form-control" required>
+                    <span class="text-danger" id="expiry-date-error"></span>
+                </div>
+            
+                <div class="form-group">
+                    <!-- Display the 'certification_authority' field -->
+                    <label for="{{ form.certification_authority.id_for_label }}">Certifying Body:</label>
+                    <input type="text" id="{{ form.certification_authority.id_for_label }}" name="{{ form.certification_authority.name }}" class="form-control" required>
+                    <span class="text-danger" id="certification-authority-error"></span>
+                </div>
+                
+                <div class="form-group">
+                    <!-- Display the 'phone_number' field -->
+                    <label for="{{ form.phone_number.id_for_label }}">Phone Number:</label>
+                    <input type="text" id="{{ form.phone_number.id_for_label }}" name="{{ form.phone_number.name }}" class="form-control" required>
+                    <span class="text-danger" id="phone-number-error"></span>
+                </div>
+            
+                <div class="form-group">
+                    <!-- Display the 'certification_number' field -->
+                    <label for="{{ form.certification_number.id_for_label }}">Certification Number:</label>
+                    <input type="text" id="{{ form.certification_number.id_for_label }}" name="{{ form.certification_number.name }}" class="form-control" required>
+                    <span class="text-danger" id="certification-number-error"></span>
+                </div>
+                <div class="form-group">
+                    <!-- Display the 'certification_number' field -->
+                    <label for="{{ form.address.id_for_label }}">Full Address:</label>
+                    <textarea id="{{ form.address.id_for_label }}" name="{{ form.address.name }}" class="form-control" required></textarea>
+                    <span class="text-danger" id="address-error"></span>
+                </div>
+            
+                <div class="form-group">
+                    <!-- Display the 'certification_image' field -->
+                    <label for="{{ form.certification_image.id_for_label }}">Copy of Certification:</label>
+                    <input type="file" accept=".img,.jpg,.png/*" id="{{ form.certification_image.id_for_label }}" name="{{ form.certification_image.name }}" class="form-control" required>
+                    <span class="text-danger" id="certification-image-error"></span>
+                </div>
+            
+                <div class="btn-container">
+                    <button type="submit" id="submit-button" class="btn btn-primary" >Submit Certification Request</button>
+                </div>
+            </form>
+          {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("certification-form");
+        const firstNameInput = document.querySelector(
+            "#certification-form input[name='first_name']"
+        );
+        const lastNameInput = document.querySelector(
+            "#certification-form input[name='last_name']"
+        );
+        const expiryDateInput = document.querySelector(
+            "#certification-form input[name='expiry_date_from']"
+        );
+        const certificationAuthorityInput = document.querySelector(
+            "#certification-form input[name='certification_authority']"
+        );
+        const phoneNumberInput = document.querySelector(
+            "#certification-form input[name='phone_number']"
+        );
+        const certificationNumberInput = document.querySelector(
+            "#certification-form input[name='certification_number']"
+        );
+        const certificationImageInput = document.getElementById(
+            "{{ form.certification_image.id_for_label }}"
+        );
+        const certificationImageError = document.getElementById(
+            "certification-image-error"
+        );
+
+        form.addEventListener("submit", function (e) {
+            let valid = true;
+
+            // Validation for First Name
+            const firstNameValue = firstNameInput.value.trim();
+            if (!/^[A-Za-z]+$/.test(firstNameValue)) {
+                document.getElementById("first-name-error").textContent =
+                    "Only alphabetic characters are allowed.";
+                valid = false;
+            } else {
+                document.getElementById("first-name-error").textContent = "";
+            }
+
+            // Validation for Last Name
+            const lastNameValue = lastNameInput.value.trim();
+            if (!/^[A-Za-z]+$/.test(lastNameValue)) {
+                document.getElementById("last-name-error").textContent =
+                    "Only alphabetic characters are allowed.";
+                valid = false;
+            } else {
+                document.getElementById("last-name-error").textContent = "";
+            }
+
+            // Validation for Expiry Date (from today to any day)
+            const currentDate = new Date();
+            const selectedDate = new Date(expiryDateInput.value);
+            if (selectedDate < currentDate) {
+                document.getElementById("expiry-date-error").textContent =
+                    "Expiry date must be today or later.";
+                valid = false;
+            } else {
+                document.getElementById("expiry-date-error").textContent = "";
+            }
+
+            // Validation for Certification Authority
+            const certificationAuthorityValue = certificationAuthorityInput.value.trim();
+            if (!/^[A-Za-z]+$/.test(certificationAuthorityValue)) {
+                document.getElementById("certification-authority-error").textContent =
+                    "Only alphabetic characters are allowed.";
+                valid = false;
+            } else {
+                document.getElementById("certification-authority-error").textContent = "";
+            }
+
+            // Validation for Phone Number
+            const phoneNumberValue = phoneNumberInput.value.trim();
+            if (!/^(\+91-|0)?[6-9]\d{9}$/.test(phoneNumberValue)) {
+                document.getElementById("phone-number-error").textContent =
+                    "Invalid phone number (10 digits required).";
+                valid = false;
+            } else {
+                document.getElementById("phone-number-error").textContent = "";
+            }
+
+            // Validation for Certification Number (assuming only digits are allowed)
+            const certificationNumberValue = certificationNumberInput.value.trim();
+            if (!/^\d+$/.test(certificationNumberValue)) {
+                document.getElementById("certification-number-error").textContent =
+                    "Only numeric characters are allowed.";
+                valid = false;
+            } else {
+                document.getElementById("certification-number-error").textContent = "";
+            }
+
+            // Validation for Certification Image
+            const certificationImageValue = certificationImageInput.value.trim();
+            const allowedExtensions = ["jpg", "jpeg", "png", "img"];
+            const fileExtension = certificationImageValue
+                .split(".")
+                .pop()
+                .toLowerCase();
+            if (allowedExtensions.indexOf(fileExtension) === -1) {
+                certificationImageError.textContent =
+                    "Please select a valid image file (jpg, jpeg, png, or img).";
+                certificationImageInput.value = ""; // Clear the input field
+                valid = false;
+            } else {
+                certificationImageError.textContent = "";
+            }
+
+            if (!valid) {
+                e.preventDefault(); // Prevent form submission if there are validation errors
+            }
+        });
+
+        // Add keyup event listeners for real-time validation
+        firstNameInput.addEventListener("keyup", function () {
+            const firstNameValue = firstNameInput.value.trim();
+            if (!/^[A-Za-z]+$/.test(firstNameValue)) {
+                document.getElementById("first-name-error").textContent =
+                    "Only alphabetic characters are allowed.";
+            } else {
+                document.getElementById("first-name-error").textContent = "";
+            }
+        });
+
+        lastNameInput.addEventListener("keyup", function () {
+            const lastNameValue = lastNameInput.value.trim();
+            if (!/^[A-Za-z]+$/.test(lastNameValue)) {
+                document.getElementById("last-name-error").textContent =
+                    "Only alphabetic characters are allowed.";
+            } else {
+                document.getElementById("last-name-error").textContent = "";
+            }
+        });
+
+        expiryDateInput.addEventListener("keyup", function () {
+            const currentDate = new Date();
+            const selectedDate = new Date(expiryDateInput.value);
+            if (selectedDate < currentDate) {
+                document.getElementById("expiry-date-error").textContent =
+                    "Expiry date must be today or later.";
+            } else {
+                document.getElementById("expiry-date-error").textContent = "";
+            }
+        });
+
+        certificationAuthorityInput.addEventListener("keyup", function () {
+            const certificationAuthorityValue = certificationAuthorityInput.value.trim();
+            if (!/^[A-Za-z]+$/.test(certificationAuthorityValue)) {
+                document.getElementById("certification-authority-error").textContent =
+                    "Only alphabetic characters are allowed.";
+            } else {
+                document.getElementById("certification-authority-error").textContent = "";
+            }
+        });
+
+        phoneNumberInput.addEventListener("keyup", function () {
+            const phoneNumberValue = phoneNumberInput.value.trim();
+            if (!/^(\+91-|0)?[6-9]\d{9}$/.test(phoneNumberValue)) {
+                document.getElementById("phone-number-error").textContent =
+                    "Invalid phone number (10 digits required).";
+            } else {
+                document.getElementById("phone-number-error").textContent = "";
+            }
+        });
+
+        certificationNumberInput.addEventListener("keyup", function () {
+            const certificationNumberValue = certificationNumberInput.value.trim();
+            if (!/^\d+$/.test(certificationNumberValue)) {
+                document.getElementById("certification-number-error").textContent =
+                    "Only numeric characters are allowed.";
+            } else {
+                document.getElementById("certification-number-error").textContent = "";
+            }
+        });
+
+        certificationImageInput.addEventListener("change", function () {
+            const certificationImageValue = certificationImageInput.value.trim();
+            const allowedExtensions = ["jpg", "jpeg", "png", "img"];
+            const fileExtension = certificationImageValue
+                .split(".")
+                .pop()
+                .toLowerCase();
+            if (allowedExtensions.indexOf(fileExtension) === -1) {
+                certificationImageError.textContent =
+                    "Please select a valid image file (jpg, jpeg, png, or img).";
+                certificationImageInput.value = ""; // Clear the input field
+            } else {
+                certificationImageError.textContent = "";
+            }
+        });
+    });
+</script>
+
+<style>
+  /* Card title styles */ 
+.card-title {
+    font-size: 1.5rem;
+    color: #007BFF;
+    margin-top:80px;
+}
+
+/* Form message styles */
+.certification-message {
+    font-weight: bold;
+    color: #28a745; /* Green color for approved messages */
+}
+
+/* Form input styles */
+.form-control {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    line-height: 1.5;
+}
+
+/* Error message styles */
+.text-danger {
+    color: #dc3545; /* Red color for error messages */
+}
+
+/* Submit button styles */
+.btn-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.btn-primary {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+</style>
+{% endblock %}
