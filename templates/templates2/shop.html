@@ -18,9 +18,9 @@
 			<div class="row justify-content-center">
                 <div class="col-md-10 mb-5 text-center">
                     <ul class="product-category">
-                        <li><a href="{% url 'shop' %}" >All</a></li>
-                        <li><a href="{% url 'category_vegetables' %}">Vegetables</a></li>
-                        <li><a href="{% url 'category_fruits' %}">Fruits</a></li>
+                        {% comment %} <li><a href="{% url 'shop' %}" >All</a></li>
+                        <li><a href="{% url 'category_vegetables' %}">Vegetables</a></li> {% endcomment %}
+                        <li><a href="{% url 'category_electronics' %}">Electronics</a></li>
                     </ul>
                 </div>
             </div>
@@ -28,7 +28,7 @@
 				{% for product in products %}
 				<div class="col-md-6 col-lg-3 ftco-animate">
           <div class="product {% if product.product_stock <= 0 %}out-of-stock{% endif %}">
-            <a href="{% url 'product_single' product.id %}" class="img-prod">
+            <a href="{% url 'product_single' product.product_id %}" class="img-prod">
                 <div class="img-container">
                     <img class="img-fluid" src="{{ product.product_image.url }}" alt="Product Image">
                 </div>
@@ -40,7 +40,7 @@
                 <div class="overlay"></div>
             </a>
             <div class="text py-3 pb-4 px-3 text-center">
-                <h3><a href="{% url 'product_single' product.id %}">{{ product.product_name }}</a></h3>
+                <h3><a href="{% url 'product_single' product.product_id %}">{{ product.product_name }}</a></h3>
                 <p>{{ product.seller }}</p>
                 <div class="d-flex">
                     <div class="pricing">

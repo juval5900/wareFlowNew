@@ -6,7 +6,8 @@ from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
-from USERAPP.models import Orders, Product,Category
+from USERAPP.models import Orders, Product,Category, Supplier
+from controllerapp.models import Stock
 
 
 # Create your models here.
@@ -132,8 +133,11 @@ class ProductSummary(models.Model):
         return self.product_name
 
     def update_total_stock(self):
+        product_name = models.CharField(max_length=100, unique=True)
         # Calculate the total stock for this product name from the Product model
-        total_stock = Product.objects.filter(product_name=self.product_name).aggregate(total_stock=Sum('product_stock'))['total_stock']
+        total_stock = Stock.objects.filter(order__product__product_name=product_name).aggregate(
+            total_stock=Sum('remaining_quantity'))['total_stock'] or 0
+        
         self.total_stock = total_stock or 0
         self.save()
     @receiver(post_save, sender=Product)
@@ -142,7 +146,8 @@ class ProductSummary(models.Model):
         product_name = instance.product_name
 
         # Calculate the total stock for the given product name
-        total_stock = Product.objects.filter(product_name=product_name).aggregate(total_stock=Sum('product_stock'))['total_stock']
+        total_stock = Stock.objects.filter(order__product__product_name=product_name).aggregate(
+            total_stock=Sum('remaining_quantity'))['total_stock'] or 0
 
         # Update or create the corresponding ProductSummary instance
         product_summary, created = ProductSummary.objects.get_or_create(product_name=product_name)
@@ -211,7 +216,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    seller = models.ForeignKey(Seller, on_delete=models.CASCADE)  # Assuming the seller is also a User
+    seller = models.ForeignKey(Supplier, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)

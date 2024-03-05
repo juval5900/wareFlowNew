@@ -182,3 +182,10 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'validationmailshow@gmail.com'  # Your Gmail email address
 EMAIL_HOST_PASSWORD = 'rjjh qjcq ouql pchb'  # Your Gmail email password or an app-specific pass
+
+
+#payment
+
+
+RAZOR_KEY_ID = 'rzp_test_4xAjz8XY2Rc0tE'
+RAZOR_KEY_SECRET = '69Mk87Zq4kydNx2tnQZ6Zwg5'

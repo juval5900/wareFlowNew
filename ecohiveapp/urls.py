@@ -9,7 +9,6 @@ from django.conf.urls.static import static
 # from ecohiveapp.views import CustomGoogleLoginView
 
 urlpatterns = [
-    path('admin/',admin.site.urls),
     path('customer_index', views.customer_index, name='customer_index'),
 
     path('register.html', views.register, name='register'),
@@ -26,10 +25,10 @@ urlpatterns = [
     path('sellerorder', views.sellerorder, name='sellerorder'),
 
 
-    path('viewaddproduct', views.viewaddproduct, name='viewaddproduct'),
-    path('addproducts', views.addproducts, name='addproducts'),
-    path('viewproducts', views.viewproducts, name='viewproducts'),
-    path('edit_product/<int:product_id>/', views.edit_product, name='edit_product'),
+    # path('viewaddproduct', views.viewaddproduct, name='viewaddproduct'),
+    # path('addproducts', views.addproducts, name='addproducts'),
+    # path('viewproducts', views.viewproducts, name='viewproducts'),
+    # path('edit_product/<int:product_id>/', views.edit_product, name='edit_product'),
     path('delete_product/<int:product_id>/', views.delete_product, name='delete_product'),
     path('category/<int:category_id>/delete/', views.delete_category, name='delete_category'),
     path('edit_category/<int:category_id>/', views.edit_category, name='edit_category'),
@@ -69,7 +68,7 @@ urlpatterns = [
     path('cart/', views.cart_view, name='cart'),
     path('remove_from_cart/<int:cart_item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('update_cart_item/<int:cart_item_id>/', views.update_cart_item, name='update_cart_item'),
-    # path('payment', views.payment, name='payment'),
+    path('payment', views.payment, name='payment'),
     path('orders/', views.orders, name='orders'),
     path('view_orders', views.view_orders, name='view_orders'),
     path('generate_pdf/<int:order_id>/', views.generate_pdf, name='generate_pdf'),
@@ -81,9 +80,9 @@ urlpatterns = [
     path('category/vegetables/', views.category_vegetables, name='category_vegetables'),
     path('category/electronics/', views.category_electronics, name='category_electronics'),
 
-    # #payment
-    # path('paymenthandler/', views.paymenthandler, name='paymenthandler'),
-    # path('paymentsuccess/', views.paymentsuccess, name='productsuccess'),
+    #payment
+    path('paymenthandler/', views.paymenthandler, name='paymenthandler'),
+    path('paymentsuccess/', views.paymentsuccess, name='productsuccess'),
 
 
 

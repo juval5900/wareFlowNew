@@ -2,6 +2,7 @@ from audioop import reverse
 from django.shortcuts import render, redirect
 from django.db.models import Sum, F, Value
 from django.db.models.functions import Coalesce
+from USERAPP import models
 from controllerapp.models import Stock
 from .forms import SignUpForm, LoginForm
 from django.contrib.auth import authenticate, login
@@ -157,7 +158,7 @@ def loggout(request):
     if 'username' in request.session:
         del request.session['username']
         request.session.clear()
-    return redirect('login')
+    return redirect('user_login')
 
 def check_email(request):
     email = request.GET.get('email')
@@ -279,68 +280,68 @@ def delete_product(request, product_id):
     # Render the delete product template
     return render(request, 'templates2/admindash/delete_product.html', {'product': product})
 
-@login_required
-def addproducts(request):
-    existing_certification = Certification.objects.filter(user=request.user).first()
+# @login_required
+# def addproducts(request):
+#     existing_certification = Certification.objects.filter(user=request.user).first()
 
-    if existing_certification:
-        certification_status = existing_certification.is_approved
-    else:
-        certification_status = 'pending'  # Set a default value if no certification exists
+#     if existing_certification:
+#         certification_status = existing_certification.is_approved
+#     else:
+#         certification_status = 'pending'  # Set a default value if no certification exists
 
-    if certification_status == 'approved':
+#     if certification_status == 'approved':
 
-        if request.method == 'POST':
-            product_name = request.POST.get('product_name')
-            formatted_product_name = product_name.capitalize()
-            product_description = request.POST.get('product_description')
-            select_category_id = request.POST.get('select_category')
-            product_price = request.POST.get('product_price')
-            product_stock = request.POST.get('product_stock')
-            product_image = request.FILES.get('product_image')
+#         if request.method == 'POST':
+#             product_name = request.POST.get('product_name')
+#             formatted_product_name = product_name.capitalize()
+#             product_description = request.POST.get('product_description')
+#             select_category_id = request.POST.get('select_category')
+#             product_price = request.POST.get('product_price')
+#             product_stock = request.POST.get('product_stock')
+#             product_image = request.FILES.get('product_image')
 
-        # Retrieve the selected category
-            category = Category.objects.get(id=select_category_id)
+#         # Retrieve the selected category
+#             category = Category.objects.get(id=select_category_id)
 
-        # Check if a product with the same name already exists in the selected category
-        # Check if the current user has already added a product with the same name in this category
-            existing_product = Product.objects.filter(
-                product_name=formatted_product_name,
-                category=category,
-                seller__user=request.user  # Filter by the current user
-            )
+#         # Check if a product with the same name already exists in the selected category
+#         # Check if the current user has already added a product with the same name in this category
+#             existing_product = Product.objects.filter(
+#                 product_name=formatted_product_name,
+#                 category=category,
+#                 seller__user=request.user  # Filter by the current user
+#             )
 
-            if existing_product.exists():
-                error_message = "You have already added a product with this name in the selected category."
-                return render(request, 'sellerdash/addproducts.html', {'error_message': error_message})
+#             if existing_product.exists():
+#                 error_message = "You have already added a product with this name in the selected category."
+#                 return render(request, 'sellerdash/addproducts.html', {'error_message': error_message})
 
-        # Retrieve the seller associated with the currently logged-in user
-            seller = Seller.objects.get(user=request.user)
+#         # Retrieve the seller associated with the currently logged-in user
+#             seller = Seller.objects.get(user=request.user)
 
-        # Create and save the Product instance
-            product = Product(
-                product_name=formatted_product_name,
-                product_description=product_description,
-                category=category,
-                product_price=product_price,
-                product_stock=product_stock,
-                product_image=product_image,
-                seller=seller  # Associate the seller with the product
-            )
-            product.save()
+#         # Create and save the Product instance
+#             product = Product(
+#                 product_name=formatted_product_name,
+#                 product_description=product_description,
+#                 category=category,
+#                 product_price=product_price,
+#                 product_stock=product_stock,
+#                 product_image=product_image,
+#                 seller=seller  # Associate the seller with the product
+#             )
+#             product.save()
 
-            return redirect('successaddproduct')  # Redirect to a success page or your desired destination
+#             return redirect('successaddproduct')  # Redirect to a success page or your desired destination
 
-        categories = Category.objects.all()  # Retrieve all Category objects from the database
+#         categories = Category.objects.all()  # Retrieve all Category objects from the database
 
-        context = {
-        'categories': categories,
-        'certification_status': certification_status,
-  # Pass the categories queryset to the template context
-         }
-        return render(request, 'templates2/sellerdash/addproducts.html', context)
-    else:
-        return render(request, 'templates2/sellerdash/addproducts.html', {'certification_status': certification_status})
+#         context = {
+#         'categories': categories,
+#         'certification_status': certification_status,
+#   # Pass the categories queryset to the template context
+#          }
+#         return render(request, 'templates2/sellerdash/addproducts.html', context)
+#     else:
+#         return render(request, 'templates2/sellerdash/addproducts.html', {'certification_status': certification_status})
 
 def delete_category(request, category_id):
     # Get the category object to delete
@@ -482,30 +483,30 @@ def edit_product_stock(request, pk):
 
     return render(request, 'templates2/admindash/editstock.html', {'product_summary': product_summary})
 
-def edit_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    categories = Category.objects.all()
+# def edit_product(request, product_id):
+#     product = get_object_or_404(Product, id=product_id)
+#     categories = Category.objects.all()
 
-    if request.method == 'POST':
-        # Update the product fields based on form input
-        product.product_description = request.POST['product_description']
+#     if request.method == 'POST':
+#         # Update the product fields based on form input
+#         product.product_description = request.POST['product_description']
 
-        category_id = request.POST.get('select_category')
-        if category_id:
-            category = get_object_or_404(Category, id=category_id)
-            product.category = category
+#         category_id = request.POST.get('select_category')
+#         if category_id:
+#             category = get_object_or_404(Category, id=category_id)
+#             product.category = category
 
-        product.product_price = request.POST['product_price']
-        product.product_stock = request.POST['product_stock']
+#         product.product_price = request.POST['product_price']
+#         product.product_stock = request.POST['product_stock']
 
-        if 'product_image' in request.FILES:
-            product.product_image = request.FILES['product_image']
+#         if 'product_image' in request.FILES:
+#             product.product_image = request.FILES['product_image']
 
-        product.save()
-        messages.success(request, 'Product updated successfully.')
-        return redirect('viewaddproduct')
+#         product.save()
+#         messages.success(request, 'Product updated successfully.')
+#         return redirect('viewaddproduct')
 
-    return render(request, 'templates2/sellerdash/edit_product.html', {'product': product, 'categories': categories})
+#     return render(request, 'templates2/sellerdash/edit_product.html', {'product': product, 'categories': categories})
 
 
 def delete_add_product(request, product_id):
@@ -682,8 +683,14 @@ def update_cart_item(request, cart_item_id):
 
         # Get the new quantity from the form
         new_quantity = int(request.POST.get('quantity'))
+        
+        product = cart_item.product
+            
+        product_name = product.product_name
+        total_remaining_stock = Stock.objects.filter(order__product__product_name=product_name).aggregate(
+            total_remaining_stock=Sum('remaining_quantity'))['total_remaining_stock'] or 0
 
-        if new_quantity > 0 and new_quantity <= cart_item.product.product_stock:
+        if new_quantity > 0 and new_quantity <= total_remaining_stock:
             # Update the cart item's quantity if it's a valid value
             cart_item.quantity = new_quantity
             cart_item.save()
@@ -760,141 +767,156 @@ def checkout(request):
 
     return render(request, 'templates2/checkout.html', context)
 
-# #payment
-# from django.shortcuts import render
-# import razorpay
-# from django.conf import settings
-# from django.views.decorators.csrf import csrf_exempt
-# from django.http import HttpResponseBadRequest
+#payment
+from django.shortcuts import render
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponseBadRequest
 
-# razorpay_client = razorpay.Client(
-#     auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+razorpay_client = razorpay.Client(
+    auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
 
-# def payment(request):
-#     cart_items = Cart.objects.filter(user=request.user)
-#     total_price = Decimal(sum(cart_item.product.product_price * cart_item.quantity for cart_item in cart_items))
+def payment(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    total_price = Decimal(sum(cart_item.product.product_price * cart_item.quantity for cart_item in cart_items))
     
-#     currency = 'INR'
+    currency = 'INR'
 
-#     # Set the 'amount' variable to 'total_price'
-#     amount = int(total_price*100)
-#     # amount=20000
+    # Set the 'amount' variable to 'total_price'
+    amount = int(total_price*100)
+    # amount=20000
 
-#     # Create a Razorpay Order
-#     razorpay_order = razorpay_client.order.create(dict(
-#         amount=amount,
-#         currency=currency,
-#         payment_capture='0'
-#     ))
+    # Create a Razorpay Order
+    razorpay_order = razorpay_client.order.create(dict(
+        amount=amount,
+        currency=currency,
+        payment_capture='0'
+    ))
 
-#     # Order id of the newly created order
-#     razorpay_order_id = razorpay_order['id']
-#     callback_url = '/paymenthandler/'
+    # Order id of the newly created order
+    razorpay_order_id = razorpay_order['id']
+    callback_url = '/paymenthandler/'
 
-#     order = Order.objects.create(
-#         user=request.user,
-#         total_price=total_price,
-#         razorpay_order_id=razorpay_order_id,
-#         payment_status=Order.PaymentStatusChoices.PENDING,
-#     )
+    order = Order.objects.create(
+        user=request.user,
+        total_price=total_price,
+        razorpay_order_id=razorpay_order_id,
+        payment_status=Order.PaymentStatusChoices.PENDING,
+    )
 
-#     # Add the products to the order
-#     for cart_item in cart_items:
-#         product = cart_item.product
-#         price = product.product_price
-#         quantity = cart_item.quantity
-#         total_item_price = price * quantity
+    # Add the products to the order
+    for cart_item in cart_items:
+        product = cart_item.product
+        price = product.product_price
+        quantity = cart_item.quantity
+        total_item_price = price * quantity
 
-#         # Create an OrderItem for this product
-#         order_item = OrderItem.objects.create(
-#             order=order,
-#             product=product,
-#             seller=product.seller,  # Set the seller of the product as the seller of the order item
-#             quantity=quantity,
-#             price=price,
-#             total_price=total_item_price,
-#         )
 
-#     # Save the order to generate an order ID
-#     order.save()
+        seller = product.suppliers.first()  # Get the first supplier
+        # Create an OrderItem for this product
+        order_item = OrderItem.objects.create(
+            order=order,
+            product=product,
+            seller=seller,  # Use the selected seller  # Set the seller of the product as the seller of the order item
+            quantity=quantity,
+            price=price,
+            total_price=total_item_price,
+        )
 
-#     # Create a context dictionary with all the variables you want to pass to the template
-#     context = {
-#         'cart_items': cart_items,
-#         'total_price': total_price,
-#         'razorpay_order_id': razorpay_order_id,
-#         'razorpay_merchant_key': settings.RAZOR_KEY_ID,
-#         'razorpay_amount': amount,  # Set to 'total_price'
-#         'currency': currency,
-#         'callback_url': callback_url,
-#     }
+    # Save the order to generate an order ID
+    order.save()
 
-#     return render(request, 'payment.html', context=context)
+    # Create a context dictionary with all the variables you want to pass to the template
+    context = {
+        'cart_items': cart_items,
+        'total_price': total_price,
+        'razorpay_order_id': razorpay_order_id,
+        'razorpay_merchant_key': settings.RAZOR_KEY_ID,
+        'razorpay_amount': amount,  # Set to 'total_price'
+        'currency': currency,
+        'callback_url': callback_url,
+    }
 
-# @csrf_exempt
-# def paymenthandler(request):
-#     if request.method == "POST":
-#         payment_id = request.POST.get('razorpay_payment_id', '')
-#         razorpay_order_id = request.POST.get('razorpay_order_id', '')
-#         signature = request.POST.get('razorpay_signature', '')
+    return render(request, 'templates2/payment.html', context=context)
 
-#         # Verify the payment signature.
-#         params_dict = {
-#             'razorpay_order_id': razorpay_order_id,
-#             'razorpay_payment_id': payment_id,
-#             'razorpay_signature': signature
-#         }
-#         result = razorpay_client.utility.verify_payment_signature(params_dict)
+from django.db.models import Sum
 
-#         if not result:
-#             # Signature verification failed.
-#             return render(request, 'templates2/paymentfail.html')
 
-#         # Signature verification succeeded.
-#         # Retrieve the order from the database
-#         try:
-#             order = Order.objects.get(razorpay_order_id=razorpay_order_id)
-#         except Order.DoesNotExist:
-#             return HttpResponseBadRequest("Order not found")
 
-#         if order.payment_status == Order.PaymentStatusChoices.SUCCESSFUL:
-#             # Payment is already marked as successful, ignore this request.
-#             return HttpResponse("Payment is already successful")
+@csrf_exempt
+def paymenthandler(request):
+    if request.method == "POST":
+        payment_id = request.POST.get('razorpay_payment_id', '')
+        razorpay_order_id = request.POST.get('razorpay_order_id', '')
+        signature = request.POST.get('razorpay_signature', '')
 
-#         if order.payment_status != Order.PaymentStatusChoices.PENDING:
-#             # Order is not in a pending state, do not proceed with stock update.
-#             return HttpResponseBadRequest("Invalid order status")
+        # Verify the payment signature.
+        params_dict = {
+            'razorpay_order_id': razorpay_order_id,
+            'razorpay_payment_id': payment_id,
+            'razorpay_signature': signature
+        }
+        result = razorpay_client.utility.verify_payment_signature(params_dict)
 
-#         # Capture the payment amount
-#         amount = int(order.total_price * 100)  # Convert Decimal to paise
-#         razorpay_client.payment.capture(payment_id, amount)
+        if not result:
+            # Signature verification failed.
+            return render(request, 'templates2/paymentfail.html')
 
-#         # Update the order with payment ID and change status to "Successful"
-#         order.payment_id = payment_id
-#         order.payment_status = Order.PaymentStatusChoices.SUCCESSFUL
-#         order.save()
+        # Signature verification succeeded.
+        # Retrieve the order from the database
+        try:
+            order = Order.objects.get(razorpay_order_id=razorpay_order_id)
+        except Order.DoesNotExist:
+            return HttpResponseBadRequest("Order not found")
 
-#         # Remove the products from the cart and update stock
-#         cart_items = Cart.objects.filter(user=request.user)
-#         for cart_item in cart_items:
-#             product = cart_item.product
-#             if product.product_stock >= cart_item.quantity:
-#                 # Decrease the product stock and update ProductSummary
-#                 product.product_stock -= cart_item.quantity
-#                 product.save()
-#                 summary, created = ProductSummary.objects.get_or_create(product_name=product.product_name)
-#                 summary.update_total_stock()
-#                 # Remove the item from the cart
-#                 cart_item.delete()
-#             else:
-#                 # Handle insufficient stock, you can redirect or show an error message
-#                 return HttpResponseBadRequest("Insufficient stock for some items")
+        if order.payment_status == Order.PaymentStatusChoices.SUCCESSFUL:
+            # Payment is already marked as successful, ignore this request.
+            return HttpResponse("Payment is already successful")
 
-#         # Redirect to a payment success page
-#         return redirect('orders')
+        if order.payment_status != Order.PaymentStatusChoices.PENDING:
+            # Order is not in a pending state, do not proceed with stock update.
+            return HttpResponseBadRequest("Invalid order status")
+
+        # Capture the payment amount
+        amount = int(order.total_price * 100)  # Convert Decimal to paise
+        razorpay_client.payment.capture(payment_id, amount)
+
+        # Update the order with payment ID and change status to "Successful"
+        order.payment_id = payment_id
+        order.payment_status = Order.PaymentStatusChoices.SUCCESSFUL
+        order.save()
+
+        # Remove the products from the cart and update stock
+        cart_items = Cart.objects.filter(user=request.user)
+        for cart_item in cart_items:
+            product = cart_item.product
+            
+            product_name = product.product_name
+            total_remaining_stock = Stock.objects.filter(order__product__product_name=product_name).aggregate(
+                total_remaining_stock=Sum('remaining_quantity'))['total_remaining_stock'] or 0
+
+            
+            
+            
+            
+            if total_remaining_stock >= cart_item.quantity:
+                # Decrease the product stock and update ProductSummary
+                total_remaining_stock -= cart_item.quantity
+                product.save()
+                summary, created = ProductSummary.objects.get_or_create(product_name=product.product_name)
+                summary.update_total_stock()
+                # Remove the item from the cart
+                cart_item.delete()
+            else:
+                # Handle insufficient stock, you can redirect or show an error message
+                return HttpResponseBadRequest("Insufficient stock for some items")
+
+        # Redirect to a payment success page
+        return redirect('orders')
     
 
-#     return HttpResponseBadRequest("Invalid request method")
+    return HttpResponseBadRequest("Invalid request method")
 
 
 @login_required
@@ -967,7 +989,7 @@ def generate_pdf(request, order_id):
     order = get_object_or_404(Order, id=order_id)
 
     # Create a Django HTML template for the PDF content
-    template = get_template('pdf_order.html')
+    template = get_template('templates2/pdf_order.html')
     context = {'order': order}
     html = template.render(context)
 
