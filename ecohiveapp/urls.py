@@ -13,7 +13,7 @@ urlpatterns = [
 
     path('register.html', views.register, name='register'),
     # path('seller_register.html', views.seller_register, name='seller_register'),
-    path('login.html', views.user_login, name='user_login'),
+    path('user_login.html', views.user_login, name='user_login'),
     path('dashlegal.html', views.dashlegal, name='dashlegal'),
     path('dashseller.html', views.dashseller, name='dashseller'),
     path('successseller.html', views.successseller, name='successseller'),
@@ -37,7 +37,7 @@ urlpatterns = [
     path('reject_certification/<int:certification_id>/', views.reject_certification, name='reject_certification'), 
 
     path('delete_add_product/<int:product_id>/', views.delete_add_product, name='delete_add_product'),
-    path('logout/', views.loggout, name='loggout'),
+    path('logout/', views.cust_loggout, name='cust_loggout'),
     path('check_email/', views.check_email, name='check_email'),
     path('check_username/', views.check_username, name='check_username'),
     # Include allauth URLs for other authentication-related views
@@ -77,8 +77,7 @@ urlpatterns = [
 
     path('about', views.about, name='about'),
     path('shop', views.shop, name='shop'),
-    path('category/vegetables/', views.category_vegetables, name='category_vegetables'),
-    path('category/electronics/', views.category_electronics, name='category_electronics'),
+    path('category/<str:category_name>/', views.category_products, name='category_products'),
 
     #payment
     path('paymenthandler/', views.paymenthandler, name='paymenthandler'),
@@ -94,6 +93,4 @@ urlpatterns = [
 
 
 
-]
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

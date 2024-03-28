@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
+from USERAPP.models import UserProfile
 from .models import Certification
 from django.core.exceptions import ValidationError
 from django.core.exceptions import ValidationError
@@ -94,3 +95,7 @@ class CertificationForm(forms.ModelForm):
         return certification_image
 
 
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = '__all__'

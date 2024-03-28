@@ -165,8 +165,8 @@
 					{% comment %} <!-- Display the seller's information -->
 					<p>Seller: {{ product.seller }}</p>
 					<strong>Seller's Address:</strong>
-					<p>{{ seller_address }}</p>				
-					<h5>Total Stock: {{ product.product_stock }} KG left</h5> {% endcomment %}
+					<p>{{ seller_address }}</p>		{% endcomment %}		
+					<h5>Total Stock: {{ total_stock }} units left</h5> 
 					{% if average_rating %}
 					<span class="star-rating">{{ average_rating }}</span>
 				{% endif %}					<!-- Add to cart button or other actions as needed -->
@@ -194,11 +194,14 @@
 							</div>
 						</div>
 						{% if is_in_cart %}
-						<p style="margin-left:20px;"> Product is already in your cart </p>
-						<a href="{% url 'cart' %}" id="cartlink" >Go to Cart</a>
+							<p style="margin-left:20px;"> Product is already in your cart </p>
+							<a href="{% url 'cart' %}" id="cartlink" >Go to Cart</a>
+						{% elif total_stock < 1 %}
+							<p style="margin-left:20px;"> Out of Stock </p>
 						{% else %}
-						<button type="submit" class="add-to-cart-button" name="buy_now" >Add to Cart</button><br><br>
+							<button type="submit" class="add-to-cart-button" name="buy_now" >Add to Cart</button><br><br>
 						{% endif %}
+
 					</form><br>
 					{% if messages %}
 					{% for message in messages %}

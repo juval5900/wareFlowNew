@@ -44,18 +44,18 @@ from controllerapp.models import Stock
 #         instance.seller.save()
 
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
-    # Add other fields related to the user profile
-    name = models.CharField(max_length=100,null=True, blank=True)
-    email = models.EmailField(max_length=255,null=True, blank=True)
-    profile_pic = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
-    # gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    phone_number = models.CharField(max_length=20, null=True, blank=True)
-    address = models.TextField(blank=True, null=True)
+# class UserProfile(models.Model):
+#     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
+#     # Add other fields related to the user profile
+#     name = models.CharField(max_length=100,null=True, blank=True)
+#     email = models.EmailField(max_length=255,null=True, blank=True)
+#     profile_pic = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+#     # gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+#     phone_number = models.CharField(max_length=20, null=True, blank=True)
+#     address = models.TextField(blank=True, null=True)
     
-    def __str__(self):
-        return self.user.username
+#     def __str__(self):
+#         return self.user.username
 
 class Certification(models.Model):
     APPROVED = 'approved'
@@ -211,8 +211,9 @@ class Order(models.Model):
     razorpay_order_id = models.CharField(max_length=255, default=None)
     payment_status = models.CharField(
         max_length=20, choices=PaymentStatusChoices.choices, default=PaymentStatusChoices.PENDING)
-    def _str_(self):
+    def __str__(self):
         return self.user.username 
+    
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

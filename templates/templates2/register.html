@@ -23,13 +23,13 @@
                 </div>
                 <form class="signup-form" method="POST">
                     {% csrf_token %}
-                    <input type="text" class="signupelement" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" placeholder="User Name" required><br>
+                    <input type="text" class="signupelement" name="FirstName" id="{{ form.username.id_for_label }}" placeholder="Name" required><br>
                     <span id="nameError" style="font-size: small;" class="element"></span><br>
-                    <input type="email" class="signupelement" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" placeholder="Email" required><br>
+                    <input type="email" class="signupelement" name="email" id="{{ form.email.id_for_label }}" placeholder="Email" required><br>
                     <span id="emailError" style="font-size: small;" class="element"></span><br>
-                    <input type="password" class="signupelement" name="{{ form.password1.name }}" id="{{ form.password1.id_for_label }}" placeholder="Password" required><br>
+                    <input type="password" class="signupelement" name="pass" id="{{ form.password1.id_for_label }}" placeholder="Password" required><br>
                     <span id="passwordError" style="font-size: small;" class="element"></span><br>
-                    <input type="password" class="signupelement" name="{{ form.password2.name }}" id="{{ form.password2.id_for_label }}" placeholder="Confirm Password" required><br>
+                    <input type="password" class="signupelement" name="cpass" id="{{ form.password2.id_for_label }}" placeholder="Confirm Password" required><br>
                     <span id="cpasswordError" style="font-size: small;" class="element"></span><br><br>
                     {% comment %} <input type="checkbox"  name="{{ form.is_customer.name }}" id="{{ form.is_customer.id_for_label }}" {{ form.is_customer.checked }}><span class="caption">Customer</span><br><br>
                     <input type="checkbox"  name="{{ form.is_seller.name }}" id="{{ form.is_seller.id_for_label }}" {{ form.is_seller.checked }}><span class="caption">Seller</span><br><br> {% endcomment %}

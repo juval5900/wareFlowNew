@@ -186,7 +186,7 @@ li:hover ~ li, li.active ~ li {
 }
 </style>
   <body class="goto-here">
-		<div class="py-1 bg-primary">
+		{% comment %} <div class="py-1 bg-primary">
     	<div class="container">
     		<div class="row no-gutters d-flex align-items-start align-items-center px-md-0">
 	    		<div class="col-lg-12 d-block">
@@ -203,7 +203,7 @@ li:hover ~ li, li.active ~ li {
 			    </div>
 		    </div>
 		  </div>
-    </div>
+    </div> {% endcomment %}
 	<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
 		<div class="container">
 		  <a class="navbar-brand" href="{% url 'index' %}">WAREFLOW</a>
@@ -237,7 +237,7 @@ li:hover ~ li, li.active ~ li {
 			  {% comment %} <li class="nav-item"><a href="{% url 'wishlist' %}" class="nav-link">Wishlist</a></li> {% endcomment %}
         <li class="nav-item"><a href="{% url 'shop' %}" id="top" class="nav-link">Shop</a></li>
         {% if user.is_authenticated %}
-			  <li class="nav-item cta cta-colored"><a href="{% url 'cart' %}" class="nav-link"><span class="icon-shopping_cart"></span>[{{ cart_item_count }}]</a></li>
+			  <li class="nav-item cta cta-colored"><a href="{% url 'cart' %}" class="nav-link"><span class="icon-shopping_cart"></span>[{{ request.session.cart_item_count }}]</a></li>
         {% else %}
 			  <li class="nav-item cta cta-colored"><a href="{% url 'cart' %}" class="nav-link"><span class="icon-shopping_cart"></span>[0]</a></li>
         {% endif %}
@@ -247,11 +247,11 @@ li:hover ~ li, li.active ~ li {
             <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
               <li class="nav-item dropdown">
                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false">
-					{% if user.userprofile.profile_pic %}
-					  <img src="{{ user.userprofile.profile_pic.url }}" alt="" width="35" height="35" class="rounded-circle">
-					{% else %}
-					  <img src="{% static 'admin/assets/images/profile/user-1.jpg' %}" alt="" width="35" height="35" class="rounded-circle">
-					{% endif %}
+                  {% if request.session.profile_picture_url %}
+                  <img src="{{ request.session.profile_picture_url }}" alt="" width="35" height="35" class="rounded-circle">
+                {% else %}
+                  <img src="{% static 'assets/images/user.png' %}" alt="" width="35" height="35" class="rounded-circle">
+                {% endif %}
 				  </a> 
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
                   <a class="d-flex align-items-center gap-2 dropdown-item">
@@ -267,7 +267,7 @@ li:hover ~ li, li.active ~ li {
                       <i class="ti ti-user fs-6"></i>
                       <p class="mb-0 fs-3">My Orders</p>
                   </a>
-                  <a href="{% url 'loggout' %}" class="d-flex align-items-center gap-2 dropdown-item">
+                  <a href="{% url 'cust_loggout' %}" class="d-flex align-items-center gap-2 dropdown-item">
                     <i class="ti ti-user fs-6"></i>
                     <p class="mb-0 fs-3">Logout</p>
                 </a>
@@ -347,6 +347,10 @@ li:hover ~ li, li.active ~ li {
 
     </script>
 
+
+
+
+    
     {%block content%}{% endblock %}
   </div>
     <div id="hello">

@@ -1,4 +1,5 @@
 from audioop import reverse
+from django import forms
 from django.shortcuts import render, redirect
 from django.db.models import Sum, F, Value
 from django.db.models.functions import Coalesce
@@ -21,7 +22,8 @@ from django.shortcuts import get_object_or_404
 
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required 
-from .models import Category,Product,Seller,UserProfile
+from .models import Category,Product,Seller
+from USERAPP.models import UserProfile, UserRole
 from django.db import IntegrityError  
 from allauth.socialaccount.providers.oauth2.views import OAuth2LoginView
 from allauth.account.views import SignupView
@@ -55,19 +57,43 @@ def customer_index(request):
         }  # Fetch all ProductSummary instances
     return render(request, 'templates2/index.html', context)
 
+from django.shortcuts import redirect
+
 def register(request):
-    msg = None
     if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            msg = 'user created'
-            return redirect('user_login')
-        else:
-            msg = 'form is not valid'
-    else:
-        form = SignUpForm()
-    return render(request,'templates2/register.html', {'form': form, 'msg': msg})
+        # Retrieve form data
+        email = request.POST['email']
+        first_name = request.POST['FirstName']
+        last_name = " "
+        password = request.POST.get('pass')
+        role = "customer"
+        
+        # Create a new user
+        user = User.objects.create_user(
+            username=email,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+        )
+        
+        # Set the password using set_password method
+        user.set_password(password)
+        user.save()
+
+        # Create or update user's role
+        user_role, created = UserRole.objects.get_or_create(user=user)
+        user_role.role = role
+        user_role.save()
+
+        # Create or update user's profile
+        user_profile, created = UserProfile.objects.get_or_create(user=user)
+        user_profile.save()
+
+        # Redirect to login if registration is successful
+        return redirect('user_login')
+
+    # Redirect to register.html if the request method is not POST
+    return render(request, 'templates2/register.html')
 
 
 
@@ -84,15 +110,27 @@ def user_login(request):
             if user is not None:
                 login(request, user)
                 auth_login(request,user)
+                
+                user_cart_items = Cart.objects.filter(user=request.user)
+                cart_item_count = user_cart_items.count()
                 request.session['customer_id'] = user.id
                 request.session['user_type'] = 'customer'
+
+                request.session['cart_item_count'] = cart_item_count
+                # Retrieve user profile only if authentication succeeds
+                user_profile = get_object_or_404(UserProfile, user=user)
+
+                # Set the profile picture URL in the session
+                request.session['profile_picture_url'] = user_profile.profile_picture.url
+
                 return redirect('customer_index')
             else:
                 msg = 'Invalid credentials'
         else:
             msg = 'Error validating form'
+    
+    return render(request, 'templates2/user_login.html', {'form': form, 'msg': msg})
 
-    return render(request, 'templates2/login.html', {'form': form, 'msg': msg})
 
 @login_required
 def dashseller(request):
@@ -152,7 +190,7 @@ def dashlegal(request):
     return render(request, 'templates2/dashlegal.html', context)
 
 
-def loggout(request):
+def cust_loggout(request):
     print('Logged Out')
     logout(request)
     if 'username' in request.session:
@@ -227,11 +265,24 @@ def addcategory(request):
         except IntegrityError as e:
             # Handle other database integrity errors if needed
             messages.error(request, 'Error creating category: {}'.format(str(e)))
-
+    if request.user.is_authenticated:
+        user_cart_items = Cart.objects.filter(user=request.user)
+        cart_item_count = user_cart_items.count()
+    else:
+        cart_item_count = 0
+    
+    request.session['cart_item_count'] = cart_item_count
     return render(request, 'templates2/admindash/addcategory.html')
 
 def viewcategory(request):
     categories = Category.objects.all()
+    if request.user.is_authenticated:
+        user_cart_items = Cart.objects.filter(user=request.user)
+        cart_item_count = user_cart_items.count()
+    else:
+        cart_item_count = 0
+    
+    request.session['cart_item_count'] = cart_item_count
     return render(request, 'templates2/admindash/viewcategory.html', {'categories': categories})
 
 def successseller(request):
@@ -385,35 +436,86 @@ def delete_certification(request, certification_id):
     return redirect('dashlegal')
 
 #USER DASHBOARD
+
+
+class ProfilePictureForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['profile_picture']
+        
+        
+from USERAPP.models import UserProfile
+
 @login_required
 def profile(request):
-    try:
-        user_profile = UserProfile.objects.get(user=request.user)
-    except UserProfile.DoesNotExist:
-        # If UserProfile doesn't exist, create one for the user
-        user_profile = UserProfile(user=request.user)
+    user = request.user
+
+    # Try to get the UserProfile or create it if it doesn't exist
+    user_profile = get_object_or_404(UserProfile, user=user)
 
     if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        profile_pic = request.FILES.get('profile_pic')
-        phone_number = request.POST.get('phone_number')
-        address = request.POST.get('address')
+        # Handle profile picture update separately using the form
+        profile_picture_form = ProfilePictureForm(request.POST, request.FILES, instance=user_profile)
+        if profile_picture_form.is_valid():
+            profile_picture_form.save()
 
-        if 'profile_pic' in request.FILES:
-            profile_pic = request.FILES['profile_pic']
-            user_profile.profile_pic = profile_pic
+        # Extract first name and last name from the full name
+        
+        
+        full_name = request.POST.get('nameupdate', '')
 
-        user_profile.name = name
-        user_profile.phone_number = phone_number
-        user_profile.address = address
-        request.user.email = email
+        if ' ' in full_name:
+            # Split the full name into first name and last name
+            first_name, last_name = full_name.split(' ', 1)
+            user.first_name = first_name
+            user.last_name = last_name
+        else:
+            # If there is no space, consider the whole name as the first name
+            user.first_name = full_name
+            user.last_name = ''
 
-        user_profile.save()
-        request.user.save()
-        messages.success(request, 'Profile updated successfully')
+        user.save()
+
+        # Update user profile fields
+        if request.POST.get('dobupdate'):
+            user_profile.date_of_birth = request.POST.get('dobupdate')
+        if request.POST.get('countryupdate'):
+            user_profile.country = request.POST.get('countryupdate')
+        if request.POST.get('stateupdate'):
+            user_profile.state = request.POST.get('stateupdate')
+        if request.POST.get('cityupdate'):
+            user_profile.city = request.POST.get('cityupdate')
+        if request.POST.get('distupdate'):
+            user_profile.district = request.POST.get('distupdate')
+        if request.POST.get('numupdate'):
+            user_profile.phone_no = request.POST.get('numupdate')
+        if request.POST.get('adrupdate'):
+            user_profile.addressline1 = request.POST.get('adrupdate')
+        if request.POST.get('adrlupdate'):
+            user_profile.addressline2 = request.POST.get('adrlupdate')
+        if request.POST.get('pinupdate'):
+            user_profile.pin_code = request.POST.get('pinupdate')
+            
+
+        with transaction.atomic():
+            user.save()
+            user_profile.save()
         return redirect('profile')
 
+    context = {
+        'user': user,
+        'user_profile': user_profile,
+        'profile_picture_form': ProfilePictureForm(instance=user_profile),  # Pass the form to the template
+    }
+    
+    
+    if request.user.is_authenticated:
+        user_cart_items = Cart.objects.filter(user=request.user)
+        cart_item_count = user_cart_items.count()
+    else:
+        cart_item_count = 0
+    
+    request.session['cart_item_count'] = cart_item_count
     return render(request, 'templates2/userprofile/user_profile.html', {'user_profile': user_profile})
 
 
@@ -530,6 +632,7 @@ from django.db.models import Avg
 def product_single(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     user = request.user
+    
     # product = Product.objects.get(pk=product_id)
 
     # Retrieve reviews for the specific product
@@ -585,9 +688,17 @@ def product_single(request, product_id):
         'reviews': reviews,
         'user_ratings': user_ratings,  
         'average_rating': star_rating, # A list of user ratings.
-
+        'total_stock': total_stock_count,
 
     }
+    if request.user.is_authenticated:
+        user_cart_items = Cart.objects.filter(user=request.user)
+        cart_item_count = user_cart_items.count()
+    else:
+        cart_item_count = 0
+    
+    request.session['cart_item_count'] = cart_item_count
+
 
     return render(request, 'templates2/product-single.html', context)
 
@@ -597,60 +708,71 @@ def remove_from_cart(request, cart_item_id):
 
     if request.method == 'POST':
         cart_item.delete()
-
+    if request.user.is_authenticated:
+        user_cart_items = Cart.objects.filter(user=request.user)
+        cart_item_count = user_cart_items.count()
+    else:
+        cart_item_count = 0
+    
+    request.session['cart_item_count'] = cart_item_count
     return redirect('cart')
 
 def about(request):
     # Add your logic here
+    if request.user.is_authenticated:
+        user_cart_items = Cart.objects.filter(user=request.user)
+        cart_item_count = user_cart_items.count()
+    else:
+        cart_item_count = 0
+    
+    request.session['cart_item_count'] = cart_item_count
     return render(request, 'templates2/about.html')
+
+
 def shop(request):
     products = Product.objects.all()
+    if request.user.is_authenticated:
+        user_cart_items = Cart.objects.filter(user=request.user)
+        cart_item_count = user_cart_items.count()
+    else:
+        cart_item_count = 0
     
+    request.session['cart_item_count'] = cart_item_count
     return render(request, 'templates2/shop.html', {'products': products})
 
-def category_vegetables(request):
-    # Filter products by the "Vegetables" category
-    vegetables_category = Category.objects.get(category_name='Vegetables')
-    vegetable_products = Product.objects.filter(category=vegetables_category)
 
-    # Pass the filtered products to the template
-    context = {
-        'category_products': {'Vegetables': vegetable_products},
-    }
+def category_products(request, category_name):
+    # Fetch the category object based on the category name
+    category = get_object_or_404(Category, category_name__iexact=category_name)
 
-    return render(request, 'category_vegetables.html', context)
-
-# def category_electronics(request):
-#     electronics_category = Category.objects.get(category_name='Electronics')
-#     electronics_products = Product.objects.filter(category=electronics_category)
-#     total_stock_count = Stock.objects.filter(order__product=product).aggregate(total_stock=Coalesce(Sum('remaining_quantity'), Value(0)))['total_stock']
-
-#     # Pass the filtered products to the template
-#     context = {
-#         'category_products': {'Fruits': electronics_products},
-#         'total_stock_count': total_stock_count,
-#     }
-#     print(electronics_products)
-#     return render(request, 'templates2/category_fruits.html', context)
-
-
-
-
-def category_electronics(request):
-    electronics_category = Category.objects.get(category_name='Electronics')
-    electronics_products = Product.objects.filter(category=electronics_category)
+    # Retrieve all products belonging to the specified category
+    category_products = Product.objects.filter(category=category)
 
     # Dictionary to store total stock count for each product
     product_stock_counts = {}
-    for product in electronics_products:
+    for product in category_products:
         total_stock_count = Stock.objects.filter(order__product=product).aggregate(total_stock=Coalesce(Sum('remaining_quantity'), Value(0)))['total_stock']
         product_stock_counts[product] = total_stock_count
+        print(f"{product.product_name}: {total_stock_count}")  # Adjusted print statement
+
+    # Preprocess product_stock_counts to a list of tuples
+    product_stock_list = [(product.product_id, stock_count) for product, stock_count in product_stock_counts.items()]
 
     context = {
-        'category_products': {'Fruits': electronics_products},
+        'category_products': category_products,
         'product_stock_counts': product_stock_counts,
+        'product_stock_list': product_stock_list,
     }
-    return render(request, 'templates2/category_fruits.html', context)
+
+    if request.user.is_authenticated:
+        user_cart_items = Cart.objects.filter(user=request.user)
+        cart_item_count = user_cart_items.count()
+    else:
+        cart_item_count = 0
+    
+    request.session['cart_item_count'] = cart_item_count
+    return render(request, 'templates2/category_products.html', context)
+
 
 def paymentsuccess(request):
     # Add your logic here
@@ -673,7 +795,13 @@ def cart_view(request):
         'total_price': total_price,
         'cart_item_count': cart_item_count,
     }
-
+    if request.user.is_authenticated:
+        user_cart_items = Cart.objects.filter(user=request.user)
+        cart_item_count = user_cart_items.count()
+    else:
+        cart_item_count = 0
+    
+    request.session['cart_item_count'] = cart_item_count
     return render(request, 'templates2/cart.html', context)
 
 def update_cart_item(request, cart_item_id):
@@ -697,7 +825,13 @@ def update_cart_item(request, cart_item_id):
         else:
             # Display an error message if the quantity is invalid
             messages.error(request, 'Invalid quantity.')
-
+    if request.user.is_authenticated:
+        user_cart_items = Cart.objects.filter(user=request.user)
+        cart_item_count = user_cart_items.count()
+    else:
+        cart_item_count = 0
+    
+    request.session['cart_item_count'] = cart_item_count
     # Redirect back to the cart view
     return redirect('cart')
 
@@ -777,15 +911,16 @@ from django.http import HttpResponseBadRequest
 razorpay_client = razorpay.Client(
     auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
 
+from django.db import transaction
+
+@transaction.atomic
 def payment(request):
     cart_items = Cart.objects.filter(user=request.user)
     total_price = Decimal(sum(cart_item.product.product_price * cart_item.quantity for cart_item in cart_items))
-    
     currency = 'INR'
 
     # Set the 'amount' variable to 'total_price'
-    amount = int(total_price*100)
-    # amount=20000
+    amount = int(total_price * 100)
 
     # Create a Razorpay Order
     razorpay_order = razorpay_client.order.create(dict(
@@ -798,6 +933,7 @@ def payment(request):
     razorpay_order_id = razorpay_order['id']
     callback_url = '/paymenthandler/'
 
+    # Create the order instance
     order = Order.objects.create(
         user=request.user,
         total_price=total_price,
@@ -805,27 +941,61 @@ def payment(request):
         payment_status=Order.PaymentStatusChoices.PENDING,
     )
 
-    # Add the products to the order
+    # Add the products to the order and collect product IDs
+    product_ids = []
     for cart_item in cart_items:
         product = cart_item.product
         price = product.product_price
         quantity = cart_item.quantity
         total_item_price = price * quantity
 
-
         seller = product.suppliers.first()  # Get the first supplier
         # Create an OrderItem for this product
         order_item = OrderItem.objects.create(
             order=order,
-            product=product,
-            seller=seller,  # Use the selected seller  # Set the seller of the product as the seller of the order item
+            product=product,  # Assign the product to the order item
+            seller=seller,
             quantity=quantity,
             price=price,
             total_price=total_item_price,
         )
+        # Collect product IDs
+        product_ids.append(product.pk)
 
     # Save the order to generate an order ID
     order.save()
+
+    # Update the products field in the order model
+    order.products.add(*product_ids)
+    
+    for order_item in order.orderitem_set.all():
+        product = order_item.product
+        remaining_quantity_to_reduce = order_item.quantity
+
+        # Get all active stocks for the product, ordered by creation datetime
+        stocks = Stock.objects.filter(order__product=product, remaining_quantity__gt=0, is_active=True).order_by('id')
+
+        # Iterate over the stocks and reduce the order quantity from the oldest one
+        for stock in stocks:
+            if remaining_quantity_to_reduce > 0:
+                if stock.remaining_quantity >= remaining_quantity_to_reduce:
+                    # Reduce the remaining quantity from the stock
+                    stock.remaining_quantity = F('remaining_quantity') - remaining_quantity_to_reduce
+                    stock.save()
+                    remaining_quantity_to_reduce = 0  # All remaining quantity is reduced
+                else:
+                    # Reduce the remaining quantity from the stock and update the remaining quantity to reduce
+                    remaining_quantity_to_reduce -= stock.remaining_quantity
+                    stock.remaining_quantity = 0  # Set remaining quantity of stock to 0
+                    stock.save()
+            else:
+                break  # Exit the loop if all order quantity is reduced
+
+        # Handle the case where order quantity is not completely fulfilled
+        if remaining_quantity_to_reduce > 0:
+            # You might want to raise an exception or handle this scenario differently based on your requirement
+            pass
+
 
     # Create a context dictionary with all the variables you want to pass to the template
     context = {
@@ -833,12 +1003,14 @@ def payment(request):
         'total_price': total_price,
         'razorpay_order_id': razorpay_order_id,
         'razorpay_merchant_key': settings.RAZOR_KEY_ID,
-        'razorpay_amount': amount,  # Set to 'total_price'
+        'razorpay_amount': amount,
         'currency': currency,
         'callback_url': callback_url,
     }
 
     return render(request, 'templates2/payment.html', context=context)
+
+
 
 from django.db.models import Sum
 
@@ -927,12 +1099,24 @@ def orders(request):
     context = {
         'orders': user_orders,
     }
+    if request.user.is_authenticated:
+        user_cart_items = Cart.objects.filter(user=request.user)
+        cart_item_count = user_cart_items.count()
+    else:
+        cart_item_count = 0
     
+    request.session['cart_item_count'] = cart_item_count
     return render(request, 'templates2/orders.html', context)
 
 def view_orders(request):
     all_orders = Order.objects.all()
-
+    if request.user.is_authenticated:
+        user_cart_items = Cart.objects.filter(user=request.user)
+        cart_item_count = user_cart_items.count()
+    else:
+        cart_item_count = 0
+    
+    request.session['cart_item_count'] = cart_item_count
     return render(request, 'templates2/admindash/view_orders.html', {'all_orders': all_orders})
 
 @login_required
@@ -1012,7 +1196,7 @@ def submit_review(request):
         rating = request.POST.get("rating")
         comment = request.POST.get("comment")
         user = request.user
-        product = get_object_or_404(Product, id=product_id)
+        product = get_object_or_404(Product, product_id=product_id)
 
         # Check if the user has already reviewed the product
         existing_review = Review.objects.filter(product=product, user=user).first()

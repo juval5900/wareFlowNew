@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, UserProfile
+from .models import User
+from USERAPP.models import UserProfile
 from django.contrib import admin
 from .models import Certification
 from .models import Category, Product
@@ -46,18 +47,18 @@ from .models import ProductSummary
 class ProductSummaryAdmin(admin.ModelAdmin):
     list_display = ('product_name', 'total_stock')
     
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'name', 'email', 'phone_number')
+# @admin.register(UserProfile)
+# class UserProfileAdmin(admin.ModelAdmin):
+#     list_display = ('user', 'name', 'email', 'phone_number')
     
-    fieldsets = (
-        ('User Info', {
-            'fields': ('user', 'name', 'email', 'phone_number'),
-        }),
-        ('Additional Info', {
-            'fields': ('profile_pic', 'address'),
-        }),
-    )
+#     fieldsets = (
+#         ('User Info', {
+#             'fields': ('user', 'name', 'email', 'phone_number'),
+#         }),
+#         ('Additional Info', {
+#             'fields': ('profile_pic', 'address'),
+#         }),
+#     )
 
 from .models import Cart
 
