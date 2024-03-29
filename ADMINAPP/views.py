@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
@@ -7,6 +8,8 @@ from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 from django.conf import settings
 import pyotp
+from django.db import transaction
+from USERAPP.views import ProfilePictureForm
 from .models import Warehouse, UserRole
 from django.contrib.auth.decorators import login_required
 
@@ -268,3 +271,71 @@ def add_warehouse(request):
 
     # Render the template for GET requests
     return render(request, 'Admin/warehousepanel.html')
+
+@login_required
+def admin_profile(request):
+    user = request.user
+
+    # Try to get the UserProfile or create it if it doesn't exist
+    user_profile = get_object_or_404(UserProfile, user=user)
+
+    if request.method == 'POST':
+        # Handle profile picture update separately using the form
+        profile_picture_form = ProfilePictureForm(request.POST, request.FILES, instance=user_profile)
+        if profile_picture_form.is_valid():
+            profile_picture_form.save()
+
+        # Extract first name and last name from the full name
+        
+        
+        full_name = request.POST.get('nameupdate', '')
+
+        if ' ' in full_name:
+            # Split the full name into first name and last name
+            first_name, last_name = full_name.split(' ', 1)
+            user.first_name = first_name
+            user.last_name = last_name
+        else:
+            # If there is no space, consider the whole name as the first name
+            user.first_name = full_name
+            user.last_name = ''
+
+        user.save()
+
+        # Update user profile fields
+        if request.POST.get('dobupdate'):
+            user_profile.date_of_birth = request.POST.get('dobupdate')
+        if request.POST.get('countryupdate'):
+            user_profile.country = request.POST.get('countryupdate')
+        if request.POST.get('stateupdate'):
+            user_profile.state = request.POST.get('stateupdate')
+        if request.POST.get('cityupdate'):
+            user_profile.city = request.POST.get('cityupdate')
+        if request.POST.get('distupdate'):
+            user_profile.district = request.POST.get('distupdate')
+        if request.POST.get('numupdate'):
+            user_profile.phone_no = request.POST.get('numupdate')
+        if request.POST.get('adrupdate'):
+            user_profile.addressline1 = request.POST.get('adrupdate')
+        if request.POST.get('adrlupdate'):
+            user_profile.addressline2 = request.POST.get('adrlupdate')
+        if request.POST.get('pinupdate'):
+            user_profile.pin_code = request.POST.get('pinupdate')
+            
+
+        with transaction.atomic():
+            user.save()
+            user_profile.save()
+        return redirect('profile_view')
+
+    user_profile.date_of_birth = user_profile.date_of_birth.strftime('%Y-%m-%d') if user_profile.date_of_birth else ''
+    sixteen_years_ago = date.today() - timedelta(days=16*365)
+    sixtyfive_years_ago = date.today() - timedelta(days=65*365)
+    context = {
+        'user': user,
+        'user_profile': user_profile,
+        'sixteen_years_ago': sixteen_years_ago.strftime('%Y-%m-%d'),  # Format the date as YYYY-MM-DD
+        'sixtyfive_years_ago': sixtyfive_years_ago.strftime('%Y-%m-%d'),
+        'profile_picture_form': ProfilePictureForm(instance=user_profile),  # Pass the form to the template
+    }
+    return render(request, 'Admin/adminaccount.html', context)

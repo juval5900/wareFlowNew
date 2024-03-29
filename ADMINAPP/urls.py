@@ -12,5 +12,5 @@ urlpatterns=[
      path('activate_user/<int:user_id>/', views.activate_user, name='activate_user'),
      path('warehousepanel/', views.warehousepanel, name='warehousepanel'),
      path('add_warehouse/', views.add_warehouse, name='add_warehouse'),
-           
+     path('admin_profile/', views.admin_profile, name='admin_profile'),
     ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

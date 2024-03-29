@@ -172,7 +172,7 @@
 									</a>
 									<ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
 										<li><span class="dropdown-item">{{ request.session.name }}</span></li>
-										<li><a class="dropdown-item" href={% url 'profile_view' %}>Account</a></li>
+										<li><a class="dropdown-item" href={% url 'admin_profile' %}>Account</a></li>
 										<li><hr class="dropdown-divider"></li>
 										<li><a class="dropdown-item" href={% url 'loggout' %}>Log Out</a></li>
 									</ul>
@@ -187,7 +187,7 @@
 				<div class="sidepanel-inner d-flex flex-column">
 					<a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
 					<div class="app-branding">
-						<a class="app-logo" href="{% url 'index' %}"><img class="logo-icon me-2"
+						<a class="app-logo" href="{% url 'adminindex' %}"><img class="logo-icon me-2"
 								src="{% static 'assets/images/app-logo.svg' %}" alt="logo"><span
 								class="logo-text">WAREFLOW</span></a>
 
@@ -278,7 +278,7 @@
 		<div class="app-wrapper">
 			<div class="app-content pt-3 p-md-3 p-lg-4">
 				<div class="container-xl" id="sales-data-container">
-					<h1 class="app-page-title">Dashboard</h1>
+					<h1 class="app-page-title">Admin Dashboard</h1>
 
 					<div class="app-card alert alert-dismissible shadow-sm mb-4 border-left-decoration" role="alert">
 						<h4>Users Overview</h4>

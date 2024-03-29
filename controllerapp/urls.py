@@ -11,6 +11,7 @@ urlpatterns=[
     path('get-stock-details/<int:stock_id>/', views.get_stock_details, name='get_stock_details'),
     path('get-stock-for-product/<int:product_id>/', views.get_stock_for_product, name='get_stock_for_product'),
     path('sales/', views.sales, name='sales'),
+    path('online_sales/', views.online_sales, name='online_sales'),
     path('add_sales/', views.add_sales, name='add_sales'),
     path("delete-multiple-sales/", views.delete_multiple_sales, name="delete_multiple_sales"),
     path('cancel_sale/<int:sale_id>/', views.cancel_sale, name='cancel_sale'),
@@ -23,6 +24,8 @@ urlpatterns=[
     path('get_top_selling_products/', views.get_top_selling_products, name='get_top_selling_products'),
     path('get_sales_data/', views.get_sales_data, name='get_sales_data'),
     path('view_invoice/<int:sale_id>/', views.view_invoice, name='view_invoice'),
+    path('view_online_invoice/<int:sale_id>/', views.view_online_invoice, name='view_online_invoice'),
     path('view_order_pdf/', views.view_order_pdf, name='view_order_pdf'),
+    path('controller_profile/', views.controller_profile, name='controller_profile'),
     
     ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

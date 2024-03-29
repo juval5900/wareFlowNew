@@ -55,7 +55,7 @@
                                       <td>{{ order.total_price }}</td>
                                       <td>
                                           {% if order.payment_status == 'successful' %}
-                                              <a href="{% url 'generate_pdf' order.id %}" target="_blank">
+                                              <a href="{% url 'view_online_invoice' item.id %}" target="_blank">
                                                   <i class="fas fa-download"></i>
                                               </a>
                                           {% else %}

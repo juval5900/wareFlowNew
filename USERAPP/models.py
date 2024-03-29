@@ -108,12 +108,21 @@ class Orders(models.Model):
     order_status = models.CharField(max_length=255)
     warehouse = models.CharField(max_length=255, null=True)
     quantity = models.PositiveIntegerField()
-    buying_price = models.DecimalField(max_digits=10, decimal_places=2,default='100')  # New field for buying price
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)  # New field for total price
+    buying_price = models.DecimalField(max_digits=10, decimal_places=2, default='100')
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     cancelled_at = models.DateTimeField(null=True, blank=True)
     is_stored = models.BooleanField(default=False)
     delivered_at = models.DateTimeField(null=True)
+    is_inspected = models.BooleanField(default=False)
+    
+    # New field for quality check status
+    QUALITY_CHECK_CHOICES = [
+        ('not_inspected', 'Not Inspected'),
+        ('passed', 'Passed'),
+        ('rejected', 'Rejected'),
+    ]
+    quality_check_status = models.CharField(max_length=20, choices=QUALITY_CHECK_CHOICES, default='not_inspected')
 
     def soft_delete(self):
         self.is_active = False
@@ -126,7 +135,6 @@ class Orders(models.Model):
         self.save()
 
     def save(self, *args, **kwargs):
-        # Calculate the total price based on buying price and quantity
         self.total_price = self.buying_price * self.quantity
         super().save(*args, **kwargs)
 

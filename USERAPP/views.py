@@ -160,7 +160,9 @@ def login(request):
             elif user_role_name == 'warehouse manager':
                 return redirect('index')  # Replace with the user app index URL
             elif user_role_name == 'inventory controller':
-                return redirect('controllerindex')  # Replace with the user app index URL       
+                return redirect('controllerindex')  # Replace with the user app index URL  
+            elif user_role_name == 'quality controller':
+                return redirect('qualityindex')  # Replace with the user app index URL      
             else:
                 messages.error(request, "Invalid role")  # Handle invalid roles
                 return redirect('login')

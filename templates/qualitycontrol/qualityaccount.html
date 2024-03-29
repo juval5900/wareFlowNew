@@ -1,0 +1,589 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>WAREFLOW</title>
+
+		<!-- Meta -->
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- FontAwesome JS-->
+		<script defer src="{% static 'assets/plugins/fontawesome/js/all.min.js' %}"></script>
+
+		<!-- App CSS -->
+		<link id="theme-style" rel="stylesheet"
+			href="{% static 'assets/css/portal.css' %}">
+
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+	</head>
+
+	<body class="app">
+		<header class="app-header fixed-top">
+			<div class="app-header-inner">
+				<div class="container-fluid py-2">
+					<div class="app-header-content">
+						<div class="row justify-content-between align-items-center">
+
+							<div class="col-auto">
+								<a id="sidepanel-toggler"
+									class="sidepanel-toggler d-inline-block d-xl-none" href="#">
+									<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+										viewBox="0 0 30 30" role="img"><title>Menu</title><path
+											stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10"
+											stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg>
+								</a>
+							</div><!--//col-->
+
+							<div class="app-utilities col-auto ml-auto">
+    							<div class="app-utility-item app-user-dropdown dropdown">
+									<a class="dropdown-toggle" id="user-dropdown-toggle"
+										data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+										<img
+											src="{% if request.session.profile_picture_url %}{{ request.session.profile_picture_url }}{% else %}{% static 'assets/images/user.png' %}{% endif %}"
+											alt="user profile">
+									</a>
+									<ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
+										<li><span class="dropdown-item">{{ request.session.name }}</span></li>
+										<li><a class="dropdown-item" href={% url 'quality_profile' %}>Account</a></li>
+										<li><hr class="dropdown-divider"></li>
+										<li><a class="dropdown-item" href={% url 'loggout' %}>Log Out</a></li>
+									</ul>
+								</div><!--//app-user-dropdown-->
+							</div><!--//app-utilities-->
+						</div><!--//row-->
+					</div><!--//app-header-content-->
+				</div><!--//container-fluid-->
+			</div><!--//app-header-inner-->
+			<div id="app-sidepanel" class="app-sidepanel">
+				<div id="sidepanel-drop" class="sidepanel-drop"></div>
+				<div class="sidepanel-inner d-flex flex-column">
+					<a href="#" id="sidepanel-close" class="sidepanel-close d-xl-none">&times;</a>
+					<div class="app-branding">
+						<a class="app-logo" href="{% url 'qualityindex' %}"><img class="logo-icon me-2"
+								src="{% static 'assets/images/app-logo.svg' %}" alt="logo"><span
+								class="logo-text">WAREFLOW</span></a>
+
+					</div><!--//app-branding-->
+
+					<nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
+						<ul class="app-menu list-unstyled accordion" id="menu-accordion">
+							<li class="nav-item">
+								<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+								<a class="nav-link active" href="{% url 'qualityindex' %}">
+									<span class="nav-icon">
+										<svg width="1em" height="1em" viewBox="0 0 16 16"
+											class="bi bi-house-door" fill="currentColor"
+											xmlns="http://www.w3.org/2000/svg">
+											<path fill-rule="evenodd"
+												d="M7.646 1.146a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 .146.354v7a.5.5 0 0 1-.5.5H9.5a.5.5 0 0 1-.5-.5v-4H7v4a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .146-.354l6-6zM2.5 7.707V14H6v-4a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v4h3.5V7.707L8 2.207l-5.5 5.5z" />
+											<path fill-rule="evenodd"
+												d="M13 2.5V6l-2-2V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5z" />
+										</svg>
+									</span>
+									<span class="nav-link-text">Dashboard</span>
+								</a><!--//nav-link-->
+							</li><!--//nav-item-->
+							<li class="nav-item">
+								<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+								<a class="nav-link" href="{% url 'order_list' %}">
+									<span class="nav-icon svg-icon svg-icon-primary svg-icon-2x"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo8/dist/../src/media/svg/icons/Shopping/Cart1.svg--><svg
+											xmlns="http://www.w3.org/2000/svg"
+											xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px"
+											viewBox="0 0 24 24" version="1.1">
+											<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+												<rect x="0" y="0" width="24" height="24" />
+												<path
+													d="M18.1446364,11.84388 L17.4471627,16.0287218 C17.4463569,16.0335568 17.4455155,16.0383857 17.4446387,16.0432083 C17.345843,16.5865846 16.8252597,16.9469884 16.2818833,16.8481927 L4.91303792,14.7811299 C4.53842737,14.7130189 4.23500006,14.4380834 4.13039941,14.0719812 L2.30560137,7.68518803 C2.28007524,7.59584656 2.26712532,7.50338343 2.26712532,7.4104669 C2.26712532,6.85818215 2.71484057,6.4104669 3.26712532,6.4104669 L16.9929851,6.4104669 L17.606173,3.78251876 C17.7307772,3.24850086 18.2068633,2.87071314 18.7552257,2.87071314 L20.8200821,2.87071314 C21.4717328,2.87071314 22,3.39898039 22,4.05063106 C22,4.70228173 21.4717328,5.23054898 20.8200821,5.23054898 L19.6915238,5.23054898 L18.1446364,11.84388 Z"
+													fill="#000000" opacity="0.3" />
+												<path
+													d="M6.5,21 C5.67157288,21 5,20.3284271 5,19.5 C5,18.6715729 5.67157288,18 6.5,18 C7.32842712,18 8,18.6715729 8,19.5 C8,20.3284271 7.32842712,21 6.5,21 Z M15.5,21 C14.6715729,21 14,20.3284271 14,19.5 C14,18.6715729 14.6715729,18 15.5,18 C16.3284271,18 17,18.6715729 17,19.5 C17,20.3284271 16.3284271,21 15.5,21 Z"
+													fill="#000000" />
+											</g>
+										</svg><!--end::Svg Icon--></span>
+									<span class="nav-link-text">Pending Orders</span>
+								</a><!--//nav-link-->
+							</li><!--//nav-item-->
+							<!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
+						</ul><!--//app-menu-->
+					</nav><!--//app-nav-->
+					<div class="app-sidepanel-footer">
+						<nav class="app-nav app-nav-footer">
+							<ul class="app-menu footer-menu list-unstyled">
+								<li class="nav-item">
+									<a class="nav-link" href={% url 'loggout' %}>
+										<span class="nav-icon">
+											<svg style="color: rgb(93, 94, 101);"
+												xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+												viewBox="0 0 24 24" fill="none" stroke="currentColor"
+												stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+												class="feather feather-log-out"><path
+													d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" fill="#5d5e65"></path><polyline
+													points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9"
+													y2="12"></line></svg> </span>
+										<span class="nav-link-text">Logout</span>
+									</a>
+								</li><!--//nav-item-->
+							</ul><!--//footer-menu-->
+						</nav>
+					</div><!--//app-sidepanel-footer-->
+				</div><!--//sidepanel-inner-->
+			</div><!--//app-sidepanel-->
+		</header><!--//app-header-->
+		<div class="main-wrapper">
+
+			<div
+				class="app-wrapper w-100 vh-100 d-flex justify-content-center align-items-center">
+				<div
+					class="app-card app-card-account shadow-sm d-flex flex-column align-items-start">
+
+					<div class="app-card-header p-3 border-bottom-0">
+						<div class="row align-items-center gx-3">
+							<div class="col-auto">
+								<div class="app-icon-holder">
+									<svg width="1em" height="1em" viewBox="0 0 16 16"
+										class="bi bi-person" fill="currentColor"
+										xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd"
+											d="M10 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0zM8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6 5c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
+									</svg>
+								</div><!--//icon-holder-->
+							</div><!--//col-->
+							<div class="col-auto">
+								<h4 class="app-card-title">Profile</h4>
+							</div><!--//col-->
+						</div><!--//row-->
+					</div><!--//app-card-header-->
+
+					<div class="app-card-body px-4 w-100">
+						<form method="post" class=" w-100 " action="{% url 'profile_view' %}"
+							enctype="multipart/form-data">
+							{% csrf_token %}
+
+							<!-- Profile Photo -->
+							<div class="item border-bottom py-3">
+								<div class="row justify-content-between align-items-center">
+									<div class="col-auto">
+										<div class="item-label mb-2"><strong>Photo</strong></div>
+										<div class="item-data">
+											<img class="profile-image" id="profile-image-preview"
+												src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}{% static 'assets/images/user.png' %}{% endif %}"
+												alt="Profile Picture">
+										</div>
+									</div><!--//col-->
+									<div class="col text-end">
+										<label for="profile-picture" class="btn-sm app-btn-secondary">Change</label>
+										<input type="file" id="profile-picture" name="profile_picture"
+											style="display: none;" accept="image/*"
+											onchange="previewImage(this);">
+									</div><!--//col-->
+								</div><!--//row-->
+							</div><!--//item-->
+
+							<!-- Profile Name -->
+							<div class="item border-bottom py-3">
+								<div class="row justify-content-between align-items-center">
+									<div class="col-auto">
+										<div class="item-label"><strong>Name</strong></div>
+										<div class="item-data">
+											<span class="data-display">{{ user.first_name }} {{ user.last_name }}</span>
+											<input type="text" class="data-input form-control" id="nameupdate"
+												name="nameupdate" value="{{ user.first_name }} {{ user.last_name }}"
+												style="display: none;">
+											<!-- Container for validation error -->
+											<div class="invalid-feedback" id="name-error"></div>
+										</div>
+									</div><!--//col-->
+									<div class="col text-end">
+										<a class="btn-sm app-btn-secondary toggle-edit" href="#">Edit</a>
+									</div><!--//col-->
+								</div><!--//row-->
+							</div><!--//item-->
+
+
+							<!-- Email -->
+							<div class="item border-bottom py-3">
+								<div class="row justify-content-between align-items-center">
+									<div class="col-auto">
+										<div class="item-label"><strong>Email</strong></div>
+										<div class="item-data">
+											<span class="data-display">{{ user.email }}</span>
+											<input type="email" class="data-input form-control" id="mailupdate"
+												name="mailupdate" value="{{user.email }}" style="display: none;">
+										</div>
+									</div><!--//col-->
+								</div><!--//row-->
+							</div><!--//item-->
+
+
+							
+							<!-- Contact Number -->
+							<div class="item border-bottom py-3">
+								<div class="row justify-content-between align-items-center">
+									<div class="col-auto">
+										<div class="item-label"><strong>Contact Number</strong></div>
+										<div class="item-data">
+											<span class="data-display">{{ user_profile.phone_no }}</span>
+											<input type="tel" class="data-input form-control" id="numupdate"
+												name="numupdate" value="{{ user_profile.phone_no }}"
+												style="display: none;">
+											<!-- Container for validation error -->
+											<div class="invalid-feedback" id="num-error"></div>
+										</div>
+									</div><!--//col-->
+									<div class="col text-end">
+										<a class="btn-sm app-btn-secondary toggle-edit" href="#">Edit</a>
+									</div><!--//col-->
+								</div><!--//row-->
+							</div><!--//item-->
+
+
+							<div class="item border-bottom py-3">
+								<div class="row justify-content-between align-items-center">
+									<div class="col-auto">
+										<div class="item-label"><strong>Date of Birth</strong></div>
+										<div class="item-data">
+											<span class="data-display">{{ user_profile.date_of_birth }}</span>
+											<input type="date" class="data-input form-control" id="dobupdate"
+												name="dobupdate" value="{{ user_profile.date_of_birth }}"
+												style="display: none;" max="{{ sixteen_years_ago }}" min="{{ sixtyfive_years_ago }}"
+												oninput="validateDateOfBirth();">
+											<!-- Container for validation error -->
+											<div class="invalid-feedback" id="dob-error"></div>
+										</div>
+									</div><!--//col-->
+									<div class="col text-end">
+										<a class="btn-sm app-btn-secondary toggle-edit" href="#">Edit</a>
+									</div><!--//col-->
+								</div><!--//row-->
+							</div><!--//item-->
+
+							<div class="item border-bottom py-3">
+								<div class="row justify-content-between align-items-center">
+									<div class="col-auto">
+										<div class="item-label"><strong>Address Line 1:</strong></div>
+										<div class="item-data">
+											<span class="data-display">{{ user_profile.addressline1 }}</span>
+											<input type="text" class="data-input form-control" id="adrupdate"
+												name="adrupdate" value="{{user_profile.addressline1 }}"
+												style="display: none;">
+											<div class="invalid-feedback" id="adr-error"></div>
+										</div>
+									</div><!--//col-->
+									<div class="col text-end">
+										<a class="btn-sm app-btn-secondary toggle-edit" href="#">Edit</a>
+									</div><!--//col-->
+								</div><!--//row-->
+							</div><!--//item-->
+
+							<div class="item border-bottom py-3">
+								<div class="row justify-content-between align-items-center">
+									<div class="col-auto">
+										<div class="item-label"><strong>Address Line 2</strong></div>
+										<div class="item-data">
+											<span class="data-display">{{user_profile.addressline2 }}</span>
+											<input type="text" class="data-input form-control" id="adrlupdate"
+												name="adrlupdate" value="{{user_profile.addressline2 }}"
+												style="display: none;">
+												<div class="invalid-feedback" id="adrl-error"></div>
+										</div>
+									</div><!--//col-->
+									<div class="col text-end">
+										<a class="btn-sm app-btn-secondary toggle-edit" href="#">Edit</a>
+									</div><!--//col-->
+								</div><!--//row-->
+							</div><!--//item-->
+
+							<div class="item border-bottom py-3">
+								<div class="row justify-content-between align-items-center">
+									<div class="col-auto">
+										<div class="item-label"><strong>District</strong></div>
+										<div class="item-data">
+											<span class="data-display">{{user_profile.district }}</span>
+											<input type="text" class="data-input form-control" id="distupdate"
+												name="distupdate" value="{{user_profile.district }}"
+												style="display: none;">
+												<div class="invalid-feedback" id="district-error"></div>
+										</div>
+									</div><!--//col-->
+									<div class="col text-end">
+										<a class="btn-sm app-btn-secondary toggle-edit" href="#">Edit</a>
+									</div><!--//col-->
+								</div><!--//row-->
+							</div><!--//item-->
+
+							<div class="item border-bottom py-3">
+								<div class="row justify-content-between align-items-center">
+									<div class="col-auto">
+										<div class="item-label"><strong>Pin Code</strong></div>
+										<div class="item-data">
+											<span class="data-display">{{user_profile.pin_code }}</span>
+											<input type="text" class="data-input form-control" id="pinupdate"
+												name="pinupdate" value="{{user_profile.pin_code }}"
+												style="display: none;">
+												<div class="invalid-feedback" id="pin-error"></div>
+										</div>
+									</div><!--//col-->
+									<div class="col text-end">
+										<a class="btn-sm app-btn-secondary toggle-edit" href="#">Edit</a>
+									</div><!--//col-->
+								</div><!--//row-->
+							</div><!--//item-->
+
+							<div class="item border-bottom py-3">
+								<div class="row justify-content-between align-items-center">
+									<div class="col-auto">
+										<div class="item-label"><strong>City</strong></div>
+										<div class="item-data">
+											<span class="data-display">{{user_profile.city }}</span>
+											<input type="text" class="data-input form-control" id="cityupdate"
+												name="cityupdate" value="{{user_profile.city }}"
+												style="display: none;">
+												<div class="invalid-feedback" id="city-error"></div>
+										</div>
+									</div><!--//col-->
+									<div class="col text-end">
+										<a class="btn-sm app-btn-secondary toggle-edit" href="#">Edit</a>
+									</div><!--//col-->
+								</div><!--//row-->
+							</div><!--//item-->
+
+							<div class="item border-bottom py-3">
+								<div class="row justify-content-between align-items-center">
+									<div class="col-auto">
+										<div class="item-label"><strong>State</strong></div>
+										<div class="item-data">
+											<span class="data-display">{{user_profile.state }}</span>
+											<input type="text" class="data-input form-control" id="stateupdate"
+												name="stateupdate" value="{{user_profile.state }}"
+												style="display: none;">
+												<div class="invalid-feedback" id="state-error"></div>
+										</div>
+									</div><!--//col-->
+									<div class="col text-end">
+										<a class="btn-sm app-btn-secondary toggle-edit" href="#">Edit</a>
+									</div><!--//col-->
+								</div><!--//row-->
+							</div><!--//item-->
+
+							<div class="item border-bottom py-3">
+								<div class="row justify-content-between align-items-center">
+									<div class="col-auto">
+										<div class="item-label"><strong>Country</strong></div>
+										<div class="item-data">
+											<span class="data-display">{{user_profile.country }}</span>
+											<input type="text" class="data-input form-control" id="countryupdate"
+												name="countryupdate" value="{{user_profile.country }}"
+												style="display: none;">
+												<div class="invalid-feedback" id="country-error"></div>
+										</div>
+									</div><!--//col-->
+									<div class="col text-end">
+										<a class="btn-sm app-btn-secondary toggle-edit" href="#">Edit</a>
+									</div><!--//col-->
+								</div><!--//row-->
+							</div><!--//item-->
+							<input type="submit" value="Add" class="btn btn-primary">
+						</form>
+					</div>
+
+				</div><!--//app-card-body-->
+			</div><!--//app-card-->
+		</div><!--//app-wrapper-->
+
+<script>
+$(document).ready(function() {
+    $('.toggle-edit').click(function() {
+        var itemData = $(this).closest('.item').find('.item-data');
+        itemData.find('.data-display').hide();
+        itemData.find('.data-input').show();
+        $(this).hide();
+        $(this).siblings('.save-edit').show();
+        return false; // Prevent the default link behavior
+    });
+
+    $('.save-edit').click(function() {
+        var itemData = $(this).closest('.item').find('.item-data');
+        var newValue = itemData.find('.data-input').val();
+        itemData.find('.data-display').text(newValue).show();
+        itemData.find('.data-input').hide();
+        $(this).hide();
+        $(this).siblings('.toggle-edit').show();
+        return false; // Prevent the default link behavior
+    });
+
+
+	function previewImage(input) {
+		var preview = document.getElementById('profile-image-preview');
+		if (input.files && input.files[0]) {
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				preview.src = e.target.result;
+			};
+			reader.readAsDataURL(input.files[0]);
+		}
+	}
+
+
+	//Function to validate the Date of Birth field
+	function validateDateOfBirth() {
+        var dobField = document.getElementById('dobupdate');
+        var dobValue = dobField.value.trim();
+
+        if (dobValue === '') {
+            // Display an error message for empty input
+            document.getElementById('dob-error').textContent = 'Date of Birth is required';
+            dobField.classList.add('is-invalid');
+            return false;
+        }
+
+        // Check if the date is in valid format (YYYY-MM-DD)
+        var datePattern = /^\d{4}-\d{2}-\d{2}$/;
+
+        if (!datePattern.test(dobValue)) {
+            // Display an error message for invalid format
+            document.getElementById('dob-error').textContent = 'Date of Birth must be in YYYY-MM-DD format';
+            dobField.classList.add('is-invalid');
+            return false;
+        }
+
+        // Calculate age from Date of Birth
+        var age = calculateAge(dobValue);
+
+        if (age < 16) {
+            // Display an error message for age less than 16
+            document.getElementById('dob-error').textContent = 'You must be at least 16 years old';
+            dobField.classList.add('is-invalid');
+            return false;
+        }
+
+        // Check if the date is greater than or equal to 65 years ago
+        var minDate = new Date('{{ sixty_five_years_ago }}');
+        var selectedDate = new Date(dobValue);
+
+        if (age > 65) {
+            // Display an error message for selecting a date older than 65 years ago
+            document.getElementById('dob-error').textContent = 'You cannot select a date older than 65 years ago';
+            dobField.classList.add('is-invalid');
+            return false;
+        }
+
+        // Clear the error message
+        document.getElementById('dob-error').textContent = '';
+        dobField.classList.remove('is-invalid');
+        return true;
+    }
+
+    // Function to calculate age from a given date
+    function calculateAge(dateString) {
+        var today = new Date();
+        var birthDate = new Date(dateString);
+        var age = today.getFullYear() - birthDate.getFullYear();
+        var monthDiff = today.getMonth() - birthDate.getMonth();
+
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        return age;
+    }
+
+    // Add event listener to the Date of Birth input field
+    var dobField = document.getElementById('dobupdate');
+    dobField.addEventListener('input', validateDateOfBirth);
+
+	function validateName() {
+        var nameField = document.getElementById('nameupdate');
+        var nameValue = nameField.value.trim();
+
+        // Regular expression to allow alphabets and spaces
+        var namePattern = /^[A-Za-z\s]{3,}$/;
+
+        if (!namePattern.test(nameValue)) {
+            // Display an error message for invalid format
+            document.getElementById('name-error').textContent = 'Name must contain only alphabets and spaces, with a minimum length of 3 characters';
+            nameField.classList.add('is-invalid');
+            return false;
+        }
+
+        // Clear the error message
+        document.getElementById('name-error').textContent = '';
+        nameField.classList.remove('is-invalid');
+        return true;
+    }
+
+    // Add event listener to the Name input field
+    var nameField = document.getElementById('nameupdate');
+    nameField.addEventListener('input', validateName);
+
+
+	function validatePin() {
+		var pinField = document.getElementById('pinupdate');
+		var pinValue = pinField.value.trim();
+		var pinPattern = /^[1-9]{1}[0-9]{2}\s{0,1}[0-9]{3}$/;
+	
+		if (!pinPattern.test(pinValue)) {
+			// Display an error message for invalid format
+			document.getElementById('pin-error').textContent = 'Invalid PIN code format. Example: 123 456';
+			pinField.classList.add('is-invalid');
+			return false;
+		}
+	
+		// Clear the error message
+		document.getElementById('pin-error').textContent = '';
+		pinField.classList.remove('is-invalid');
+		return true;
+	}
+	
+	// Attach an event listener to the PIN code input field
+	var pinField = document.getElementById('pinupdate');
+	pinField.addEventListener('input', validatePin);
+
+
+	// Define an array of field IDs and corresponding error message IDs
+var fieldIds = ['adrupdate','adrlupdate', 'distupdate', 'cityupdate', 'stateupdate', 'countryupdate'];
+var errorIds = ['adr-error','adrl-error', 'district-error', 'city-error', 'state-error', 'country-error'];
+
+// Define a common validation function for all fields
+function validateField(fieldIndex) {
+    var field = document.getElementById(fieldIds[fieldIndex]);
+    var fieldValue = field.value.trim();
+    var fieldPattern = /^[A-Za-z\s]{3,}$/;
+
+    if (!fieldPattern.test(fieldValue)) {
+        // Display an error message for invalid format
+        document.getElementById(errorIds[fieldIndex]).textContent = 'Field must contain only alphabets and spaces, with a minimum length of 3 characters';
+        field.classList.add('is-invalid');
+        return false;
+    }
+
+    // Clear the error message
+    document.getElementById(errorIds[fieldIndex]).textContent = '';
+    field.classList.remove('is-invalid');
+    return true;
+}
+
+// Attach event listeners for all fields
+for (var i = 0; i < fieldIds.length; i++) {
+    var field = document.getElementById(fieldIds[i]);
+    field.addEventListener('input', validateField.bind(null, i));
+}
+
+
+
+});
+
+</script>
+
+		<!-- Javascript -->
+		<script src="{% static 'assets/plugins/popper.min.js' %}"></script>
+		<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+
+		<!-- Page Specific JS -->
+		<script src="{% static 'assets/js/app.js' %}"></script>
+
+	</body>
+</html>

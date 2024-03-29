@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'USERAPP',
     'ADMINAPP',
     'controllerapp',
+    'qualityapp',
     'multiselectfield',
     'django.contrib.admin',
     'django.contrib.auth',

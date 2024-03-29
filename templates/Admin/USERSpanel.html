@@ -149,7 +149,7 @@
 							</a>
 							<ul class="dropdown-menu" aria-labelledby="user-dropdown-toggle">
 								<li><span class="dropdown-item">{{ request.session.name }}</span></li>
-								<li><a class="dropdown-item" href={% url 'profile_view' %}>Account</a></li>
+								<li><a class="dropdown-item" href={% url 'admin_profile' %}>Account</a></li>
 								<li><hr class="dropdown-divider"></li>
 								<li><a class="dropdown-item" href={% url 'loggout' %}>Log Out</a></li>
 							</ul>
@@ -320,6 +320,7 @@
 							<select class="form-control" id="userrole" name="userrole" required>
 								<option value="warehouse manager">Warehouse Manager</option>
 								<option value="inventory controller">Inventory Controller</option>
+								<option value="quality controller">Quality Controller</option>
 							</select><br>
 							<span id="roleError" class="text-danger"></span>
 						</div>
