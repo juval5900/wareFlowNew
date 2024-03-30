@@ -15,6 +15,9 @@
             <img id="logoimg" src="{% static 'static2/images/logoecohive.png' %}">
         </div>
     </nav> {% endcomment %}
+    
+    <br><br><br><br><br><br><br><br><br><br>
+<br><br><br>
         <div class="signup">
                 <div id="signuptext">
                     <p id="signuptext1">SIGN UP</p>
@@ -47,7 +50,8 @@
                     </div>
                     <button id="submitButton" class="signupbtn" type="submit">Register</button>
                    
-                    <p id="signupelement2">Already have an account? <a href="login.html" style="color: #27350F; text-decoration: none">Sign in</a></p>
+                    <p id="signupelement2">Already have an account? <a href="{% url 'user_login' %}" style="color: #27350F; text-decoration: none">Sign in</a></p>
+
                 </form>
                 <div class="signupimg">
                     <img id="img1" src="{% static 'static2/images/background1.png' %}">
