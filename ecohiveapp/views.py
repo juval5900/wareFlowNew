@@ -87,6 +87,7 @@ def register(request):
 
         # Create or update user's profile
         user_profile, created = UserProfile.objects.get_or_create(user=user)
+        user_profile.profile_picture = 'assets/images/user.png'  # Assign default picture path here
         user_profile.save()
 
         # Redirect to login if registration is successful
