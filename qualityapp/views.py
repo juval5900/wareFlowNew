@@ -157,7 +157,7 @@ def save_inspection(request, order_id):
         product_packing_safe = request.POST.get('product_packing_safe') == 'yes'
         seal_tampered = request.POST.get('seal_tampered') == 'yes'
         shipping_quality = int(request.POST.get('shipping_quality', 0))
-
+        print(shipping_quality)
         # Create an instance of Inspection and save it
         inspection = Inspection.objects.create(
             order=order,
@@ -168,11 +168,19 @@ def save_inspection(request, order_id):
             shipping_quality=shipping_quality
         )
 
+        print(packing_quality)
+        print(product_packing_safe)
+        print(box_tampered)
+        print(seal_tampered)
+        print(shipping_quality)
         # Check quality criteria and set quality_check_status accordingly
         if packing_quality < 3 or not product_packing_safe or box_tampered or seal_tampered or shipping_quality < 3:
-            order.quality_check_status = 'failed'
-            inspection.quality_check_status = 'failed'
+            print("uc")
+            order.quality_check_status = 'Rejected'
+            inspection.quality_check_status = 'Failed'
             order.order_status='Return Completed'
+            order.save()
+            inspection.save()
             try:
                 stock = Stock.objects.get(order=order)
                 stock.is_active = False
@@ -181,8 +189,8 @@ def save_inspection(request, order_id):
             except Stock.DoesNotExist:
                 pass  # Stock entry not found, nothing to delete
         else:
-            inspection.quality_check_status = 'passed'
-            order.quality_check_status = 'passed'
+            inspection.quality_check_status = 'Passed'
+            order.quality_check_status = 'Passed'
 
         # Set is_inspected field of the order to True
         order.is_inspected = True
@@ -229,3 +237,29 @@ def get_inspection_data(request):
 
     # Return counts as JSON response
     return JsonResponse(counts) 
+
+
+@login_required
+def inspection_list(request):
+    inspections = Inspection.objects.order_by('-id')
+
+    orders_per_page = 12
+    paginator = Paginator(inspections, orders_per_page)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    return render(request, 'qualitycontrol/inspections_done.html', {'page': page})
+
+def print_inspection_report(request, order_id):
+    # Fetch the inspection report for the given order ID
+    inspection = get_object_or_404(Inspection, id=order_id)
+    
+    # Prepare the data to pass to the template
+    report_data = {
+        'inspection': inspection,
+        # Add more data if needed
+    }
+    print(report_data)
+    
+    # Return the template with the data
+    return render(request, 'qualitycontrol/inspectreport.html', report_data)    

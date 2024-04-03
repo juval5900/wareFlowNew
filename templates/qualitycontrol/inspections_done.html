@@ -186,7 +186,7 @@
                     </li><!--//nav-item-->
                     <li class="nav-item ">
                         <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                        <a class="nav-link active" href="{% url 'order_list' %}">
+                        <a class="nav-link" href="{% url 'order_list' %}">
                             <span class="nav-icon svg-icon svg-icon-primary svg-icon-2x"><!--begin::Svg Icon | path:/var/www/preview.keenthemes.com/metronic/releases/2021-05-14-112058/theme/html/demo8/dist/../src/media/svg/icons/Shopping/Cart1.svg--><svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px"
@@ -204,10 +204,9 @@
                             <span class="nav-link-text">Pending Orders</span>
                         </a><!--//nav-link-->
                     </li><!--//nav-item-->
-
                     <li class="nav-item">
                         <!--//Bootstrap Icons: https://icons.getbootstrap.com/ -->
-                        <a class="nav-link" href="{% url 'inspection_list' %}">
+                        <a class="nav-link  active" href="{% url 'inspection_list' %}">
                             <span class="nav-icon">
                                 <svg width="1em" height="1em" viewBox="0 0 16 16"
                                     class="bi bi-house-door" fill="currentColor"
@@ -286,33 +285,35 @@
 											<thead>
 												<tr>
                                                     <th></th>
-													<th class="cell">Product</th>
+													<th class="cell">order</th>
 													<th class="cell">Supplier</th>
-													<th class="cell">Warehouse</th>
-													<th class="cell">Date</th>
-													<th class="cell">Quantity</th>
-													<th class="cell">Buying Price (₹)</th> <!-- Added Buying Price column -->
-													<th class="cell">Total Price (₹)</th> <!-- Added Total Price column -->
-													<th class="cell">Status</th>
+                                                    <th class="cell">Quantity</th>
+													<th class="cell">Packing Quality</th>
+													<th class="cell">Whether Box Tampered</th>
+													<th class="cell">Whether packing is safe</th>
+													<th class="cell">Whether Seal Tampered</th>
+													<th class="cell">Shipping Quality</th>
+                                                    <th class="cell">Status</th>
 													<th class="cell"></th>
 												</tr>
 											</thead>
 											<tbody>
-                                                {% for order in page %}
+                                                {% for inspection in page %}
                                                 <tr class="order-row">
                                                     <td class="cell">
-                                                        <input type="hidden" class="order-checkbox" data-order-id="{{ order.order_id }}">
+                                                        <input type="hidden" class="order-checkbox" data-order-id="{{ inspection.id }}">
                                                     </td>
-                                                    <td class="cell order-name"><span class="truncate">{{ order.product }}</span></td>
-                                                    <td class="cell">{{ order.supplier }}</td>
-                                                    <td class="cell">{{ order.warehouse }}</td>
-                                                    <td class="cell">{{ order.order_datetime }}</td>
-                                                    <td class="cell">{{ order.quantity }}</td>
-                                                    <td class="cell">{{ order.buying_price }}</td>
-                                                    <td class="cell">{{ order.total_price }}</td>
-                                                    <td class="cell">{{ order.order_status }}</td>
+                                                    <td class="cell order-name"><span class="truncate">{{ inspection.order.product }}</span></td>
+                                                    <td class="cell">{{ inspection.order.supplier }}</td>
+                                                    <td class="cell">{{ inspection.order.quantity }}</td>
+                                                    <td class="cell">{{ inspection.packing_quality }}/5</td>
+                                                    <td class="cell">{{ inspection.box_tampered }}</td>
+                                                    <td class="cell">{{ inspection.product_packing_safe }}</td>
+                                                    <td class="cell">{{ inspection.seal_tampered }}</td>
+                                                    <td class="cell">{{ inspection.shipping_quality }}/5</td>
+                                                    <td class="cell">{{ inspection.quality_check_status }}</td>
                                                     <td class="cell">
-                                                        <button class="btn btn-danger text-white inspect-order" data-order-id="{{ order.order_id }}">Inspect</button>
+                                                        <button class="btn btn-danger text-white inspect-order" data-order-id="{{ inspection.id }}">Print report</button>
                                                     </td>
                                                 </tr>
                                                 {% endfor %}
@@ -327,87 +328,25 @@
 					</div>
 				</div>
 				
-			
 
 
-                <!-- Add a hidden form for inspection -->
-<div class="popup" id="inspection-form">
-    <h2>Inspection Form</h2>
-    <form id="inspection-form-content">
-        {% csrf_token %}
-        <input type="hidden" id="order-id" name="order_id" value="">
-        <label for="packing-quality">Packing Quality:</label>
-        <select id="packing-quality" name="packing_quality">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-        </select><br><br>
-        <label for="box-tampered">Box Tampered:</label>
-        <select id="box-tampered" name="box_tampered">
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-        </select><br><br>
-        <label for="product-packing-safe">Product Packing Safe:</label>
-        <select id="product-packing-safe" name="product_packing_safe">
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-        </select><br><br>
-        <label for="seal-tampered">Seal Tampered:</label>
-        <select id="seal-tampered" name="seal_tampered">
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-        </select><br><br>
-        <label for="shipping-quality">Overall Shipping Quality:</label>
-        <select id="shipping-quality" name="shipping_quality">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-        </select><br><br>
-        <input type="submit" value="Submit">
-    </form>
-</div>
-
-<script>
-    $(document).ready(function(){
-        $(".order-row button").click(function(){
-            var orderId = $(this).closest('tr').find('.order-checkbox').data('order-id');
-
-            $("#order-id").val(orderId);
-            $("#inspection-form").show();
-        });
-
-        $("#inspection-form-content").submit(function(e) {
-            e.preventDefault(); // Prevent the form from submitting normally
-            
-            // Serialize the form data including the order ID
-            var formData = $(this).serialize();
-
-            // Get the order ID from the hidden input
-            var orderId =document.getElementById('order-id').value;
-            // Submit the form data via AJAX
-            $.ajax({
-                type: "POST",
-                url: `/save_inspection/${orderId}/`, // Pass the order ID dynamically
-                data: formData,
-                success: function(response) {
-                    // Handle success response
-                    console.log(response);
-                    $("#inspection-form").hide(); // Hide the form after successful submission
-                    alert("Inspection saved successfully.");
-                },
-                error: function(xhr, status, error) {
-                    // Handle error response
-                    console.error(xhr.responseText);
-                    alert("An error occurred while saving the inspection.");
-                }
-            });
-        });
-    });
-</script>
+                <script>
+                    $(document).ready(function() {
+                    
+                        const viewInspectButtons = document.querySelectorAll('.inspect-order');
+        
+                        viewInspectButtons.forEach(button => {
+                            button.addEventListener('click', function () {
+                                const orderId = this.getAttribute('data-order-id');
+                                const url = `/print_inspection_report/${orderId}/`; // Replace with your actual URL
+                                
+                                // You can use any method to navigate to the URL, for example, window.location.href
+                                window.location.href = url;
+                            });
+                        });
+                    });
+                </script>
+                
 
 
 
