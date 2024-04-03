@@ -118,6 +118,21 @@
 			color: #007BFF;
 		}
 		
+
+            #inspection-form-content button[type="button"] {
+                background-color: #ccc; /* Background color */
+                border: none; /* Remove border */
+                color: #fff; /* Text color */
+                padding: 10px 20px; /* Padding */
+                cursor: pointer; /* Cursor style */
+                border-radius: 5px; /* Rounded corners */
+            }
+        
+            #inspection-form-content button[type="button"]:hover {
+                background-color: #aaa; /* Darker background color on hover */
+            }
+
+        
     </style>
 
 </head> 
@@ -331,83 +346,90 @@
 
 
                 <!-- Add a hidden form for inspection -->
-<div class="popup" id="inspection-form">
-    <h2>Inspection Form</h2>
-    <form id="inspection-form-content">
-        {% csrf_token %}
-        <input type="hidden" id="order-id" name="order_id" value="">
-        <label for="packing-quality">Packing Quality:</label>
-        <select id="packing-quality" name="packing_quality">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-        </select><br><br>
-        <label for="box-tampered">Box Tampered:</label>
-        <select id="box-tampered" name="box_tampered">
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-        </select><br><br>
-        <label for="product-packing-safe">Product Packing Safe:</label>
-        <select id="product-packing-safe" name="product_packing_safe">
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-        </select><br><br>
-        <label for="seal-tampered">Seal Tampered:</label>
-        <select id="seal-tampered" name="seal_tampered">
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-        </select><br><br>
-        <label for="shipping-quality">Overall Shipping Quality:</label>
-        <select id="shipping-quality" name="shipping_quality">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-        </select><br><br>
-        <input type="submit" value="Submit">
-    </form>
-</div>
+                <div class="popup" id="inspection-form">
+                    <h2>Inspection Form</h2>
+                    <form id="inspection-form-content">
+                        {% csrf_token %}
+                        <input type="hidden" id="order-id" name="order_id" value="">
+                        <label for="packing-quality">Packing Quality:</label>
+                        <select id="packing-quality" name="packing_quality">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select><br><br>
+                        <label for="box-tampered">Box Tampered:</label>
+                        <select id="box-tampered" name="box_tampered">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select><br><br>
+                        <label for="product-packing-safe">Product Packing Safe:</label>
+                        <select id="product-packing-safe" name="product_packing_safe">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select><br><br>
+                        <label for="seal-tampered">Seal Tampered:</label>
+                        <select id="seal-tampered" name="seal_tampered">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select><br><br>
+                        <label for="shipping-quality">Overall Shipping Quality:</label>
+                        <select id="shipping-quality" name="shipping_quality">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select><br><br>
+                        <input type="submit" value="Submit">
+                        <button type="button" onclick="window.location.reload();">Cancel</button>
+                    </form>
+                </div>
+                
 
-<script>
-    $(document).ready(function(){
-        $(".order-row button").click(function(){
-            var orderId = $(this).closest('tr').find('.order-checkbox').data('order-id');
-
-            $("#order-id").val(orderId);
-            $("#inspection-form").show();
-        });
-
-        $("#inspection-form-content").submit(function(e) {
-            e.preventDefault(); // Prevent the form from submitting normally
-            
-            // Serialize the form data including the order ID
-            var formData = $(this).serialize();
-
-            // Get the order ID from the hidden input
-            var orderId =document.getElementById('order-id').value;
-            // Submit the form data via AJAX
-            $.ajax({
-                type: "POST",
-                url: `/save_inspection/${orderId}/`, // Pass the order ID dynamically
-                data: formData,
-                success: function(response) {
-                    // Handle success response
-                    console.log(response);
-                    $("#inspection-form").hide(); // Hide the form after successful submission
-                    alert("Inspection saved successfully.");
-                },
-                error: function(xhr, status, error) {
-                    // Handle error response
-                    console.error(xhr.responseText);
-                    alert("An error occurred while saving the inspection.");
-                }
-            });
-        });
-    });
-</script>
+                <script>
+                    $(document).ready(function(){
+                        $(".order-row button").click(function(){
+                            var orderId = $(this).closest('tr').find('.order-checkbox').data('order-id');
+                
+                            $("#order-id").val(orderId);
+                            $("#inspection-form").show();
+                        });
+                
+                        $("#inspection-form-content").submit(function(e) {
+                            e.preventDefault(); // Prevent the form from submitting normally
+                            
+                            // Serialize the form data including the order ID
+                            var formData = $(this).serialize();
+                
+                            // Get the order ID from the hidden input
+                            var orderId =document.getElementById('order-id').value;
+                            // Submit the form data via AJAX
+                            $.ajax({
+                                type: "POST",
+                                url: `/save_inspection/${orderId}/`, // Pass the order ID dynamically
+                                data: formData,
+                                success: function(response) {
+                                    // Handle success response
+                                    console.log(response);
+                                    $("#inspection-form").hide(); // Hide the form after successful submission
+                                    alert("Inspection saved successfully.", function() {
+                                        window.location.reload(); // Refresh the page after clicking OK in the alert
+                                    });
+                                },
+                                error: function(xhr, status, error) {
+                                    // Handle error response
+                                    console.error(xhr.responseText);
+                                    alert("An error occurred while saving the inspection.", function() {
+                                        window.location.reload(); // Refresh the page after clicking OK in the alert
+                                    });
+                                }
+                            });
+                        });
+                    });
+                </script>
+                
 
 
 
